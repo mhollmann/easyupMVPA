@@ -1,0 +1,159 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of doLinearDetrending</title>
+  <meta name="keywords" content="doLinearDetrending">
+  <meta name="description" content="Removes linear trends in sample dimension (i.e. per voxel over samples in fMRI-time series).">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">easyupMVPA</a> &gt; doLinearDetrending.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for easyupMVPA&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>doLinearDetrending
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Removes linear trends in sample dimension (i.e. per voxel over samples in fMRI-time series).</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [dataset] = doLinearDetrending(dataset, breakpoints) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Removes linear trends in sample dimension (i.e. per voxel over samples in fMRI-time series). 
+
+ Author: Maurice Hollmann
+ Date  : 08/10
+
+ Description:
+
+   [dataset] = doLinearDetrending(dataset, [breakpoints])
+
+   This method does a linear Detrending of the data. Every 3D element is processed for itself.
+   Fitting is done by a least squares fit of a linear function. The mean of the timecourse is
+   again added at the end of  the algorithm.
+
+   Usage of breakpoints: 
+   If i.e. your dataset is from 2 different runs (distinct in time) set a breakpoint at the
+   end of session 1 (i.e. sample 100) and at the begining of session 2 (i.e. sample 101):  
+   [ds] = doLinearDetrending(ds, [100 101]);
+                         
+
+ Parameters:
+   dataset     - the dataset to detrend
+   breakpoints - [optional] scalar or vector of breakpoints in signal i.e. if two independent datasets are combined
+
+ Returns:
+   dataset    - the detrended datset
+
+ Comments:</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="easyupMVPA_getGlobals.html" class="code" title="function [propertyValue] = easyupMVPA_getGlobals(propertyName)">easyupMVPA_getGlobals</a>	Returns values for global properties in the toolbox.</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% Removes linear trends in sample dimension (i.e. per voxel over samples in fMRI-time series).</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% Author: Maurice Hollmann</span>
+0004 <span class="comment">% Date  : 08/10</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% Description:</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%   [dataset] = doLinearDetrending(dataset, [breakpoints])</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%   This method does a linear Detrending of the data. Every 3D element is processed for itself.</span>
+0011 <span class="comment">%   Fitting is done by a least squares fit of a linear function. The mean of the timecourse is</span>
+0012 <span class="comment">%   again added at the end of  the algorithm.</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">%   Usage of breakpoints:</span>
+0015 <span class="comment">%   If i.e. your dataset is from 2 different runs (distinct in time) set a breakpoint at the</span>
+0016 <span class="comment">%   end of session 1 (i.e. sample 100) and at the begining of session 2 (i.e. sample 101):</span>
+0017 <span class="comment">%   [ds] = doLinearDetrending(ds, [100 101]);</span>
+0018 <span class="comment">%</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">% Parameters:</span>
+0021 <span class="comment">%   dataset     - the dataset to detrend</span>
+0022 <span class="comment">%   breakpoints - [optional] scalar or vector of breakpoints in signal i.e. if two independent datasets are combined</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">% Returns:</span>
+0025 <span class="comment">%   dataset    - the detrended datset</span>
+0026 <span class="comment">%</span>
+0027 <span class="comment">% Comments:</span>
+0028 <span class="comment">%</span>
+0029 <a name="_sub0" href="#_subfunctions" class="code">function [dataset] = doLinearDetrending(dataset, breakpoints)</a>
+0030   
+0031   <span class="keyword">if</span>(~exist(<span class="string">'dataset'</span>,<span class="string">'var'</span>))
+0032     error(<span class="string">'Usage of doLinearDetrending: [dataset] = doLinearDetrending(dataset, breakpoints [optional - scalar or vector of breaks in signal])'</span>);
+0033   <span class="keyword">end</span>
+0034   
+0035   <span class="keyword">if</span>(exist(<span class="string">'breakpoints'</span>,<span class="string">'var'</span>) &amp;&amp; ~isnumeric(breakpoints))
+0036     error(<span class="string">'Usage of doLinearDetrending: [dataset] = doLinearDetrending(dataset, breakpoints [optional - scalar or vector of breaks in signal])'</span>);
+0037   <span class="keyword">end</span>
+0038   
+0039   <span class="keyword">if</span>(dataset.is4D)
+0040     sizeData = size(dataset.data);
+0041     data2D   = reshape(dataset.data, sizeData(1)*sizeData(2)*sizeData(3),sizeData(4));
+0042   <span class="keyword">elseif</span>(dataset.is2D)
+0043     sizeData = size(dataset.data);
+0044     data2D  = dataset.data;
+0045   <span class="keyword">end</span>
+0046   
+0047   
+0048   <span class="keyword">if</span>(~<a href="easyupMVPA_getGlobals.html" class="code" title="function [propertyValue] = easyupMVPA_getGlobals(propertyName)">easyupMVPA_getGlobals</a>(<span class="string">'quietMode'</span>))
+0049     disp(<span class="string">'Running linear detrending. Please wait ...'</span>);
+0050   <span class="keyword">end</span>
+0051   
+0052   tic;
+0053   <span class="keyword">if</span>(~strcmp(class(data2D), <span class="string">'single'</span>) )
+0054    data2D = single(data2D);
+0055   <span class="keyword">end</span>
+0056   
+0057   <span class="comment">%calculate the mean for adding it afterwards again</span>
+0058   meanData2D = mean(data2D,2);
+0059   
+0060   <span class="keyword">if</span>(exist(<span class="string">'breakpoints'</span>,<span class="string">'var'</span>))
+0061     data2D = detrend(data2D', <span class="string">'linear'</span>, breakpoints)';
+0062   <span class="keyword">else</span>
+0063     data2D = detrend(data2D', <span class="string">'linear'</span>)';
+0064   <span class="keyword">end</span>
+0065   
+0066   <span class="comment">%add the mean again</span>
+0067   <span class="keyword">if</span>(dataset.is4D)
+0068     meanData3D = reshape(meanData2D, sizeData(1),sizeData(2),sizeData(3));
+0069     dataset.data = reshape(data2D, sizeData(1), sizeData(2), sizeData(3), sizeData(4));
+0070     <span class="keyword">for</span> i=1:sizeData(4)
+0071       dataset.data(:,:,:,i) = dataset.data(:,:,:,i)+meanData3D;
+0072     <span class="keyword">end</span>
+0073   <span class="keyword">elseif</span>(dataset.is2D)
+0074     dataset.data = data2D;
+0075     <span class="keyword">for</span> i=1:sizeData(2)
+0076       dataset.data(:,i) = dataset.data(:,i)+meanData2D;
+0077     <span class="keyword">end</span>
+0078   <span class="keyword">end</span>
+0079   
+0080   t = toc;
+0081   
+0082   <span class="keyword">if</span>(~<a href="easyupMVPA_getGlobals.html" class="code" title="function [propertyValue] = easyupMVPA_getGlobals(propertyName)">easyupMVPA_getGlobals</a>(<span class="string">'quietMode'</span>))
+0083     disp([<span class="string">'Done linear detrending (Time needed was: '</span>,num2str(t), <span class="string">' sec).'</span>]);
+0084   <span class="keyword">end</span>
+0085   
+0086 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Tue 12-Apr-2011 12:12:55 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

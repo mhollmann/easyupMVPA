@@ -1,0 +1,14 @@
+#ignore xcode user specific settings
+
+
+
+#ignore temp files
+*~
+*.asv
+*.swp
+*.DS_STORE
+.DS_Store
+
+
+#ignore directories
+

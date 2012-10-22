@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getEmpty4DDataset</title>
+  <meta name="keywords" content="getEmpty4DDataset">
+  <meta name="description" content="Returns an empty 4D dataset (i.e. for fMRI-data).">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">easyupMVPA</a> &gt; getEmpty4DDataset.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for easyupMVPA&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>getEmpty4DDataset
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Returns an empty 4D dataset (i.e. for fMRI-data).</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [dataset] = getEmpty4DDataset() </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Returns an empty 4D dataset (i.e. for fMRI-data).
+
+ Author: Maurice Hollmann
+ Date  : 08/07
+
+ Description:
+
+   [dataset] = getEmpty4DDataset()
+
+   Returns an empty 4D dataset (i.e. for fMRI-data) , that can be &quot;filled&quot; with content:
+   This is aequivalent to getEmpty2DDataset() in 2D case (i.e. eeg data). 
+
+   Returned sructure:
+
+   dataset.type                  = 'dataset4D';
+   dataset.is4D = true;
+   dataset.is2D = false;
+   dataset.dataFilelist          = [];
+   dataset.data                  = [];
+   dataset.chunks                = [];
+   dataset.classIDs              = [];
+   dataset.mask                  = [];
+   dataset.featureSelectionMap   = [];
+   dataset.data_3DNiftiHdr       = [];
+
+ Parameters:
+
+ Returns:
+
+   dataset          -&gt; empty dataset
+
+ Comments:</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="splitDataset.html" class="code" title="function [dataset1, dataset2] = splitDataset(dataset, vectorDS1, vectorDS2)">splitDataset</a>	Splits a dataset by selecting the elements defined by given vectors for the two result datasets.</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% Returns an empty 4D dataset (i.e. for fMRI-data).</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% Author: Maurice Hollmann</span>
+0004 <span class="comment">% Date  : 08/07</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% Description:</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%   [dataset] = getEmpty4DDataset()</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%   Returns an empty 4D dataset (i.e. for fMRI-data) , that can be &quot;filled&quot; with content:</span>
+0011 <span class="comment">%   This is aequivalent to getEmpty2DDataset() in 2D case (i.e. eeg data).</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">%   Returned sructure:</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">%   dataset.type                  = 'dataset4D';</span>
+0016 <span class="comment">%   dataset.is4D = true;</span>
+0017 <span class="comment">%   dataset.is2D = false;</span>
+0018 <span class="comment">%   dataset.dataFilelist          = [];</span>
+0019 <span class="comment">%   dataset.data                  = [];</span>
+0020 <span class="comment">%   dataset.chunks                = [];</span>
+0021 <span class="comment">%   dataset.classIDs              = [];</span>
+0022 <span class="comment">%   dataset.mask                  = [];</span>
+0023 <span class="comment">%   dataset.featureSelectionMap   = [];</span>
+0024 <span class="comment">%   dataset.data_3DNiftiHdr       = [];</span>
+0025 <span class="comment">%</span>
+0026 <span class="comment">% Parameters:</span>
+0027 <span class="comment">%</span>
+0028 <span class="comment">% Returns:</span>
+0029 <span class="comment">%</span>
+0030 <span class="comment">%   dataset          -&gt; empty dataset</span>
+0031 <span class="comment">%</span>
+0032 <span class="comment">% Comments:</span>
+0033 <span class="comment">%</span>
+0034 <a name="_sub0" href="#_subfunctions" class="code">function [dataset] = getEmpty4DDataset()</a>
+0035 
+0036   dataset = {};
+0037   
+0038   dataset.type = <span class="string">'dataset4D'</span>;
+0039   dataset.is4D = true;
+0040   dataset.is2D = false;
+0041   
+0042   dataset.dataFilelist          = [];
+0043   dataset.data                  = [];
+0044   dataset.chunks                = [];
+0045   dataset.classIDs              = [];
+0046   dataset.mask                  = [];
+0047   dataset.featureSelectionMap   = [];
+0048   dataset.data_3DNiftiHdr       = [];
+0049   
+0050 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Tue 12-Apr-2011 12:12:55 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

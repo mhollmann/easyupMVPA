@@ -1,0 +1,18 @@
+
+
+Infos Test:
+
+1. kann es sein, dass in duration-files fuer jedes onset auch unbedingt eine duration stehen muss?
+  (in SPM geht ja auch eine Zahl wenn es fuer alle onsets gleich ist - um es den Nutzern die moeglichkeit 
+   zu geben ihre spm duration files zu nutzen sollte dies auch in der Toolbox so sein...)
+
+    -> das macht das quasi das feld 'samtrialdurations' ueberfluessig oder?
+
+2. BUG: wenn man als 'samtrialdurations' die laenge in sekunden angibt, weil das design in sekunden ist, wird in setDataset_chunks_classID_byconfigParameters
+        diese variable schon in scans umgerechnet bevor der duration vector erstellt wird. Der neu erstellte duration vektor wird dann jedoch 
+        auch nochmal von sekunden in scans umgerechnet, was am ende zu kurze durations ergibt...
+
+3. Mich verwirrt es etwas, wenn es keine Fortschritts-anzeige gibt. 
+
+
+

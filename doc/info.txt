@@ -1,0 +1,22 @@
+Author: M. Hollmann
+
+call of m2html:
+
+
+
+2DO:
+----
+
+110328:
+- 2Do easyup MVPA :  
+
+  - bootstrapping implementierung klaeren...
+
+  - RFE SVM kann immens beschleunigt werden - call fast 2D LOOCV!!!
+
+
+
+Future Ideas:
+--------------
+- Stability of features selected in every LOOCV run is to be estimated ...
+- Zscoring in beiden Dimensionen (ueber rows o. ueber time) zulassen

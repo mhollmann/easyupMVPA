@@ -1,0 +1,155 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of averageFeaturesInROIs</title>
+  <meta name="keywords" content="averageFeaturesInROIs">
+  <meta name="description" content="Set the mask (1D or 3D) field of a dataset by a given matrix.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">easyupMVPA</a> &gt; averageFeaturesInROIs.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for easyupMVPA&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>averageFeaturesInROIs
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Set the mask (1D or 3D) field of a dataset by a given matrix.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [dataset, dataset2D] = averageFeaturesInROIs(dataset, roiMap) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Set the mask (1D or 3D) field of a dataset by a given matrix.
+
+ Author: Maurice Hollmann
+ Date  : 08/10
+
+ [dataset] = averageFeaturesInROIs(dataset, roiMap)
+
+ Description:
+   Averages the features according to given roiMap. The number of samples is not
+   influenced. The number of feature space dimensions is reduced to the number of 
+   unique indices in the given roiMap.
+
+
+ Parameters:
+   dataset   - the original datset
+   roiMap    - 1D or 3D matrix with integers (0=Background, 1=roi1, 2= roi2, ...)
+
+ Returns:
+   dataset   - the original input dataset
+   dataset2D - a 2D dataset with feature values representing the average signal of rois
+
+ Comments:</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getEmpty2DDataset.html" class="code" title="function [dataset] = getEmpty2DDataset()">getEmpty2DDataset</a>	Returns an empty 2D dataset (i.e. for EEG-data).</li><li><a href="printDatasetInfo.html" class="code" title="function printDatasetInfo(dataset)">printDatasetInfo</a>	Prints the content of the dataset on the screen.</li><li><a href="setDataset_chunks_ByVector.html" class="code" title="function [dataset] = setDataset_chunks_ByVector(dataset, chunkVector)">setDataset_chunks_ByVector</a>	Set the chunks of a dataset by a given vector.</li><li><a href="setDataset_classIDs_ByVector.html" class="code" title="function [dataset] = setDataset_classIDs_ByVector(dataset, classIDsVector)">setDataset_classIDs_ByVector</a>	Set the class-IDs of a dataset by a given vector.</li><li><a href="setDataset_data_ByMatrix.html" class="code" title="function [dataset] = setDataset_data_ByMatrix(dataset, dataMatrix)">setDataset_data_ByMatrix</a>	Set the data field of a datasets by a given matrix.</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% Set the mask (1D or 3D) field of a dataset by a given matrix.</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% Author: Maurice Hollmann</span>
+0004 <span class="comment">% Date  : 08/10</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% [dataset] = averageFeaturesInROIs(dataset, roiMap)</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">% Description:</span>
+0009 <span class="comment">%   Averages the features according to given roiMap. The number of samples is not</span>
+0010 <span class="comment">%   influenced. The number of feature space dimensions is reduced to the number of</span>
+0011 <span class="comment">%   unique indices in the given roiMap.</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">% Parameters:</span>
+0015 <span class="comment">%   dataset   - the original datset</span>
+0016 <span class="comment">%   roiMap    - 1D or 3D matrix with integers (0=Background, 1=roi1, 2= roi2, ...)</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">% Returns:</span>
+0019 <span class="comment">%   dataset   - the original input dataset</span>
+0020 <span class="comment">%   dataset2D - a 2D dataset with feature values representing the average signal of rois</span>
+0021 <span class="comment">%</span>
+0022 <span class="comment">% Comments:</span>
+0023 <span class="comment">%</span>
+0024 <a name="_sub0" href="#_subfunctions" class="code">function [dataset, dataset2D] = averageFeaturesInROIs(dataset, roiMap)</a>
+0025 
+0026   sizeRoiMap = size(roiMap);
+0027 
+0028   <span class="comment">%4D dataset</span>
+0029   <span class="keyword">if</span>(dataset.is4D)
+0030     <span class="comment">%check dimensions</span>
+0031     sizeInputData = size(dataset.data);
+0032     <span class="keyword">if</span>(sizeInputData(1)~=sizeRoiMap(1) || sizeInputData(2)~=sizeRoiMap(2) || sizeInputData(3)~=sizeRoiMap(3))
+0033       error(<span class="string">'The dimensions of given roiMap (4D) do not fit the space of dataset.data!'</span>);
+0034     <span class="keyword">end</span>
+0035     
+0036     <span class="comment">%variable featureData is 2D: [nmbFeatures, nmbSamples]</span>
+0037     featureData = reshape(dataset.data, sizeInputData(1)*sizeInputData(2)*sizeInputData(3),sizeInputData(4));
+0038     
+0039   <span class="keyword">elseif</span>(dataset.is2D)
+0040     <span class="comment">%check dimensions</span>
+0041     sizeInputData = size(dataset.data);
+0042     <span class="keyword">if</span>(sizeInputData(1)~= length(sizeRoiMap))
+0043       error(<span class="string">'The given roiMap (1D) does not fit the nmb of features in dataset.data!'</span>);
+0044     <span class="keyword">end</span>
+0045     
+0046     <span class="comment">%variable featureData is 2D: [nmbFeatures, nmbSamples]</span>
+0047     featureData = dataset.data;
+0048     
+0049   <span class="keyword">end</span>
+0050   
+0051   <span class="comment">%reshape roiMap to 2D</span>
+0052   roiMap  = reshape(roiMap, sizeRoiMap(1)*sizeRoiMap(2)*sizeRoiMap(3), 1);  
+0053   
+0054   <span class="comment">%extract number of ROIs in dataset</span>
+0055   roiLabels = unique(roiMap(:));
+0056   
+0057   nmbROIs = numel(roiLabels)-1;
+0058   disp(<span class="string">'Number of ROIs:'</span>);
+0059   disp(nmbROIs);
+0060   
+0061   newFeatureData = zeros(nmbROIs, sizeInputData(end));
+0062   roiIndex = 1;
+0063   
+0064   <span class="comment">%loop over roi indices</span>
+0065   <span class="keyword">for</span> i=1:numel(roiLabels)
+0066     
+0067     <span class="keyword">if</span>(roiLabels(i)~=0)
+0068       <span class="comment">%select all elements with given roi index</span>
+0069       tmpArr = featureData(roiMap==roiLabels(i),:);
+0070       newFeatureData(roiIndex, :) = mean(tmpArr);
+0071       roiIndex = roiIndex+1;
+0072     <span class="keyword">end</span>
+0073     
+0074   <span class="keyword">end</span>
+0075   
+0076   <span class="comment">%this one will be returned</span>
+0077   dataset2D = <a href="getEmpty2DDataset.html" class="code" title="function [dataset] = getEmpty2DDataset()">getEmpty2DDataset</a>();
+0078   dataset2D = <a href="setDataset_chunks_ByVector.html" class="code" title="function [dataset] = setDataset_chunks_ByVector(dataset, chunkVector)">setDataset_chunks_ByVector</a>(dataset2D, dataset.chunks);
+0079   dataset2D = <a href="setDataset_classIDs_ByVector.html" class="code" title="function [dataset] = setDataset_classIDs_ByVector(dataset, classIDsVector)">setDataset_classIDs_ByVector</a>(dataset2D, dataset.classIDs);
+0080   dataset2D = <a href="setDataset_data_ByMatrix.html" class="code" title="function [dataset] = setDataset_data_ByMatrix(dataset, dataMatrix)">setDataset_data_ByMatrix</a>(dataset2D, newFeatureData);
+0081   
+0082   <a href="printDatasetInfo.html" class="code" title="function printDatasetInfo(dataset)">printDatasetInfo</a>(dataset2D);
+0083    
+0084 <span class="keyword">end</span>
+0085 
+0086 
+0087</pre></div>
+<hr><address>Generated on Tue 12-Apr-2011 12:12:55 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

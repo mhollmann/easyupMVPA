@@ -1,0 +1,345 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of doLeaveOneOutCrossValidation_SVM</title>
+  <meta name="keywords" content="doLeaveOneOutCrossValidation_SVM">
+  <meta name="description" content="Implements a Leave One Out Cross Validation (LOOCV) using a Support Vector Machine Classifier (parallel execution).">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">easyupMVPA</a> &gt; doLeaveOneOutCrossValidation_SVM.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for easyupMVPA&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>doLeaveOneOutCrossValidation_SVM
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Implements a Leave One Out Cross Validation (LOOCV) using a Support Vector Machine Classifier (parallel execution).</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [dataset, resultStruct, avgWeights] = doLeaveOneOutCrossValidation_SVM(dataset, dataSplitter, kernelMode, costParam, paramStruct) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Implements a Leave One Out Cross Validation (LOOCV) using a Support Vector Machine Classifier (parallel execution).
+
+ Author: Maurice Hollmann
+ Date  : 08/10
+
+ Description:
+
+   [dataset, resultStruct, avgWeights] = doLeaveOneOutCrossValidation_SVM(dataset, dataSplitter, kernelMode, costParam, [paramStruct])
+
+   This highlevel function does the Leave One Out Cross Validation (LOOCV) of a complete dataset(DS) using a Support Vector Machine.
+   LOOCV means a repeated classification in the dataset to get a general performance measure.
+   Which samples are used in every repetition as training and testing set is described in the given dataSplitter-struct.
+
+   For a &quot;oneSampleOut&quot;-splitter LOOCV means that for every single sample in DS the DS without this sample is trained and the test is 
+   done on the excluded sample. This means the classifier is trained n times for n samples, which may be very time consuming.
+
+   In every new training the weights used in the model are saved and the function returns the average weights of all single models trained.
+
+   Explanation of resultStruct fields:
+   Accuracy:    Percentual value of correct predictions (correct * 100 / nmbSamples)
+   Sensitivity: TP/TP+FN (Proportion of true positives to all positives)
+   Specificity: TN/TN+FP (Proportion of true negatives to all negatives)
+
+   If possible, the function executes parallelized depending on settings defined via easyupMVPA_init().
+
+
+ Parameters:
+   dataset        - The dataset to work on  (all samples are included in LOOCV)
+   dataSplitter   - describes the splitting of the data in LOOCV
+   kernelMode     - Kernels: ['linear', 'polynomial', 'radial', 'sigmoid']
+   costParam      - The slack variable C in SVM (range 0 to 1  0 = low cost, 1 = highest costs). 
+                    It defines the costs for misclassification (How strongly are outliers punished?).
+   paramStruct    - [optional] - i.e. {&quot;degree&quot;, 3}
+
+
+ Returns:
+   dataset        - the datset that has been the input 
+   resultStruct   - The struct holding the classification results: 
+                    resultStruct.nmbTests     (the number of samples tested for this result)
+                    resultStruct.accuracy     (percentual value of correct predictions (correct * 100 / nmbSamples))
+                    resultStruct.sensitivity  (TP/TP+FN = Proportion of true positives to all positives)
+                    resultStruct.specificity  (TN/TN+FP = Proportion of true negatives to all negatives)
+                    resultStruct.TP           (True positives = all correct predicted in class 1)
+                    resultStruct.TN           (True negatives = all correct predicted in class 2)
+                    resultStruct.FP           (False positives = all incorrect predicted in class 1)
+                    resultStruct.FN           (False negatives = all incorrect predicted in class 2)
+   avgWeights    - a 3D or 1D map containing the average weights used in the LOOCV (See Description of this function)
+
+
+ Comments:</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="easyupMVPA_getGlobals.html" class="code" title="function [propertyValue] = easyupMVPA_getGlobals(propertyName)">easyupMVPA_getGlobals</a>	Returns values for global properties in the toolbox.</li><li><a href="selectFeaturesBySelectionMap.html" class="code" title="function [dataset, data2D] = selectFeaturesBySelectionMap(dataset)">selectFeaturesBySelectionMap</a>	Apply a featureSelection map that is stored in a dataset to this dataset.</li><li><a href="setDataset_featureSelectionMap_ByMatrix.html" class="code" title="function [dataset] = setDataset_featureSelectionMap_ByMatrix(dataset, mapMatrix)">setDataset_featureSelectionMap_ByMatrix</a>	Set the featureSelectionMap (1D or 3D) field of a dataset by a given matrix.</li><li><a href="splitDataset.html" class="code" title="function [dataset1, dataset2] = splitDataset(dataset, vectorDS1, vectorDS2)">splitDataset</a>	Splits a dataset by selecting the elements defined by given vectors for the two result datasets.</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="doRecursiveFeatureElemination_SVM_nestedLOOCV.html" class="code" title="function [dataset, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = doRecursiveFeatureElemination_SVM_nestedLOOCV(dataset, nmbIterations, thresholdPercentOfFeaturesOut, nmbSplitsLOOCV, dataSplitter, kernelMode, costParam, paramStruct)">doRecursiveFeatureElemination_SVM_nestedLOOCV</a>	! DEPRECATED ! Recursively removes features according to SVM classification weights from LOOCV.</li><li><a href="doRecursiveFeatureElemination_bootStrap_SVM.html" class="code" title="function [dataset, resultStruct] = doRecursiveFeatureElemination_bootStrap_SVM(dataset, nmbBootSteps)">doRecursiveFeatureElemination_bootStrap_SVM</a>	(UNDER CONSTRUCTION) Recursively removes features according to SVM classification weights obtained by bootstrapping.</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function [ds, maskedData2D] = member_getMasked2DData_from4D(ds)</a></li><li><a href="#_sub2" class="code">function [ds, maskedData2D] = member_getMasked2DData_from2D(ds)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% Implements a Leave One Out Cross Validation (LOOCV) using a Support Vector Machine Classifier (parallel execution).</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% Author: Maurice Hollmann</span>
+0004 <span class="comment">% Date  : 08/10</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% Description:</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%   [dataset, resultStruct, avgWeights] = doLeaveOneOutCrossValidation_SVM(dataset, dataSplitter, kernelMode, costParam, [paramStruct])</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%   This highlevel function does the Leave One Out Cross Validation (LOOCV) of a complete dataset(DS) using a Support Vector Machine.</span>
+0011 <span class="comment">%   LOOCV means a repeated classification in the dataset to get a general performance measure.</span>
+0012 <span class="comment">%   Which samples are used in every repetition as training and testing set is described in the given dataSplitter-struct.</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">%   For a &quot;oneSampleOut&quot;-splitter LOOCV means that for every single sample in DS the DS without this sample is trained and the test is</span>
+0015 <span class="comment">%   done on the excluded sample. This means the classifier is trained n times for n samples, which may be very time consuming.</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">%   In every new training the weights used in the model are saved and the function returns the average weights of all single models trained.</span>
+0018 <span class="comment">%</span>
+0019 <span class="comment">%   Explanation of resultStruct fields:</span>
+0020 <span class="comment">%   Accuracy:    Percentual value of correct predictions (correct * 100 / nmbSamples)</span>
+0021 <span class="comment">%   Sensitivity: TP/TP+FN (Proportion of true positives to all positives)</span>
+0022 <span class="comment">%   Specificity: TN/TN+FP (Proportion of true negatives to all negatives)</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">%   If possible, the function executes parallelized depending on settings defined via easyupMVPA_init().</span>
+0025 <span class="comment">%</span>
+0026 <span class="comment">%</span>
+0027 <span class="comment">% Parameters:</span>
+0028 <span class="comment">%   dataset        - The dataset to work on  (all samples are included in LOOCV)</span>
+0029 <span class="comment">%   dataSplitter   - describes the splitting of the data in LOOCV</span>
+0030 <span class="comment">%   kernelMode     - Kernels: ['linear', 'polynomial', 'radial', 'sigmoid']</span>
+0031 <span class="comment">%   costParam      - The slack variable C in SVM (range 0 to 1  0 = low cost, 1 = highest costs).</span>
+0032 <span class="comment">%                    It defines the costs for misclassification (How strongly are outliers punished?).</span>
+0033 <span class="comment">%   paramStruct    - [optional] - i.e. {&quot;degree&quot;, 3}</span>
+0034 <span class="comment">%</span>
+0035 <span class="comment">%</span>
+0036 <span class="comment">% Returns:</span>
+0037 <span class="comment">%   dataset        - the datset that has been the input</span>
+0038 <span class="comment">%   resultStruct   - The struct holding the classification results:</span>
+0039 <span class="comment">%                    resultStruct.nmbTests     (the number of samples tested for this result)</span>
+0040 <span class="comment">%                    resultStruct.accuracy     (percentual value of correct predictions (correct * 100 / nmbSamples))</span>
+0041 <span class="comment">%                    resultStruct.sensitivity  (TP/TP+FN = Proportion of true positives to all positives)</span>
+0042 <span class="comment">%                    resultStruct.specificity  (TN/TN+FP = Proportion of true negatives to all negatives)</span>
+0043 <span class="comment">%                    resultStruct.TP           (True positives = all correct predicted in class 1)</span>
+0044 <span class="comment">%                    resultStruct.TN           (True negatives = all correct predicted in class 2)</span>
+0045 <span class="comment">%                    resultStruct.FP           (False positives = all incorrect predicted in class 1)</span>
+0046 <span class="comment">%                    resultStruct.FN           (False negatives = all incorrect predicted in class 2)</span>
+0047 <span class="comment">%   avgWeights    - a 3D or 1D map containing the average weights used in the LOOCV (See Description of this function)</span>
+0048 <span class="comment">%</span>
+0049 <span class="comment">%</span>
+0050 <span class="comment">% Comments:</span>
+0051 <span class="comment">%</span>
+0052 <a name="_sub0" href="#_subfunctions" class="code">function [dataset, resultStruct, avgWeights] = doLeaveOneOutCrossValidation_SVM(dataset, dataSplitter, kernelMode, costParam, paramStruct)</a>
+0053  
+0054 
+0055   <span class="keyword">if</span>( ~exist(<span class="string">'dataset'</span>,<span class="string">'var'</span>) || ~exist(<span class="string">'dataSplitter'</span>,<span class="string">'var'</span>) || ~exist(<span class="string">'kernelMode'</span>,<span class="string">'var'</span>) || ~exist(<span class="string">'costParam'</span>,<span class="string">'var'</span>)) 
+0056     error(<span class="string">'Usage of doLeaveOneOutCrossValidation_SVM: [dataset, classificationResult] = doLeaveOneOutCrossValidation_SVM(dataset, dataSplitter, kernelMode - [linear, polynomial, radial, sigmoid] , costParam [0-1], paramStruct [optional - i.e. {&quot;degree&quot;, 3}])'</span>);
+0057   <span class="keyword">end</span>
+0058   
+0059   <span class="comment">%extractt the SVM parameter values from paramStruct</span>
+0060   <span class="keyword">if</span>( ~exist(<span class="string">'paramStruct'</span>,<span class="string">'var'</span>))
+0061     [paramStructIsValid, svmParamInfoStruct, cmdString] = getSVMParamInfo(kernelMode, costParam, {});
+0062   <span class="keyword">else</span>
+0063     [paramStructIsValid, svmParamInfoStruct, cmdString] = getSVMParamInfo(kernelMode, costParam, paramStruct);
+0064   <span class="keyword">end</span>
+0065   <span class="keyword">if</span>( ~paramStructIsValid)
+0066     error(<span class="string">'Usage of doLeaveOneOutCrossValidation_SVM: [dataset, classificationResult] = doLeaveOneOutCrossValidation_SVM(dataset, dataSplitter, kernelMode - [linear, polynomial, radial, sigmoid] , costParam [0-1], paramStruct [optional - i.e. {&quot;degree&quot;, 3}])'</span>);
+0067   <span class="keyword">end</span>
+0068   
+0069  
+0070   
+0071   <span class="comment">%use quiet mode (no outputs)</span>
+0072   cmdString = [cmdString, <span class="string">' -q '</span>];
+0073   
+0074    <span class="keyword">if</span>(dataset.is4D)
+0075      sizeData   = size(dataset.data);
+0076      avgWeights = zeros(sizeData(1),sizeData(2),sizeData(3),1);
+0077      tmpWeightsSize = [sizeData(1),sizeData(2),sizeData(3),1];
+0078    <span class="keyword">elseif</span>(dataset.is2D)
+0079      sizeData   = size(dataset.data);
+0080      avgWeights = zeros(sizeData(1),1);
+0081      tmpWeightsSize = [sizeData(1),1];
+0082    <span class="keyword">else</span>
+0083     error(<span class="string">'LOOCV: Please check the dataset: field &quot;type&quot; is not defined!'</span>);
+0084    <span class="keyword">end</span>
+0085    
+0086    nmbSamples = length(dataset.chunks);
+0087    
+0088    nmbCorrect    = 0;
+0089    
+0090    nmbTruePosAll    = 0;
+0091    nmbTrueNegAll    = 0;
+0092    nmbFalsePosAll   = 0;
+0093    nmbFalseNegAll   = 0; 
+0094    
+0095    <span class="keyword">if</span>(~<a href="easyupMVPA_getGlobals.html" class="code" title="function [propertyValue] = easyupMVPA_getGlobals(propertyName)">easyupMVPA_getGlobals</a>(<span class="string">'quietMode'</span>))
+0096      disp([<span class="string">'Running Leave One Out Cross Validation with command string: '</span>,cmdString,<span class="string">' ...'</span>]);
+0097     <span class="comment">% h = waitbar(0, 'Running Leave One Out Cross Validation ...');</span>
+0098    <span class="keyword">end</span>
+0099    
+0100    nmbTests = 0;
+0101    
+0102    <span class="comment">%extract the number of splits that are used</span>
+0103    nmbSplits = size(dataSplitter.splitMatrix,1);
+0104       
+0105    parfor i=1:nmbSplits
+0106      
+0107      trainData2D = [];
+0108      testData2D  = [];
+0109      
+0110      <span class="comment">%at first split the dataset according to given splitting</span>
+0111      ds1Indices = dataSplitter.splitMatrix(i,:) == 1; <span class="comment">%test data</span>
+0112      ds2Indices = dataSplitter.splitMatrix(i,:) == 2; <span class="comment">%train data</span>
+0113      
+0114      [ds1, ds2] = <a href="splitDataset.html" class="code" title="function [dataset1, dataset2] = splitDataset(dataset, vectorDS1, vectorDS2)">splitDataset</a>(dataset, ds1Indices, ds2Indices );     
+0115      
+0116      <span class="keyword">if</span>(dataset.is4D)
+0117        [ds2, trainData2D] = <a href="#_sub1" class="code" title="subfunction [ds, maskedData2D] = member_getMasked2DData_from4D(ds)">member_getMasked2DData_from4D</a>(ds2);
+0118      <span class="keyword">elseif</span>(dataset.is2D)
+0119        [ds2, trainData2D] = <a href="#_sub2" class="code" title="subfunction [ds, maskedData2D] = member_getMasked2DData_from2D(ds)">member_getMasked2DData_from2D</a>(ds2);
+0120      <span class="keyword">end</span>
+0121      
+0122      <span class="comment">%train on all samples with one left out</span>
+0123      svmModel  = svmtrain(double(ds2.classIDs)', trainData2D, cmdString);
+0124      
+0125      <span class="comment">%extract the weights</span>
+0126      weights = svmModel.SVs' * svmModel.sv_coef;
+0127      
+0128      tmpWeights = zeros(tmpWeightsSize);
+0129      
+0130      <span class="keyword">if</span>(dataset.is4D)
+0131        
+0132        tmpWeights(ds2.featureSelectionMap &gt;0) = weights;
+0133        avgWeights = avgWeights + tmpWeights*(1/nmbSamples);
+0134        
+0135        <span class="comment">%select the data for the testset</span>
+0136        [ds1, testData2D] = <a href="#_sub1" class="code" title="subfunction [ds, maskedData2D] = member_getMasked2DData_from4D(ds)">member_getMasked2DData_from4D</a>(ds1);
+0137        
+0138      <span class="keyword">elseif</span>(dataset.is2D)
+0139        
+0140        tmpWeights(ds2.featureSelectionMap &gt;0) = weights;
+0141        avgWeights = avgWeights + tmpWeights*(1/nmbSamples);
+0142        
+0143         <span class="comment">%select the data for the testset</span>
+0144        [ds1, testData2D] = <a href="#_sub2" class="code" title="subfunction [ds, maskedData2D] = member_getMasked2DData_from2D(ds)">member_getMasked2DData_from2D</a>(ds1);
+0145        
+0146      <span class="keyword">end</span>
+0147      
+0148      <span class="comment">%predict the class ID of the test data</span>
+0149      <span class="comment">%check if the model was trained with probability estimates</span>
+0150      <span class="keyword">if</span>(~isempty(svmModel.ProbA) &amp;&amp; ~isempty(svmModel.ProbB))
+0151        [predicted_labels, accuracy, probEst] = svmpredict(double(ds1.classIDs)', testData2D, svmModel, <span class="string">'-b 1'</span>);
+0152        <span class="comment">%disp(probEstimatesVector);</span>
+0153      <span class="keyword">else</span>
+0154        [predicted_labels, accuracy, probEst] = svmpredict(double(ds1.classIDs)', testData2D, svmModel); 
+0155      <span class="keyword">end</span>
+0156      
+0157      cVec = predicted_labels' == ds1.classIDs;
+0158      
+0159      nmbTruePos  = sum(cVec(ds1.classIDs==1));
+0160      nmbTrueNeg  = sum(cVec(ds1.classIDs==0));
+0161      nmbFalsePos = sum(ds1.classIDs) - sum(predicted_labels);
+0162      <span class="keyword">if</span>(nmbFalsePos &lt; 0)
+0163        nmbFalsePos = abs(nmbFalsePos);
+0164      <span class="keyword">else</span>
+0165        nmbFalsePos = 0;
+0166      <span class="keyword">end</span>
+0167      nmbFalseNeg = length(ds1.classIDs) - nmbTrueNeg - nmbFalsePos - nmbTruePos;
+0168 
+0169      nmbCorrect = nmbCorrect+nmbTruePos+nmbTrueNeg;
+0170 
+0171      nmbTruePosAll    = nmbTruePosAll+nmbTruePos;
+0172      nmbTrueNegAll    = nmbTrueNegAll+nmbTrueNeg;
+0173      nmbFalsePosAll   = nmbFalsePosAll+nmbFalsePos;
+0174      nmbFalseNegAll   = nmbFalseNegAll+nmbFalseNeg; 
+0175      
+0176      nmbTests         = nmbTests+length(ds1.classIDs);
+0177      
+0178 <span class="comment">%</span>
+0179 <span class="comment">%      if(~easyupMVPA_getGlobals('quietMode'))</span>
+0180 <span class="comment">%        waitbar(i/nmbSplits,h);</span>
+0181 <span class="comment">%        waitbar(i/nmbSplits);</span>
+0182 <span class="comment">%      end</span>
+0183 
+0184    <span class="keyword">end</span> <span class="comment">% endfor</span>
+0185 <span class="comment">%</span>
+0186 <span class="comment">%    if(~easyupMVPA_getGlobals('quietMode'))</span>
+0187 <span class="comment">%      close(h);</span>
+0188 <span class="comment">%    end</span>
+0189    
+0190    
+0191    accuracy    = nmbCorrect/nmbTests*100;
+0192    sensitivity = nmbTruePosAll/(nmbTruePosAll+nmbFalseNegAll); 
+0193    specificity = nmbTrueNegAll/(nmbTrueNegAll+nmbFalsePosAll);
+0194    
+0195    resultStruct             = {};
+0196    resultStruct.nmbTests    = nmbTests;
+0197    resultStruct.accuracy    = accuracy;
+0198    resultStruct.sensitivity = sensitivity;
+0199    resultStruct.specificity = specificity;
+0200    resultStruct.TP          = nmbTruePosAll;
+0201    resultStruct.TN          = nmbTrueNegAll;
+0202    resultStruct.FP          = nmbFalsePosAll;
+0203    resultStruct.FN          = nmbFalseNegAll;
+0204    
+0205    <span class="keyword">if</span>(~<a href="easyupMVPA_getGlobals.html" class="code" title="function [propertyValue] = easyupMVPA_getGlobals(propertyName)">easyupMVPA_getGlobals</a>(<span class="string">'quietMode'</span>))
+0206     
+0207    <span class="keyword">end</span>
+0208    
+0209 <span class="keyword">end</span>
+0210 
+0211 
+0212 
+0213 <a name="_sub1" href="#_subfunctions" class="code">function [ds, maskedData2D] = member_getMasked2DData_from4D(ds)</a>
+0214   sizeMaskedData2D = size(ds.data);
+0215      
+0216   <span class="comment">%get the data as 2D array by using the 3D mask or selection map</span>
+0217   <span class="comment">%the function selectFeaturesBySelectionMap sets the field dataset.featureSelectionMap3D</span>
+0218   <span class="keyword">if</span>(isfield(ds,<span class="string">'featureSelectionMap'</span>) &amp;&amp; ~isempty(ds.featureSelectionMap))
+0219     [ds, maskedData2D] = <a href="selectFeaturesBySelectionMap.html" class="code" title="function [dataset, data2D] = selectFeaturesBySelectionMap(dataset)">selectFeaturesBySelectionMap</a>(ds);
+0220   <span class="keyword">elseif</span>(isfield(ds,<span class="string">'mask'</span>) &amp;&amp; ~isempty(ds.mask))      
+0221     ds = <a href="setDataset_featureSelectionMap_ByMatrix.html" class="code" title="function [dataset] = setDataset_featureSelectionMap_ByMatrix(dataset, mapMatrix)">setDataset_featureSelectionMap_ByMatrix</a>(ds, ds.mask);
+0222     [ds, maskedData2D] = <a href="selectFeaturesBySelectionMap.html" class="code" title="function [dataset, data2D] = selectFeaturesBySelectionMap(dataset)">selectFeaturesBySelectionMap</a>(ds);
+0223   <span class="keyword">else</span>
+0224     ds = <a href="setDataset_featureSelectionMap_ByMatrix.html" class="code" title="function [dataset] = setDataset_featureSelectionMap_ByMatrix(dataset, mapMatrix)">setDataset_featureSelectionMap_ByMatrix</a>(ds, ones(sizeMaskedData2D(1)*sizeMaskedData2D(2)*sizeMaskedData2D(3)));
+0225     [ds, maskedData2D] = <a href="selectFeaturesBySelectionMap.html" class="code" title="function [dataset, data2D] = selectFeaturesBySelectionMap(dataset)">selectFeaturesBySelectionMap</a>(ds);
+0226   <span class="keyword">end</span>
+0227  
+0228 <span class="keyword">end</span> <span class="comment">% end function  member_getMasked2DData_from4D</span>
+0229 
+0230 
+0231 <a name="_sub2" href="#_subfunctions" class="code">function [ds, maskedData2D] = member_getMasked2DData_from2D(ds)</a>
+0232   sizeMaskedData2D = size(ds.data);
+0233      
+0234   <span class="comment">%numel(find(dataset.featureSelectionMap1D &gt; 0)</span>
+0235   <span class="comment">%get the data as 2D array by using the 1D mask1D</span>
+0236   <span class="comment">%the function selectFeaturesBySelectionMap sets the field dataset.featureSelectionMap3D</span>
+0237   <span class="keyword">if</span>(isfield(ds,<span class="string">'featureSelectionMap'</span>) &amp;&amp; ~isempty(ds.featureSelectionMap))
+0238     [ds, maskedData2D] = <a href="selectFeaturesBySelectionMap.html" class="code" title="function [dataset, data2D] = selectFeaturesBySelectionMap(dataset)">selectFeaturesBySelectionMap</a>(ds);
+0239   <span class="keyword">elseif</span>(isfield(ds,<span class="string">'mask'</span>) &amp;&amp; ~isempty(ds.mask))      
+0240     ds = <a href="setDataset_featureSelectionMap_ByMatrix.html" class="code" title="function [dataset] = setDataset_featureSelectionMap_ByMatrix(dataset, mapMatrix)">setDataset_featureSelectionMap_ByMatrix</a>(ds, ds.mask);
+0241     [ds, maskedData2D] = <a href="selectFeaturesBySelectionMap.html" class="code" title="function [dataset, data2D] = selectFeaturesBySelectionMap(dataset)">selectFeaturesBySelectionMap</a>(ds);
+0242   <span class="keyword">else</span>
+0243     ds = <a href="setDataset_featureSelectionMap_ByMatrix.html" class="code" title="function [dataset] = setDataset_featureSelectionMap_ByMatrix(dataset, mapMatrix)">setDataset_featureSelectionMap_ByMatrix</a>(ds, ones(sizeMaskedData2D(1),1));
+0244     [ds, maskedData2D] = <a href="selectFeaturesBySelectionMap.html" class="code" title="function [dataset, data2D] = selectFeaturesBySelectionMap(dataset)">selectFeaturesBySelectionMap</a>(ds);
+0245   <span class="keyword">end</span>
+0246 
+0247 <span class="keyword">end</span> <span class="comment">% end function  member_getMasked2DData_from2D</span></pre></div>
+<hr><address>Generated on Tue 12-Apr-2011 12:12:55 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>
