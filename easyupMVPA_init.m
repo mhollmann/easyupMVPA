@@ -24,8 +24,10 @@ function easyupMVPA_init(varargin)
   
   %set path variable
   dirEU = which('easyupMVPA_init');
-  [pathstr, name, ext, versn] = fileparts(dirEU);
+  [pathstr, name, ext] = fileparts(dirEU);
   addpath(genpath(pathstr));
+  
+  easyupMVPA_version();
   
   easyupMVPA_setGlobals('quietMode', false);
   

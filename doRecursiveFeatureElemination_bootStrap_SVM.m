@@ -1,4 +1,4 @@
-% (UNDER CONSTRUCTION) Recursively removes features according to SVM classification weights obtained by bootstrapping.
+% [DO NOT USE: UNDER DEVELOPEMENT!] Recursively removes features according to SVM classification weights obtained by bootstrapping.
 %
 % Author: Maurice Hollmann
 % Date  : 09/10

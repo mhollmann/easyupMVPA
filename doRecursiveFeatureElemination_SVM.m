@@ -42,6 +42,7 @@
 %   nmbIterations                 - iterations (how often is basic feature set reduced by "thresholdPercentOfFeaturesOut")
 %   thresholdPercentOfFeaturesOut - percentual value of non-zero elements in weight map that should be cut (suggestion btw. 10 and 50)
 %   dataSplitter                  - describes the splitting of the data in the background LOOCV
+%   svmType                       - Types: Just 'classification' supported!
 %   kernelMode                    - Kernels: ['linear', 'polynomial', 'radial', 'sigmoid']
 %   costParam                     - The slack variable C in SVM (range 0 to 1  0 = low cost, 1 = highest costs). 
 %                                   It defines the costs for misclassification (How strongly are outliers punished?).
@@ -65,27 +66,31 @@
 %
 % Comments:
 %
-function [dataset, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = doRecursiveFeatureElemination_SVM(dataset, nmbIterations, thresholdPercentOfFeaturesOut, dataSplitter, kernelMode, costParam, paramStruct)
+function [dataset, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = doRecursiveFeatureElemination_SVM(dataset, nmbIterations, thresholdPercentOfFeaturesOut, dataSplitter, svmType, kernelMode, costParam, paramStruct)
   
-  if( ~exist('dataset','var') || ~exist('nmbIterations','var') || ~exist('thresholdPercentOfFeaturesOut','var') || ~exist('dataSplitter','var') || ~exist('kernelMode','var') || ~exist('costParam','var')) 
-    error('Usage of doRecursiveFeatureElemination_SVM: [dataset, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = doRecursiveFeatureElemination_SVM(dataset, nmbIterations, thresholdPercentOfFeaturesOut - [0-100%], dataSplitter, kernelMode - [linear, polynomial, radial, sigmoid] , costParam [0-1], paramStruct [optional - i.e. {"degree", 3}])');
+  if( ~exist('dataset','var') || ~exist('nmbIterations','var') || ~exist('thresholdPercentOfFeaturesOut','var') || ~exist('dataSplitter','var') || ~exist('svmType','var') || ~exist('kernelMode','var') || ~exist('costParam','var')) 
+    error('Usage of doRecursiveFeatureElemination_SVM: [dataset, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = doRecursiveFeatureElemination_SVM(dataset, nmbIterations, thresholdPercentOfFeaturesOut - [0-100%], dataSplitter, svmType - [classification], kernelMode - [linear, polynomial, radial, sigmoid] , costParam [0-1], paramStruct [optional - i.e. {"degree", 3}])');
   end
   
   %extractt the SVM parameter values from paramStruct
   if( ~exist('paramStruct','var'))
-    [paramStructIsValid, svmParamInfoStruct, cmdString] = getSVMParamInfo(kernelMode, costParam, {});
+    [paramStructIsValid, svmParamInfoStruct, cmdString] = getSVMParamInfo(svmType, kernelMode, costParam, {});
   else
-    [paramStructIsValid, svmParamInfoStruct, cmdString] = getSVMParamInfo(kernelMode, costParam, paramStruct);
+    [paramStructIsValid, svmParamInfoStruct, cmdString] = getSVMParamInfo(svmType, kernelMode, costParam, paramStruct);
   end
   if( ~paramStructIsValid)
-    error('Usage of doRecursiveFeatureElemination_SVM: [dataset] = doRecursiveFeatureElemination_SVM(dataset, nmbIterations, thresholdPercentOfFeaturesOut - [0-100%], dataSplitter, kernelMode - [linear, polynomial, radial, sigmoid] , costParam [0-1], paramStruct [optional - i.e. {"degree", 3}])');
+    error('Usage of doRecursiveFeatureElemination_SVM: [dataset] = doRecursiveFeatureElemination_SVM(dataset, nmbIterations, thresholdPercentOfFeaturesOut - [0-100%], dataSplitter, svmType - [classification], kernelMode - [linear, polynomial, radial, sigmoid] , costParam [0-1], paramStruct [optional - i.e. {"degree", 3}])');
+  end
+  
+  if(~strcmp(svmType, 'classification'))
+    error('Sorry, the RFE function just supports C-classification in this version.');
   end
   
   %use quiet mode (no outputs)
   cmdString = [cmdString, ' -q '];
   
   if(thresholdPercentOfFeaturesOut < 0 || thresholdPercentOfFeaturesOut > 100)
-    error('Usage of doRecursiveFeatureElemination_SVM: [dataset] = doRecursiveFeatureElemination_SVM(dataset, nmbIterations, thresholdPercentOfFeaturesOut - [0-100%], dataSplitter, kernelMode - [linear, polynomial, radial, sigmoid] , costParam [0-1], paramStruct [optional - i.e. {"degree", 3}])');
+    error('Usage of doRecursiveFeatureElemination_SVM: [dataset] = doRecursiveFeatureElemination_SVM(dataset, nmbIterations, thresholdPercentOfFeaturesOut - [0-100%], dataSplitter, svmType - [classification], kernelMode - [linear, polynomial, radial, sigmoid] , costParam [0-1], paramStruct [optional - i.e. {"degree", 3}])');
   end
       
   localQuietMode = easyupMVPA_getGlobals('quietMode');

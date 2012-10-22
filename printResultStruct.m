@@ -31,7 +31,7 @@ function printResultStruct(resultStruct)
      if(isfield(resultStruct, 'infoString'))
        disp(['Additional Info: ', resultStruct.infoString])
      end
-     disp('************************');
+     
      
      if(isfield(resultStruct, 'innerResultStruct') && ~isempty(resultStruct.innerResultStruct))
        disp(' ');
@@ -39,4 +39,12 @@ function printResultStruct(resultStruct)
        printResultStruct(resultStruct.innerResultStruct);
      end
      
+     if(isfield(resultStruct, 'predictedClassIDs') && ~isempty(resultStruct.predictedClassIDs))
+       disp(' ');
+       disp('Predicted class IDs / regression values:');
+       disp(['                 size : ', num2str(size(resultStruct.predictedClassIDs))]);
+       disp(['                 class: ', class(resultStruct.predictedClassIDs)]);
+
+     end
+     disp('************************');
 end

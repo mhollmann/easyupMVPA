@@ -20,6 +20,17 @@
 %     .       .
 %     .       .
 %
+%   For regression the classIDs may also be doubles:
+%
+%     0.23    0
+%     0.1     1
+%     0.98    1
+%     1.23    0
+%     3.2456  2
+%     0.2     2
+%     .       .
+%     .       .
+%
 %
 % Parameters:
 %   dataset     - the datset to set the classIDs for
@@ -46,7 +57,7 @@ function [dataset] = setDataset_classIDs_ByAttribFile(dataset, attribFile)
   attribs = textscan(fid, '%s', 'delimiter', '\n');
   fclose(fid); 
   
-  dataset.classIDs = zeros(1, size(attribs{1},1), 'uint8');
+  dataset.classIDs = zeros(1, size(attribs{1},1));
   
   %loop over lines
   for i=1:size(attribs{1},1)

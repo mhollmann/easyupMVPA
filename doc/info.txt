@@ -1,18 +1,15 @@
 Author: M. Hollmann
 
-call of m2html:
-
-
 
 2DO:
 ----
+MH 120915:
+  - check regression for complete workflow in bootstrapping and RFE
 
-110328:
-- 2Do easyup MVPA :  
+MH 110328:
 
-  - bootstrapping implementierung klaeren...
-
-  - RFE SVM kann immens beschleunigt werden - call fast 2D LOOCV!!!
+  - bootstrapping implementation
+  - make RFE SVM call fast 2D LOOCV!!!
 
 
 

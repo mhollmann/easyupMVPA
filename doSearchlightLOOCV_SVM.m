@@ -12,9 +12,14 @@
 %
 %
 % Parameters:
-%   dataset          - The dataset to work on  (all samples are included in LOOCV)
-%   dataSplitter     - describes the splitting of the data in LOOCV
-%   svmCommandString - the svm command string for exmaple '-t 0 -c 0.5' 
+%   dataset        - The dataset to work on  (all samples are included in LOOCV)
+%   dataSplitter   - describes the splitting of the data in LOOCV
+%   svmType        - Types:
+%                     ['classification', 'regression_epsilon', 'regression_nu']
+%   kernelMode     - Kernels: ['linear', 'polynomial', 'radial', 'sigmoid']
+%   costParam      - The slack variable C in SVM (range 0 to 1  0 = low cost, 1 = highest costs). 
+%                    It defines the costs for misclassification (How strongly are outliers punished?)
+%   paramStruct    - [optional] - i.e. {"degree", 3}
 %
 % Returns:
 %   dataset            - the datset that has been the input
@@ -31,17 +36,17 @@
 %
 % Comments:
 %
-function [datasetOut, resultAccuracyMap, resultStruct] = doSearchlightLOOCV_SVM(dataset, searchlightDiameter, dataSplitter, kernelMode, costParam, paramStruct)
+function [datasetOut, resultAccuracyMap, resultStruct] = doSearchlightLOOCV_SVM(dataset, searchlightDiameter, dataSplitter, svmType, kernelMode, costParam, paramStruct)
 
   
   %extractt the SVM parameter values from paramStruct
   if( ~exist('paramStruct','var'))
-    [paramStructIsValid, svmParamInfoStruct, cmdString] = getSVMParamInfo(kernelMode, costParam, {});
+    [paramStructIsValid, svmParamInfoStruct, cmdString] = getSVMParamInfo(svmType, kernelMode, costParam, {});
   else
-    [paramStructIsValid, svmParamInfoStruct, cmdString] = getSVMParamInfo(kernelMode, costParam, paramStruct);
+    [paramStructIsValid, svmParamInfoStruct, cmdString] = getSVMParamInfo(svmType, kernelMode, costParam, paramStruct);
   end
   if( ~paramStructIsValid)
-    error(['Usage of doLeaveOneOutCrossValidation_SVM: [datasetOut, resultAccuracyMap3D, resultStruct] = doSearchlightLOOCV_SVM(dataset, searchlightDiameter, dataSplitter,', ... 
+    error(['Usage of doLeaveOneOutCrossValidation_SVM: [datasetOut, resultAccuracyMap3D, resultStruct] = doSearchlightLOOCV_SVM(dataset, searchlightDiameter, dataSplitter, svmType - [classification, regression_epsilon, regression_nu]', ... 
           'kernelMode - [linear, polynomial, radial, sigmoid] , costParam [0-1], paramStruct [optional - i.e. {"degree", 3}])']);
   end
   

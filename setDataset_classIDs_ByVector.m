@@ -7,7 +7,8 @@
 %
 %   [dataset] = setDataset_classIDs_ByVector(dataset, classIDsVector)
 %
-%   This methods sets the classIDs of the given dataset (i.e. [0 0 0 1 1 1]). 
+%   This methods sets the classIDs of the given dataset (i.e. [0 0 0 1 1 1]).
+%   For regression purposes classIDs may also be double values (i.e. [0.2 0.45 0.12 0.9 12.3 1.2]).
 %
 % Parameters:
 %   dataset         - the datset to set the classIDs for
@@ -25,9 +26,9 @@ function [dataset] = setDataset_classIDs_ByVector(dataset, classIDsVector)
   end
 
   if(size(classIDsVector,2) == 1 && size(classIDsVector,1) > size(classIDsVector,2))
-    dataset.classIDs = uint8(classIDsVector');
+    dataset.classIDs = classIDsVector';
   else
-    dataset.classIDs = uint8(classIDsVector);
+    dataset.classIDs = classIDsVector;
   end
   
   if(~checkDataset(dataset))

@@ -5,7 +5,7 @@
 %
 % Description:
 %
-%   [dataset, resultStruct, avgWeights] = doLeaveOneOutCrossValidation_SVM(dataset, dataSplitter, kernelMode, costParam, [paramStruct])
+%   [dataset, resultStruct, avgWeights] = doLeaveOneOutCrossValidation_SVM(dataset, dataSplitter, svmType, kernelMode, costParam, [paramStruct])
 %
 %   This highlevel function does the Leave One Out Cross Validation (LOOCV) of a complete dataset(DS) using a Support Vector Machine.
 %   LOOCV means a repeated classification in the dataset to get a general performance measure.
@@ -27,6 +27,8 @@
 % Parameters:
 %   dataset        - The dataset to work on  (all samples are included in LOOCV)
 %   dataSplitter   - describes the splitting of the data in LOOCV
+%   svmType        - Types:
+%                     ['classification', 'regression_epsilon', 'regression_nu']
 %   kernelMode     - Kernels: ['linear', 'polynomial', 'radial', 'sigmoid']
 %   costParam      - The slack variable C in SVM (range 0 to 1  0 = low cost, 1 = highest costs). 
 %                    It defines the costs for misclassification (How strongly are outliers punished?).
@@ -49,21 +51,21 @@
 %
 % Comments:
 %
-function [dataset, resultStruct, avgWeights] = doLeaveOneOutCrossValidation_SVM(dataset, dataSplitter, kernelMode, costParam, paramStruct)
+function [dataset, resultStruct, avgWeights] = doLeaveOneOutCrossValidation_SVM(dataset, dataSplitter, svmType, kernelMode, costParam, paramStruct)
  
 
-  if( ~exist('dataset','var') || ~exist('dataSplitter','var') || ~exist('kernelMode','var') || ~exist('costParam','var')) 
-    error('Usage of doLeaveOneOutCrossValidation_SVM: [dataset, classificationResult] = doLeaveOneOutCrossValidation_SVM(dataset, dataSplitter, kernelMode - [linear, polynomial, radial, sigmoid] , costParam [0-1], paramStruct [optional - i.e. {"degree", 3}])');
+  if( ~exist('dataset','var') || ~exist('dataSplitter','var') || ~exist('svmType','var') || ~exist('kernelMode','var') || ~exist('costParam','var')) 
+    error('Usage of doLeaveOneOutCrossValidation_SVM: [dataset, classificationResult] = doLeaveOneOutCrossValidation_SVM(dataset, dataSplitter, svmType - [classification, regression_epsilon, regression_nu], kernelMode - [linear, polynomial, radial, sigmoid] , costParam [0-1], paramStruct [optional - i.e. {"degree", 3}])');
   end
   
   %extractt the SVM parameter values from paramStruct
   if( ~exist('paramStruct','var'))
-    [paramStructIsValid, svmParamInfoStruct, cmdString] = getSVMParamInfo(kernelMode, costParam, {});
+    [paramStructIsValid, svmParamInfoStruct, cmdString] = getSVMParamInfo(svmType, kernelMode, costParam, {});
   else
-    [paramStructIsValid, svmParamInfoStruct, cmdString] = getSVMParamInfo(kernelMode, costParam, paramStruct);
+    [paramStructIsValid, svmParamInfoStruct, cmdString] = getSVMParamInfo(svmType, kernelMode, costParam, paramStruct);
   end
   if( ~paramStructIsValid)
-    error('Usage of doLeaveOneOutCrossValidation_SVM: [dataset, classificationResult] = doLeaveOneOutCrossValidation_SVM(dataset, dataSplitter, kernelMode - [linear, polynomial, radial, sigmoid] , costParam [0-1], paramStruct [optional - i.e. {"degree", 3}])');
+    error('Usage of doLeaveOneOutCrossValidation_SVM: [dataset, classificationResult] = doLeaveOneOutCrossValidation_SVM(dataset, dataSplitter, svmType - [classification, regression_epsilon, regression_nu], kernelMode - [linear, polynomial, radial, sigmoid] , costParam [0-1], paramStruct [optional - i.e. {"degree", 3}])');
   end
   
  
@@ -94,6 +96,10 @@ function [dataset, resultStruct, avgWeights] = doLeaveOneOutCrossValidation_SVM(
    
    %extract the number of splits that are used
    nmbSplits = size(dataSplitter.splitMatrix,1);
+   nmbTests  = numel(find(dataSplitter.splitMatrix(:)==1));
+   
+   %variable to store predicted labels
+   predictedLabels = {};
    
    localQuietMode = easyupMVPA_getGlobals('quietMode');
    
@@ -163,30 +169,38 @@ function [dataset, resultStruct, avgWeights] = doLeaveOneOutCrossValidation_SVM(
      %predict the class ID of the test data
      %check if the model was trained with probability estimates
      if(~isempty(svmModel.ProbA) && ~isempty(svmModel.ProbB))
-       [predicted_labels, accuracy, probEst] = svmpredict(double(ds1.classIDs)', testData2D, svmModel, '-b 1');
+       [predicted_labels, accuracy, probEst] = svmpredict_modifiedMH(double(ds1.classIDs)', testData2D, svmModel, '-b 1');
        %disp(probEstimatesVector);
      else
-       [predicted_labels, accuracy, probEst] = svmpredict(double(ds1.classIDs)', testData2D, svmModel); 
+       [predicted_labels, accuracy, probEst] = svmpredict_modifiedMH(double(ds1.classIDs)', testData2D, svmModel); 
      end
      
-     cVec = predicted_labels' == ds1.classIDs;
+     %remember predicted labels
+     predictedLabels(i).predLabels = predicted_labels;
      
-     nmbTruePos  = sum(cVec(ds1.classIDs==1));
-     nmbTrueNeg  = sum(cVec(ds1.classIDs==0));
-     nmbFalsePos = sum(ds1.classIDs) - sum(predicted_labels);
-     if(nmbFalsePos < 0)
-       nmbFalsePos = abs(nmbFalsePos);
-     else
-       nmbFalsePos = 0;
+     if(strcmp(svmType, 'classification'))
+
+       cVec = predicted_labels' == ds1.classIDs;
+
+       nmbTruePos  = sum(cVec(ds1.classIDs==1));
+       nmbTrueNeg  = sum(cVec(ds1.classIDs==0));
+       nmbFalsePos = sum(ds1.classIDs) - sum(predicted_labels);
+       if(nmbFalsePos < 0)
+         nmbFalsePos = abs(nmbFalsePos);
+       else
+         nmbFalsePos = 0;
+       end
+       nmbFalseNeg = length(ds1.classIDs) - nmbTrueNeg - nmbFalsePos - nmbTruePos;
+
+       nmbCorrect = nmbCorrect+nmbTruePos+nmbTrueNeg;
+
+       nmbTruePosAll    = nmbTruePosAll+nmbTruePos;
+       nmbTrueNegAll    = nmbTrueNegAll+nmbTrueNeg;
+       nmbFalsePosAll   = nmbFalsePosAll+nmbFalsePos;
+       nmbFalseNegAll   = nmbFalseNegAll+nmbFalseNeg; 
+       
      end
-     nmbFalseNeg = length(ds1.classIDs) - nmbTrueNeg - nmbFalsePos - nmbTruePos;
-
-     nmbCorrect = nmbCorrect+nmbTruePos+nmbTrueNeg;
-
-     nmbTruePosAll    = nmbTruePosAll+nmbTruePos;
-     nmbTrueNegAll    = nmbTrueNegAll+nmbTrueNeg;
-     nmbFalsePosAll   = nmbFalsePosAll+nmbFalsePos;
-     nmbFalseNegAll   = nmbFalseNegAll+nmbFalseNeg; 
+     
      
      nmbTests         = nmbTests+length(ds1.classIDs);
 
@@ -203,19 +217,43 @@ function [dataset, resultStruct, avgWeights] = doLeaveOneOutCrossValidation_SVM(
      fprintf('\n');
    end
    
-   accuracy    = nmbCorrect/nmbTests*100;
-   sensitivity = nmbTruePosAll/(nmbTruePosAll+nmbFalseNegAll); 
-   specificity = nmbTrueNegAll/(nmbTrueNegAll+nmbFalsePosAll);
+   predLabelsVec = [];
+   for i=1:length(predictedLabels)
+     %sorry it is growing but hard to avoid 
+     predLabelsVec = horzcat(predLabelsVec, predictedLabels(i).predLabels);
+   end
    
-   resultStruct             = {};
-   resultStruct.nmbTests    = nmbTests;
-   resultStruct.accuracy    = accuracy;
-   resultStruct.sensitivity = sensitivity;
-   resultStruct.specificity = specificity;
-   resultStruct.TP          = nmbTruePosAll;
-   resultStruct.TN          = nmbTrueNegAll;
-   resultStruct.FP          = nmbFalsePosAll;
-   resultStruct.FN          = nmbFalseNegAll;
+   if(strcmp(svmType, 'classification'))
+
+     accuracy    = nmbCorrect/nmbTests*100;
+     sensitivity = nmbTruePosAll/(nmbTruePosAll+nmbFalseNegAll); 
+     specificity = nmbTrueNegAll/(nmbTrueNegAll+nmbFalsePosAll);
+
+     resultStruct             = {};
+     resultStruct.nmbTests    = nmbTests;
+     resultStruct.accuracy    = accuracy;
+     resultStruct.sensitivity = sensitivity;
+     resultStruct.specificity = specificity;
+     resultStruct.TP          = nmbTruePosAll;
+     resultStruct.TN          = nmbTrueNegAll;
+     resultStruct.FP          = nmbFalsePosAll;
+     resultStruct.FN          = nmbFalseNegAll;
+     resultStruct.predictedClassIDs = predLabelsVec;
+     
+   else %must be regression
+     
+     resultStruct             = {};
+     resultStruct.nmbTests    = nmbTests;
+     resultStruct.accuracy    = NaN;
+     resultStruct.sensitivity = NaN;
+     resultStruct.specificity = NaN;
+     resultStruct.TP          = NaN;
+     resultStruct.TN          = NaN;
+     resultStruct.FP          = NaN;
+     resultStruct.FN          = NaN;
+     resultStruct.predictedClassIDs = predLabelsVec;
+     
+   end
    
 end
 

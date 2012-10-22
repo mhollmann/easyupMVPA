@@ -17,14 +17,13 @@
 %   matrix3D    - the 3D matrix to save
 %   hdrFilename - filename of the header
 %   scaleFactor - [optional] a scale factor multiplied with dataset (this scaling is directly applied and NOT written in header)
-%   dataType    - [optional] one of the char 'int16'(default) or 'float32'
 %
 % Returns:
 %
 % Comments:
 %
 %
-function saveMatrix3DasNiftiInDatasetSpace(dataset, matrix3D, hdrFilename, scaleFactor, dataType)
+function saveMatrix3DasNiftiInDatasetSpace(dataset, matrix3D, hdrFilename, scaleFactor)
 
   if( ~exist('dataset','var') || ~exist('matrix3D','var') || ~exist('hdrFilename','var')) 
     error('Usage of saveMatrix3DasNiftiInDatasetSpace: saveMatrix3DasNiftiInDatasetSpace(dataset, matrix3D (3D matrix), hdrFilename (filename of the header), scaleFactor (optional)  )');
@@ -34,22 +33,6 @@ function saveMatrix3DasNiftiInDatasetSpace(dataset, matrix3D, hdrFilename, scale
      error('Function saveMatrix3DasNiftiInDatasetSpace can just be used for 4D datasets! ');
   end
 
-  
-  if(exist('scaleFactor','var'))
-    %this can mean the dataType is given
-    if(ischar(scaleFactor))
-      dataType = scaleFactor;
-    end
-  end
-  
-  if(exist('dataType', 'var'))
-      if(strcmp('scaleFactor', 'int16') || strcmp('scaleFactor', 'float32')) 
-        
-      end
-    
-  end
-  
-  
   %scale if necessary
   if(exist('scaleFactor','var'))
     matrix3D = matrix3D*scaleFactor;
@@ -60,7 +43,7 @@ function saveMatrix3DasNiftiInDatasetSpace(dataset, matrix3D, hdrFilename, scale
   %set the 4th dimension to 1 because it is just a 3D array
   niiHdr.dime.dim(5) = 1;
   
-  [pathstr, name, ext, versn] = fileparts(hdrFilename);
+  [pathstr, name, ext] = fileparts(hdrFilename);
   
   if( ~strcmp(ext,'.hdr') )
     disp('INFO: saveMatrix3DasNiftiInDatasetSpace: Extension of header filename was set to: .hdr !' );

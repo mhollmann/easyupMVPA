@@ -21,6 +21,8 @@
 %                    resultStruct.TN           (True negatives = all correct predicted in class 2)
 %                    resultStruct.FP           (False positives = all incorrect predicted in class 1)
 %                    resultStruct.FN           (False negatives = all incorrect predicted in class 2)
+%                    resultStruct.predictedClassIDs (values that depict the predicted class label or a predicted 
+%                                                    value in regression for each input sample)
 %
 %   probEstimates  - Probability estimates if model was learned with Option 'probEstimates' = 1, otherwise empty matrix
 %
@@ -52,36 +54,54 @@ function [resultStruct, probEstimates] = predict_SVM(dataset, svmModel)
    %predict the class ID of the test data
    %check if the model was trained with probability estimates
    if(~isempty(svmModel.ProbA) && ~isempty(svmModel.ProbB))
-     [predicted_labels, accuracy, probEstimates] = svmpredict(double(dataset.classIDs)', testData2D, svmModel, '-b 1');
+     [predicted_labels, accuracy, probEstimates] = svmpredict_modifiedMH(double(dataset.classIDs)', testData2D, svmModel, '-b 1');
    else
-     [predicted_labels, accuracy, decisionValues] = svmpredict(double(dataset.classIDs)', testData2D, svmModel); 
+     [predicted_labels, accuracy, decisionValues] = svmpredict_modifiedMH(double(dataset.classIDs)', testData2D, svmModel); 
    end
-
-   cVec = predicted_labels' == dataset.classIDs;
    
- 
-   nmbTruePos  = sum(cVec(dataset.classIDs==1));
-   nmbTrueNeg  = sum(cVec(dataset.classIDs==0));
-   nmbFalsePos = sum(dataset.classIDs) - sum(predicted_labels);
-   if(nmbFalsePos < 0)
-     nmbFalsePos = abs(nmbFalsePos);
-   else
-     nmbFalsePos = 0;
-   end
-   nmbFalseNeg = nmbSamples - nmbTrueNeg - nmbFalsePos - nmbTruePos;
+   svmInfoStruct = getSVMModelInfo(svmModel);
+   
+   if(strcmp(svmInfoStruct.svmType, 'classification'))
+   
+     cVec = predicted_labels' == dataset.classIDs;
+
+     nmbTruePos  = sum(cVec(dataset.classIDs==1));
+     nmbTrueNeg  = sum(cVec(dataset.classIDs==0));
+     nmbFalsePos = sum(dataset.classIDs) - sum(predicted_labels);
+     if(nmbFalsePos < 0)
+       nmbFalsePos = abs(nmbFalsePos);
+     else
+       nmbFalsePos = 0;
+     end
+     nmbFalseNeg = nmbSamples - nmbTrueNeg - nmbFalsePos - nmbTruePos;
+
+     accuracy    = sum(cVec)/nmbSamples*100;
+     sensitivity = nmbTruePos/(nmbTruePos+nmbFalseNeg); 
+     specificity = nmbTrueNeg/(nmbTrueNeg+nmbFalsePos);
+
+     resultStruct             = {};
+     resultStruct.nmbTests    = nmbSamples;
+     resultStruct.accuracy    = accuracy;
+     resultStruct.sensitivity = sensitivity;
+     resultStruct.specificity = specificity;
+     resultStruct.TP          = nmbTruePos;
+     resultStruct.TN          = nmbTrueNeg;
+     resultStruct.FP          = nmbFalsePos;
+     resultStruct.FN          = nmbFalseNeg;
+     resultStruct.predictedClassIDs = predicted_labels';
      
-   accuracy    = sum(cVec)/nmbSamples*100;
-   sensitivity = nmbTruePos/(nmbTruePos+nmbFalseNeg); 
-   specificity = nmbTrueNeg/(nmbTrueNeg+nmbFalsePos);
+   else %must be regression
+     
+     resultStruct             = {};
+     resultStruct.nmbTests    = nmbSamples;
+     resultStruct.accuracy    = NaN;
+     resultStruct.sensitivity = NaN;
+     resultStruct.specificity = NaN;
+     resultStruct.TP          = NaN;
+     resultStruct.TN          = NaN;
+     resultStruct.FP          = NaN;
+     resultStruct.FN          = NaN;
+     resultStruct.predictedClassIDs = predicted_labels';
 
-   resultStruct             = {};
-   resultStruct.nmbTests    = nmbSamples;
-   resultStruct.accuracy    = accuracy;
-   resultStruct.sensitivity = sensitivity;
-   resultStruct.specificity = specificity;
-   resultStruct.TP          = nmbTruePos;
-   resultStruct.TN          = nmbTrueNeg;
-   resultStruct.FP          = nmbFalsePos;
-   resultStruct.FN          = nmbFalseNeg;
-   
+   end
 end
