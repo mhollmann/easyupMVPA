@@ -64,7 +64,7 @@ This function calls:
 </ul>
 This function is called by:
 <ul style="list-style-image:url(../matlabicon.gif)">
-<li><a href="doLeaveOneOutCrossValidation_SVM.html" class="code" title="function [dataset, resultStruct, avgWeights] = doLeaveOneOutCrossValidation_SVM(dataset, dataSplitter, kernelMode, costParam, paramStruct)">doLeaveOneOutCrossValidation_SVM</a>	Implements a Leave One Out Cross Validation (LOOCV) using a Support Vector Machine Classifier (parallel execution).</li><li><a href="doRecursiveFeatureElemination_SVM.html" class="code" title="function [dataset, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = doRecursiveFeatureElemination_SVM(dataset, nmbIterations, thresholdPercentOfFeaturesOut, dataSplitter, kernelMode, costParam, paramStruct)">doRecursiveFeatureElemination_SVM</a>	Recursively removes features according to SVM classification weights (parallel execution).</li><li><a href="doRecursiveFeatureElemination_SVM_nestedLOOCV.html" class="code" title="function [dataset, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = doRecursiveFeatureElemination_SVM_nestedLOOCV(dataset, nmbIterations, thresholdPercentOfFeaturesOut, nmbSplitsLOOCV, dataSplitter, kernelMode, costParam, paramStruct)">doRecursiveFeatureElemination_SVM_nestedLOOCV</a>	! DEPRECATED ! Recursively removes features according to SVM classification weights from LOOCV.</li><li><a href="doRecursiveFeatureElemination_bootStrap_SVM.html" class="code" title="function [dataset, resultStruct] = doRecursiveFeatureElemination_bootStrap_SVM(dataset, nmbBootSteps)">doRecursiveFeatureElemination_bootStrap_SVM</a>	(UNDER CONSTRUCTION) Recursively removes features according to SVM classification weights obtained by bootstrapping.</li><li><a href="predict_RVM.html" class="code" title="function [resultStruct, probEstimates] = predict_RVM(dataset, rvmModel)">predict_RVM</a>	(UNDER CONSTRUCTION) Predicts classes of the samples in dataset using the given SVM-model.</li><li><a href="predict_SVM.html" class="code" title="function [resultStruct, probEstimates] = predict_SVM(dataset, svmModel)">predict_SVM</a>	Predicts classes of the samples in dataset using the given SVM-model.</li><li><a href="train_RVM.html" class="code" title="function [rvmModel, weights] = train_RVM(dataset, kernelType, kernelWidth, paramStruct)">train_RVM</a>	(UNDER CONSTRUCTION) Simple training of a dataset based on the given dataset using a Relevance Vector Machine (RVM).</li><li><a href="train_SVM.html" class="code" title="function [svmModel, weights] = train_SVM(dataset, kernelMode, costParam, paramStruct)">train_SVM</a>	Simple training of a dataset based on the given dataset using a Support Vector Machine (SVM).</li></ul>
+<li><a href="doLeaveOneOutCrossValidation_SVM.html" class="code" title="function [dataset, resultStruct, avgWeights] = doLeaveOneOutCrossValidation_SVM(dataset, dataSplitter, svmType, kernelMode, costParam, paramStruct)">doLeaveOneOutCrossValidation_SVM</a>	Implements a Leave One Out Cross Validation (LOOCV) using a Support Vector Machine Classifier (parallel execution).</li><li><a href="doRecursiveFeatureElemination_SVM.html" class="code" title="function [dataset, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = doRecursiveFeatureElemination_SVM(dataset, nmbIterations, thresholdPercentOfFeaturesOut, dataSplitter, svmType, kernelMode, costParam, paramStruct)">doRecursiveFeatureElemination_SVM</a>	Recursively removes features according to SVM classification weights (parallel execution).</li><li><a href="doRecursiveFeatureElemination_SVM_nestedLOOCV.html" class="code" title="function [dataset, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = doRecursiveFeatureElemination_SVM_nestedLOOCV(dataset, nmbIterations, thresholdPercentOfFeaturesOut, nmbSplitsLOOCV, dataSplitter, kernelMode, costParam, paramStruct)">doRecursiveFeatureElemination_SVM_nestedLOOCV</a>	! DEPRECATED ! Recursively removes features according to SVM classification weights from LOOCV.</li><li><a href="doRecursiveFeatureElemination_bootStrap_SVM.html" class="code" title="function [dataset, resultStruct] = doRecursiveFeatureElemination_bootStrap_SVM(dataset, nmbBootSteps)">doRecursiveFeatureElemination_bootStrap_SVM</a>	[DO NOT USE: UNDER DEVELOPEMENT!] Recursively removes features according to SVM classification weights obtained by bootstrapping.</li><li><a href="doRecursiveFeatureElemination_bootstrapping_SVM.html" class="code" title="function [dataset, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = doRecursiveFeatureElemination_bootstrapping_SVM(dataset, nmbBootstrapIterations, nmbIterations, thresholdPercentOfFeaturesOut, dataSplitter, kernelMode, costParam, paramStruct)">doRecursiveFeatureElemination_bootstrapping_SVM</a>	[DO NOT USE: UNDER DEVELOPEMENT!] Recursively removes features according to SVM classification weights (parallel execution).</li><li><a href="predict_RVM.html" class="code" title="function [resultStruct, probEstimates] = predict_RVM(dataset, rvmModel)">predict_RVM</a>	(UNDER CONSTRUCTION) Predicts classes of the samples in dataset using the given SVM-model.</li><li><a href="predict_SVM.html" class="code" title="function [resultStruct, probEstimates] = predict_SVM(dataset, svmModel)">predict_SVM</a>	Predicts classes of the samples in dataset using the given SVM-model.</li><li><a href="train_RVM.html" class="code" title="function [rvmModel, weights] = train_RVM(dataset, kernelType, kernelWidth, paramStruct)">train_RVM</a>	(UNDER CONSTRUCTION) Simple training of a dataset based on the given dataset using a Relevance Vector Machine (RVM).</li><li><a href="train_SVM.html" class="code" title="function [svmModel, weights] = train_SVM(dataset, svmType, kernelMode, costParam, paramStruct)">train_SVM</a>	Simple training of a dataset based on the given dataset using a Support Vector Machine (SVM).</li></ul>
 <!-- crossreference -->
 
 
@@ -107,28 +107,44 @@ This function is called by:
 0035      <span class="keyword">if</span>(~isfield(dataset,<span class="string">'featureSelectionMap'</span>) || isempty(dataset.featureSelectionMap))
 0036       error(<span class="string">'The field dataset.featureSelectionMap is not set. It is not possible to select features without this field.'</span>);
 0037      <span class="keyword">end</span>
-0038      data2D   = zeros(size(dataset.data, 4), numel(find(dataset.featureSelectionMap &gt; 0)));
-0039      <span class="keyword">for</span> i=1:size(dataset.data,4)
-0040        tmp            = dataset.data(:,:,:,i);
-0041        data2D(i,:)    = tmp(dataset.featureSelectionMap&gt;0);
-0042      <span class="keyword">end</span>
-0043      
-0044   <span class="keyword">elseif</span>(dataset.is2D)
-0045     
-0046      <span class="keyword">if</span>(~isfield(dataset,<span class="string">'featureSelectionMap'</span>) || isempty(dataset.featureSelectionMap))
-0047       error(<span class="string">'The field dataset.featureSelectionMap is not set. It is not possible to select features without this field.'</span>);
-0048      <span class="keyword">end</span>
-0049      data2D   = zeros(size(dataset.data, 2), numel(find(dataset.featureSelectionMap &gt; 0)));
-0050      <span class="keyword">for</span> i=1:size(dataset.data,2)
-0051        tmp            = dataset.data(:,i);
-0052        data2D(i,:)    = tmp(dataset.featureSelectionMap&gt;0);
-0053      <span class="keyword">end</span>
-0054      
-0055   <span class="keyword">else</span>
-0056     error(<span class="string">'selectFeaturesBySelectionMap: Please check the dataset: &quot;type&quot; is not corretly defined!'</span>);
-0057   <span class="keyword">end</span>
-0058   
-0059 <span class="keyword">end</span></pre></div>
-<hr><address>Generated on Tue 12-Apr-2011 12:12:55 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+0038      
+0039      numelFselMap = numel(dataset.featureSelectionMap(dataset.featureSelectionMap &gt; 0));
+0040      
+0041      <span class="comment">%more memory less computing time...</span>
+0042      selMap   = repmat(dataset.featureSelectionMap, [1, 1, 1, size(dataset.data,4)]);
+0043      data2D   = double(reshape(dataset.data(selMap&gt;0), numelFselMap, size(dataset.data,4))');
+0044      
+0045      <span class="comment">%less memory more computing time</span>
+0046 <span class="comment">%      data2D   = zeros(size(dataset.data,4), numelFselMap);</span>
+0047 <span class="comment">%      for i=1:size(dataset.data,4)</span>
+0048 <span class="comment">%        tmp            = dataset.data(:,:,:,i);</span>
+0049 <span class="comment">%        data2D(i,:)    = tmp(dataset.featureSelectionMap&gt;0);</span>
+0050 <span class="comment">%      end</span>
+0051      
+0052   <span class="keyword">elseif</span>(dataset.is2D)
+0053     
+0054      <span class="keyword">if</span>(~isfield(dataset,<span class="string">'featureSelectionMap'</span>) || isempty(dataset.featureSelectionMap))
+0055       error(<span class="string">'The field dataset.featureSelectionMap is not set. It is not possible to select features without this field.'</span>);
+0056      <span class="keyword">end</span>
+0057      
+0058      numelFselMap = numel(dataset.featureSelectionMap(dataset.featureSelectionMap &gt; 0));
+0059 
+0060      <span class="comment">%more memory less computing time...</span>
+0061      selMap   = repmat(dataset.featureSelectionMap, [1, 1, size(dataset.data,2)]);
+0062      data2D   = double(reshape(dataset.data(selMap&gt;0), numelFselMap, size(dataset.data,2))');
+0063     
+0064      <span class="comment">%less memory more computing time</span>
+0065 <span class="comment">%      data2D   = zeros(size(dataset.data, 2), numel(find(dataset.featureSelectionMap &gt; 0)));</span>
+0066 <span class="comment">%      for i=1:size(dataset.data,2)</span>
+0067 <span class="comment">%        tmp            = dataset.data(:,i);</span>
+0068 <span class="comment">%        data2D(i,:)    = tmp(dataset.featureSelectionMap&gt;0);</span>
+0069 <span class="comment">%      end</span>
+0070      
+0071   <span class="keyword">else</span>
+0072     error(<span class="string">'selectFeaturesBySelectionMap: Please check the dataset: &quot;type&quot; is not corretly defined!'</span>);
+0073   <span class="keyword">end</span>
+0074   
+0075 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 22-Oct-2012 13:45:25 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
 </body>
 </html>

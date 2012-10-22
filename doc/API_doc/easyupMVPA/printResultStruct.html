@@ -53,7 +53,7 @@ This function calls:
 <li><a href="printResultStruct.html" class="code" title="function printResultStruct(resultStruct)">printResultStruct</a>	Prints the content of the result struct (result of prediction, LOOCV, RFE) on the screen.</li></ul>
 This function is called by:
 <ul style="list-style-image:url(../matlabicon.gif)">
-<li><a href="doRecursiveFeatureElemination_SVM.html" class="code" title="function [dataset, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = doRecursiveFeatureElemination_SVM(dataset, nmbIterations, thresholdPercentOfFeaturesOut, dataSplitter, kernelMode, costParam, paramStruct)">doRecursiveFeatureElemination_SVM</a>	Recursively removes features according to SVM classification weights (parallel execution).</li><li><a href="doRecursiveFeatureElemination_SVM_nestedLOOCV.html" class="code" title="function [dataset, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = doRecursiveFeatureElemination_SVM_nestedLOOCV(dataset, nmbIterations, thresholdPercentOfFeaturesOut, nmbSplitsLOOCV, dataSplitter, kernelMode, costParam, paramStruct)">doRecursiveFeatureElemination_SVM_nestedLOOCV</a>	! DEPRECATED ! Recursively removes features according to SVM classification weights from LOOCV.</li><li><a href="doRecursiveFeatureElemination_bootStrap_SVM.html" class="code" title="function [dataset, resultStruct] = doRecursiveFeatureElemination_bootStrap_SVM(dataset, nmbBootSteps)">doRecursiveFeatureElemination_bootStrap_SVM</a>	(UNDER CONSTRUCTION) Recursively removes features according to SVM classification weights obtained by bootstrapping.</li><li><a href="printResultStruct.html" class="code" title="function printResultStruct(resultStruct)">printResultStruct</a>	Prints the content of the result struct (result of prediction, LOOCV, RFE) on the screen.</li></ul>
+<li><a href="doRecursiveFeatureElemination_SVM.html" class="code" title="function [dataset, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = doRecursiveFeatureElemination_SVM(dataset, nmbIterations, thresholdPercentOfFeaturesOut, dataSplitter, svmType, kernelMode, costParam, paramStruct)">doRecursiveFeatureElemination_SVM</a>	Recursively removes features according to SVM classification weights (parallel execution).</li><li><a href="doRecursiveFeatureElemination_SVM_nestedLOOCV.html" class="code" title="function [dataset, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = doRecursiveFeatureElemination_SVM_nestedLOOCV(dataset, nmbIterations, thresholdPercentOfFeaturesOut, nmbSplitsLOOCV, dataSplitter, kernelMode, costParam, paramStruct)">doRecursiveFeatureElemination_SVM_nestedLOOCV</a>	! DEPRECATED ! Recursively removes features according to SVM classification weights from LOOCV.</li><li><a href="doRecursiveFeatureElemination_bootStrap_SVM.html" class="code" title="function [dataset, resultStruct] = doRecursiveFeatureElemination_bootStrap_SVM(dataset, nmbBootSteps)">doRecursiveFeatureElemination_bootStrap_SVM</a>	[DO NOT USE: UNDER DEVELOPEMENT!] Recursively removes features according to SVM classification weights obtained by bootstrapping.</li><li><a href="doRecursiveFeatureElemination_bootstrapping_SVM.html" class="code" title="function [dataset, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = doRecursiveFeatureElemination_bootstrapping_SVM(dataset, nmbBootstrapIterations, nmbIterations, thresholdPercentOfFeaturesOut, dataSplitter, kernelMode, costParam, paramStruct)">doRecursiveFeatureElemination_bootstrapping_SVM</a>	[DO NOT USE: UNDER DEVELOPEMENT!] Recursively removes features according to SVM classification weights (parallel execution).</li><li><a href="printResultStruct.html" class="code" title="function printResultStruct(resultStruct)">printResultStruct</a>	Prints the content of the result struct (result of prediction, LOOCV, RFE) on the screen.</li></ul>
 <!-- crossreference -->
 
 
@@ -92,7 +92,7 @@ This function is called by:
 0031      <span class="keyword">if</span>(isfield(resultStruct, <span class="string">'infoString'</span>))
 0032        disp([<span class="string">'Additional Info: '</span>, resultStruct.infoString])
 0033      <span class="keyword">end</span>
-0034      disp(<span class="string">'************************'</span>);
+0034      
 0035      
 0036      <span class="keyword">if</span>(isfield(resultStruct, <span class="string">'innerResultStruct'</span>) &amp;&amp; ~isempty(resultStruct.innerResultStruct))
 0037        disp(<span class="string">' '</span>);
@@ -100,7 +100,15 @@ This function is called by:
 0039        <a href="printResultStruct.html" class="code" title="function printResultStruct(resultStruct)">printResultStruct</a>(resultStruct.innerResultStruct);
 0040      <span class="keyword">end</span>
 0041      
-0042 <span class="keyword">end</span></pre></div>
-<hr><address>Generated on Tue 12-Apr-2011 12:12:55 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+0042      <span class="keyword">if</span>(isfield(resultStruct, <span class="string">'predictedClassIDs'</span>) &amp;&amp; ~isempty(resultStruct.predictedClassIDs))
+0043        disp(<span class="string">' '</span>);
+0044        disp(<span class="string">'Predicted class IDs / regression values:'</span>);
+0045        disp([<span class="string">'                 size : '</span>, num2str(size(resultStruct.predictedClassIDs))]);
+0046        disp([<span class="string">'                 class: '</span>, class(resultStruct.predictedClassIDs)]);
+0047 
+0048      <span class="keyword">end</span>
+0049      disp(<span class="string">'************************'</span>);
+0050 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 22-Oct-2012 13:45:25 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
 </body>
 </html>

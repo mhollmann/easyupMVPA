@@ -53,7 +53,7 @@
 <h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
 This function calls:
 <ul style="list-style-image:url(../matlabicon.gif)">
-<li><a href="easyupMVPA_setGlobals.html" class="code" title="function [ok] = easyupMVPA_setGlobals(propertyName, propertyValue)">easyupMVPA_setGlobals</a>	Used to set values for global properties in the toolbox.</li></ul>
+<li><a href="easyupMVPA_setGlobals.html" class="code" title="function [ok] = easyupMVPA_setGlobals(propertyName, propertyValue)">easyupMVPA_setGlobals</a>	Used to set values for global properties in the toolbox.</li><li><a href="easyupMVPA_version.html" class="code" title="function [versionNmb] = easyupMVPA_version()">easyupMVPA_version</a>	Returns the current version of easyup mvpa.</li></ul>
 This function is called by:
 <ul style="list-style-image:url(../matlabicon.gif)">
 </ul>
@@ -88,89 +88,91 @@ This function is called by:
 0024   
 0025   <span class="comment">%set path variable</span>
 0026   dirEU = which(<span class="string">'easyupMVPA_init'</span>);
-0027   [pathstr, name, ext, versn] = fileparts(dirEU);
+0027   [pathstr, name, ext] = fileparts(dirEU);
 0028   addpath(genpath(pathstr));
 0029   
-0030   <a href="easyupMVPA_setGlobals.html" class="code" title="function [ok] = easyupMVPA_setGlobals(propertyName, propertyValue)">easyupMVPA_setGlobals</a>(<span class="string">'quietMode'</span>, false);
+0030   <a href="easyupMVPA_version.html" class="code" title="function [versionNmb] = easyupMVPA_version()">easyupMVPA_version</a>();
 0031   
-0032   <span class="keyword">for</span> i=1:size(varargin,2)
-0033      
-0034      <span class="comment">%Read input var</span>
-0035      <span class="keyword">try</span>
-0036        varName = char(varargin(1,i));
-0037      <span class="keyword">catch</span>
-0038        varName = <span class="string">'X'</span>;
-0039      <span class="keyword">end</span>
-0040      
-0041      <span class="keyword">switch</span> varName
-0042        <span class="keyword">case</span> <span class="string">'nmbCores'</span>  
-0043           <span class="keyword">try</span> 
-0044             nmbUsedCores = cell2mat(varargin(1,i+1));
-0045             <span class="keyword">if</span>(~isnumeric(nmbUsedCores))
-0046               clear(<span class="string">'nmbUsedCores'</span>);
-0047             <span class="keyword">end</span>
-0048           <span class="keyword">catch</span>
-0049           <span class="keyword">end</span>
-0050        <span class="keyword">case</span> <span class="string">'quietMode'</span>
-0051          <span class="keyword">try</span> 
-0052            quietMode = cell2mat(varargin(1,i+1));
-0053            <span class="keyword">if</span>(quietMode)
-0054              <a href="easyupMVPA_setGlobals.html" class="code" title="function [ok] = easyupMVPA_setGlobals(propertyName, propertyValue)">easyupMVPA_setGlobals</a>(<span class="string">'quietMode'</span>, true);
-0055            <span class="keyword">else</span>
-0056              <a href="easyupMVPA_setGlobals.html" class="code" title="function [ok] = easyupMVPA_setGlobals(propertyName, propertyValue)">easyupMVPA_setGlobals</a>(<span class="string">'quietMode'</span>, false);
-0057            <span class="keyword">end</span>
-0058          <span class="keyword">catch</span>
-0059            <a href="easyupMVPA_setGlobals.html" class="code" title="function [ok] = easyupMVPA_setGlobals(propertyName, propertyValue)">easyupMVPA_setGlobals</a>(<span class="string">'quietMode'</span>, false);
-0060          <span class="keyword">end</span>
-0061        <span class="keyword">case</span> <span class="string">'X'</span>
-0062          <span class="comment">%do nothing</span>
-0063        <span class="keyword">otherwise</span>
-0064          error([<span class="string">'Invalid option : '''</span>,varName,<span class="string">'''. Usage of easyupMVPA_init example: easyupMVPA_init() or easyupMVPA_init(''nmbCores'', 4, ''quietMode'', true).'</span>]);
-0065      <span class="keyword">end</span>
-0066      
-0067   <span class="keyword">end</span>
-0068   
-0069   <span class="comment">%check if matlabpool command is available otherwise</span>
-0070   <span class="comment">%the distributed computing toolbox is not available</span>
-0071   <span class="keyword">try</span>
-0072     sPool = matlabpool(<span class="string">'size'</span>);
-0073   <span class="keyword">catch</span>
-0074     disp(<span class="string">'INFO: running easyUpMVPA without parallelization.'</span>);
-0075     <span class="keyword">return</span>;
-0076   <span class="keyword">end</span>
-0077   
-0078   <span class="keyword">if</span>(exist(<span class="string">'nmbUsedCores'</span>,<span class="string">'var'</span>) &amp;&amp; nmbUsedCores&gt;0)
-0079     outP = findResource();
-0080     <span class="keyword">if</span>(nmbUsedCores &gt; outP.ClusterSize || nmbUsedCores &lt; 0) 
-0081       nmbUsedCores = outP.ClusterSize;
-0082       warning([<span class="string">'Restricted number of used cores to maximum available cores: '</span>, num2str(nmbUsedCores),<span class="string">'.'</span>]);
-0083     <span class="keyword">end</span>
-0084   <span class="keyword">end</span>
-0085   <span class="keyword">if</span>(~exist(<span class="string">'nmbUsedCores'</span>,<span class="string">'var'</span>))
-0086     outP = findResource();
-0087     nmbUsedCores = outP.ClusterSize;
-0088   <span class="keyword">end</span>
-0089   
-0090   sPool = matlabpool(<span class="string">'size'</span>);
+0032   <a href="easyupMVPA_setGlobals.html" class="code" title="function [ok] = easyupMVPA_setGlobals(propertyName, propertyValue)">easyupMVPA_setGlobals</a>(<span class="string">'quietMode'</span>, false);
+0033   
+0034   <span class="keyword">for</span> i=1:size(varargin,2)
+0035      
+0036      <span class="comment">%Read input var</span>
+0037      <span class="keyword">try</span>
+0038        varName = char(varargin(1,i));
+0039      <span class="keyword">catch</span>
+0040        varName = <span class="string">'X'</span>;
+0041      <span class="keyword">end</span>
+0042      
+0043      <span class="keyword">switch</span> varName
+0044        <span class="keyword">case</span> <span class="string">'nmbCores'</span>  
+0045           <span class="keyword">try</span> 
+0046             nmbUsedCores = cell2mat(varargin(1,i+1));
+0047             <span class="keyword">if</span>(~isnumeric(nmbUsedCores))
+0048               clear(<span class="string">'nmbUsedCores'</span>);
+0049             <span class="keyword">end</span>
+0050           <span class="keyword">catch</span>
+0051           <span class="keyword">end</span>
+0052        <span class="keyword">case</span> <span class="string">'quietMode'</span>
+0053          <span class="keyword">try</span> 
+0054            quietMode = cell2mat(varargin(1,i+1));
+0055            <span class="keyword">if</span>(quietMode)
+0056              <a href="easyupMVPA_setGlobals.html" class="code" title="function [ok] = easyupMVPA_setGlobals(propertyName, propertyValue)">easyupMVPA_setGlobals</a>(<span class="string">'quietMode'</span>, true);
+0057            <span class="keyword">else</span>
+0058              <a href="easyupMVPA_setGlobals.html" class="code" title="function [ok] = easyupMVPA_setGlobals(propertyName, propertyValue)">easyupMVPA_setGlobals</a>(<span class="string">'quietMode'</span>, false);
+0059            <span class="keyword">end</span>
+0060          <span class="keyword">catch</span>
+0061            <a href="easyupMVPA_setGlobals.html" class="code" title="function [ok] = easyupMVPA_setGlobals(propertyName, propertyValue)">easyupMVPA_setGlobals</a>(<span class="string">'quietMode'</span>, false);
+0062          <span class="keyword">end</span>
+0063        <span class="keyword">case</span> <span class="string">'X'</span>
+0064          <span class="comment">%do nothing</span>
+0065        <span class="keyword">otherwise</span>
+0066          error([<span class="string">'Invalid option : '''</span>,varName,<span class="string">'''. Usage of easyupMVPA_init example: easyupMVPA_init() or easyupMVPA_init(''nmbCores'', 4, ''quietMode'', true).'</span>]);
+0067      <span class="keyword">end</span>
+0068      
+0069   <span class="keyword">end</span>
+0070   
+0071   <span class="comment">%check if matlabpool command is available otherwise</span>
+0072   <span class="comment">%the distributed computing toolbox is not available</span>
+0073   <span class="keyword">try</span>
+0074     sPool = matlabpool(<span class="string">'size'</span>);
+0075   <span class="keyword">catch</span>
+0076     disp(<span class="string">'INFO: Seems as the Distributed Computing Toolbox is not available. Running easyUpMVPA without parallelization.'</span>);
+0077     <span class="keyword">return</span>;
+0078   <span class="keyword">end</span>
+0079   
+0080   <span class="keyword">if</span>(exist(<span class="string">'nmbUsedCores'</span>,<span class="string">'var'</span>) &amp;&amp; nmbUsedCores&gt;0)
+0081     outP = findResource();
+0082     <span class="keyword">if</span>(nmbUsedCores &gt; outP.ClusterSize || nmbUsedCores &lt; 0) 
+0083       nmbUsedCores = outP.ClusterSize;
+0084       warning([<span class="string">'Restricted number of used cores to maximum available cores: '</span>, num2str(nmbUsedCores),<span class="string">'.'</span>]);
+0085     <span class="keyword">end</span>
+0086   <span class="keyword">end</span>
+0087   <span class="keyword">if</span>(~exist(<span class="string">'nmbUsedCores'</span>,<span class="string">'var'</span>))
+0088     outP = findResource();
+0089     nmbUsedCores = outP.ClusterSize;
+0090   <span class="keyword">end</span>
 0091   
-0092   <span class="comment">%try to open a parallel session if intended</span>
-0093   <span class="keyword">if</span>( sPool==0 &amp;&amp; nmbUsedCores&gt;0)
-0094     matlabpool(<span class="string">'open'</span>, nmbUsedCores);    
-0095   <span class="keyword">elseif</span>(sPool ~= nmbUsedCores &amp;&amp; nmbUsedCores&gt;0)
-0096     matlabpool close;
-0097     matlabpool(<span class="string">'open'</span>, nmbUsedCores); 
-0098   <span class="keyword">elseif</span>(sPool &gt; 0 &amp;&amp; nmbUsedCores==0)
-0099     matlabpool close;
-0100   <span class="keyword">end</span>
-0101     
-0102   <span class="keyword">if</span>(matlabpool(<span class="string">'size'</span>) &gt; 0)
-0103     disp([<span class="string">'INFO: running easyUpMVPA parallelized using '</span>, num2str(matlabpool(<span class="string">'size'</span>)),<span class="string">' cores. You can set the number of maximal cores to N using easyupMVPA_init(''nmbCores'', N)!'</span>]);
-0104   <span class="keyword">else</span>
-0105     disp(<span class="string">'INFO: running easyUpMVPA without parallelization.'</span>);
-0106   <span class="keyword">end</span>
-0107   
-0108   
-0109 <span class="keyword">end</span></pre></div>
-<hr><address>Generated on Tue 12-Apr-2011 12:12:55 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+0092   sPool = matlabpool(<span class="string">'size'</span>);
+0093   
+0094   <span class="comment">%try to open a parallel session if intended</span>
+0095   <span class="keyword">if</span>( sPool==0 &amp;&amp; nmbUsedCores&gt;0)
+0096     matlabpool(<span class="string">'open'</span>, nmbUsedCores);    
+0097   <span class="keyword">elseif</span>(sPool ~= nmbUsedCores &amp;&amp; nmbUsedCores&gt;0)
+0098     matlabpool close;
+0099     matlabpool(<span class="string">'open'</span>, nmbUsedCores); 
+0100   <span class="keyword">elseif</span>(sPool &gt; 0 &amp;&amp; nmbUsedCores==0)
+0101     matlabpool close;
+0102   <span class="keyword">end</span>
+0103     
+0104   <span class="keyword">if</span>(matlabpool(<span class="string">'size'</span>) &gt; 0)
+0105     disp([<span class="string">'INFO: running easyUpMVPA parallelized using '</span>, num2str(matlabpool(<span class="string">'size'</span>)),<span class="string">' cores. You can set the number of maximal cores to N using easyupMVPA_init(''nmbCores'', N)!'</span>]);
+0106   <span class="keyword">else</span>
+0107     disp(<span class="string">'INFO: running easyUpMVPA without parallelization.'</span>);
+0108   <span class="keyword">end</span>
+0109   
+0110   
+0111 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 22-Oct-2012 13:45:25 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
 </body>
 </html>

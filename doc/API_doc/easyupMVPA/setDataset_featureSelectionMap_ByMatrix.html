@@ -58,7 +58,7 @@ This function calls:
 <li><a href="checkDataset.html" class="code" title="function [ok] = checkDataset(dataset)">checkDataset</a>	Checks a given dataset for correctness (i.e. size of defined matrices).</li></ul>
 This function is called by:
 <ul style="list-style-image:url(../matlabicon.gif)">
-<li><a href="doLeaveOneOutCrossValidation_SVM.html" class="code" title="function [dataset, resultStruct, avgWeights] = doLeaveOneOutCrossValidation_SVM(dataset, dataSplitter, kernelMode, costParam, paramStruct)">doLeaveOneOutCrossValidation_SVM</a>	Implements a Leave One Out Cross Validation (LOOCV) using a Support Vector Machine Classifier (parallel execution).</li><li><a href="doRecursiveFeatureElemination_SVM.html" class="code" title="function [dataset, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = doRecursiveFeatureElemination_SVM(dataset, nmbIterations, thresholdPercentOfFeaturesOut, dataSplitter, kernelMode, costParam, paramStruct)">doRecursiveFeatureElemination_SVM</a>	Recursively removes features according to SVM classification weights (parallel execution).</li><li><a href="doRecursiveFeatureElemination_SVM_nestedLOOCV.html" class="code" title="function [dataset, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = doRecursiveFeatureElemination_SVM_nestedLOOCV(dataset, nmbIterations, thresholdPercentOfFeaturesOut, nmbSplitsLOOCV, dataSplitter, kernelMode, costParam, paramStruct)">doRecursiveFeatureElemination_SVM_nestedLOOCV</a>	! DEPRECATED ! Recursively removes features according to SVM classification weights from LOOCV.</li><li><a href="doRecursiveFeatureElemination_bootStrap_SVM.html" class="code" title="function [dataset, resultStruct] = doRecursiveFeatureElemination_bootStrap_SVM(dataset, nmbBootSteps)">doRecursiveFeatureElemination_bootStrap_SVM</a>	(UNDER CONSTRUCTION) Recursively removes features according to SVM classification weights obtained by bootstrapping.</li><li><a href="predict_RVM.html" class="code" title="function [resultStruct, probEstimates] = predict_RVM(dataset, rvmModel)">predict_RVM</a>	(UNDER CONSTRUCTION) Predicts classes of the samples in dataset using the given SVM-model.</li><li><a href="predict_SVM.html" class="code" title="function [resultStruct, probEstimates] = predict_SVM(dataset, svmModel)">predict_SVM</a>	Predicts classes of the samples in dataset using the given SVM-model.</li><li><a href="train_RVM.html" class="code" title="function [rvmModel, weights] = train_RVM(dataset, kernelType, kernelWidth, paramStruct)">train_RVM</a>	(UNDER CONSTRUCTION) Simple training of a dataset based on the given dataset using a Relevance Vector Machine (RVM).</li><li><a href="train_SVM.html" class="code" title="function [svmModel, weights] = train_SVM(dataset, kernelMode, costParam, paramStruct)">train_SVM</a>	Simple training of a dataset based on the given dataset using a Support Vector Machine (SVM).</li></ul>
+<li><a href="doLeaveOneOutCrossValidation_SVM.html" class="code" title="function [dataset, resultStruct, avgWeights] = doLeaveOneOutCrossValidation_SVM(dataset, dataSplitter, svmType, kernelMode, costParam, paramStruct)">doLeaveOneOutCrossValidation_SVM</a>	Implements a Leave One Out Cross Validation (LOOCV) using a Support Vector Machine Classifier (parallel execution).</li><li><a href="doRecursiveFeatureElemination_SVM.html" class="code" title="function [dataset, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = doRecursiveFeatureElemination_SVM(dataset, nmbIterations, thresholdPercentOfFeaturesOut, dataSplitter, svmType, kernelMode, costParam, paramStruct)">doRecursiveFeatureElemination_SVM</a>	Recursively removes features according to SVM classification weights (parallel execution).</li><li><a href="doRecursiveFeatureElemination_SVM_nestedLOOCV.html" class="code" title="function [dataset, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = doRecursiveFeatureElemination_SVM_nestedLOOCV(dataset, nmbIterations, thresholdPercentOfFeaturesOut, nmbSplitsLOOCV, dataSplitter, kernelMode, costParam, paramStruct)">doRecursiveFeatureElemination_SVM_nestedLOOCV</a>	! DEPRECATED ! Recursively removes features according to SVM classification weights from LOOCV.</li><li><a href="doRecursiveFeatureElemination_bootStrap_SVM.html" class="code" title="function [dataset, resultStruct] = doRecursiveFeatureElemination_bootStrap_SVM(dataset, nmbBootSteps)">doRecursiveFeatureElemination_bootStrap_SVM</a>	[DO NOT USE: UNDER DEVELOPEMENT!] Recursively removes features according to SVM classification weights obtained by bootstrapping.</li><li><a href="doRecursiveFeatureElemination_bootstrapping_SVM.html" class="code" title="function [dataset, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = doRecursiveFeatureElemination_bootstrapping_SVM(dataset, nmbBootstrapIterations, nmbIterations, thresholdPercentOfFeaturesOut, dataSplitter, kernelMode, costParam, paramStruct)">doRecursiveFeatureElemination_bootstrapping_SVM</a>	[DO NOT USE: UNDER DEVELOPEMENT!] Recursively removes features according to SVM classification weights (parallel execution).</li><li><a href="predict_RVM.html" class="code" title="function [resultStruct, probEstimates] = predict_RVM(dataset, rvmModel)">predict_RVM</a>	(UNDER CONSTRUCTION) Predicts classes of the samples in dataset using the given SVM-model.</li><li><a href="predict_SVM.html" class="code" title="function [resultStruct, probEstimates] = predict_SVM(dataset, svmModel)">predict_SVM</a>	Predicts classes of the samples in dataset using the given SVM-model.</li><li><a href="train_RVM.html" class="code" title="function [rvmModel, weights] = train_RVM(dataset, kernelType, kernelWidth, paramStruct)">train_RVM</a>	(UNDER CONSTRUCTION) Simple training of a dataset based on the given dataset using a Relevance Vector Machine (RVM).</li><li><a href="train_SVM.html" class="code" title="function [svmModel, weights] = train_SVM(dataset, svmType, kernelMode, costParam, paramStruct)">train_SVM</a>	Simple training of a dataset based on the given dataset using a Support Vector Machine (SVM).</li></ul>
 <!-- crossreference -->
 
 
@@ -95,7 +95,7 @@ This function is called by:
 0029   <span class="keyword">end</span>
 0030   
 0031   <span class="comment">%4D type</span>
-0032   <span class="keyword">if</span>(isfield(dataset, <span class="string">'type'</span>) &amp;&amp;  strcmp(dataset.type,<span class="string">'dataset4D'</span>))
+0032   <span class="keyword">if</span>(dataset.is4D)
 0033   
 0034     <span class="comment">%check dimensions</span>
 0035     sizeData = size(dataset.data);
@@ -112,7 +112,7 @@ This function is called by:
 0046 
 0047     mapMatrix(mapMatrix&gt;0)=1;
 0048     mapMatrix(mapMatrix&lt;0)=1;
-0049     dataset.featureSelectionMap = mapMatrix;
+0049     dataset.featureSelectionMap = uint8(mapMatrix);
 0050 
 0051     <span class="comment">%combine an existing mask3D and given map (just voxels in both will survive)</span>
 0052     <span class="keyword">if</span>(isfield(dataset, <span class="string">'mask'</span>) &amp;&amp; ~isempty(dataset.mask))
@@ -120,7 +120,7 @@ This function is called by:
 0054     <span class="keyword">end</span>
 0055   
 0056   <span class="comment">%2D type</span>
-0057   <span class="keyword">elseif</span>(isfield(dataset, <span class="string">'type'</span>) &amp;&amp;  strcmp(dataset.type,<span class="string">'dataset2D'</span>))
+0057   <span class="keyword">elseif</span>(dataset.is2D)
 0058     
 0059     <span class="comment">%check dimensions</span>
 0060     sizeData = size(dataset.data);
@@ -137,7 +137,7 @@ This function is called by:
 0071 
 0072     mapMatrix(mapMatrix&gt;0)=1;
 0073     mapMatrix(mapMatrix&lt;0)=1;
-0074     dataset.featureSelectionMap = mapMatrix;
+0074     dataset.featureSelectionMap = uint8(mapMatrix);
 0075 
 0076     <span class="comment">%combine an existing mask and given map (just voxels in both will survive)</span>
 0077     <span class="keyword">if</span>(isfield(dataset, <span class="string">'mask'</span>) &amp;&amp; ~isempty(dataset.mask))
@@ -154,6 +154,6 @@ This function is called by:
 0088   <span class="keyword">end</span>
 0089   
 0090 <span class="keyword">end</span></pre></div>
-<hr><address>Generated on Tue 12-Apr-2011 12:12:55 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+<hr><address>Generated on Mon 22-Oct-2012 13:45:25 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
 </body>
 </html>

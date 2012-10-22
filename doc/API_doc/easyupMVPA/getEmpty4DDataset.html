@@ -51,6 +51,7 @@
    dataset.mask                  = [];
    dataset.featureSelectionMap   = [];
    dataset.data_3DNiftiHdr       = [];
+   dataset.processingHistory     = {};
 
  Parameters:
 
@@ -97,32 +98,34 @@ This function is called by:
 0022 <span class="comment">%   dataset.mask                  = [];</span>
 0023 <span class="comment">%   dataset.featureSelectionMap   = [];</span>
 0024 <span class="comment">%   dataset.data_3DNiftiHdr       = [];</span>
-0025 <span class="comment">%</span>
-0026 <span class="comment">% Parameters:</span>
-0027 <span class="comment">%</span>
-0028 <span class="comment">% Returns:</span>
-0029 <span class="comment">%</span>
-0030 <span class="comment">%   dataset          -&gt; empty dataset</span>
-0031 <span class="comment">%</span>
-0032 <span class="comment">% Comments:</span>
-0033 <span class="comment">%</span>
-0034 <a name="_sub0" href="#_subfunctions" class="code">function [dataset] = getEmpty4DDataset()</a>
-0035 
-0036   dataset = {};
-0037   
-0038   dataset.type = <span class="string">'dataset4D'</span>;
-0039   dataset.is4D = true;
-0040   dataset.is2D = false;
-0041   
-0042   dataset.dataFilelist          = [];
-0043   dataset.data                  = [];
-0044   dataset.chunks                = [];
-0045   dataset.classIDs              = [];
-0046   dataset.mask                  = [];
-0047   dataset.featureSelectionMap   = [];
-0048   dataset.data_3DNiftiHdr       = [];
-0049   
-0050 <span class="keyword">end</span></pre></div>
-<hr><address>Generated on Tue 12-Apr-2011 12:12:55 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+0025 <span class="comment">%   dataset.processingHistory     = {};</span>
+0026 <span class="comment">%</span>
+0027 <span class="comment">% Parameters:</span>
+0028 <span class="comment">%</span>
+0029 <span class="comment">% Returns:</span>
+0030 <span class="comment">%</span>
+0031 <span class="comment">%   dataset          -&gt; empty dataset</span>
+0032 <span class="comment">%</span>
+0033 <span class="comment">% Comments:</span>
+0034 <span class="comment">%</span>
+0035 <a name="_sub0" href="#_subfunctions" class="code">function [dataset] = getEmpty4DDataset()</a>
+0036 
+0037   dataset = {};
+0038   
+0039   dataset.type = <span class="string">'dataset4D'</span>;
+0040   dataset.is4D = true;
+0041   dataset.is2D = false;
+0042   
+0043   dataset.dataFilelist          = [];
+0044   dataset.data                  = [];
+0045   dataset.chunks                = [];
+0046   dataset.classIDs              = [];
+0047   dataset.mask                  = [];
+0048   dataset.featureSelectionMap   = [];
+0049   dataset.data_3DNiftiHdr       = [];
+0050   dataset.processingHistory     = {};
+0051   
+0052 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 22-Oct-2012 13:45:25 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
 </body>
 </html>

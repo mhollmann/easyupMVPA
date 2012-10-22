@@ -1,0 +1,660 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of doRecursiveFeatureElemination_bootstrapping_SVM</title>
+  <meta name="keywords" content="doRecursiveFeatureElemination_bootstrapping_SVM">
+  <meta name="description" content="[DO NOT USE: UNDER DEVELOPEMENT!] Recursively removes features according to SVM classification weights (parallel execution).">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">easyupMVPA</a> &gt; doRecursiveFeatureElemination_bootstrapping_SVM.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for easyupMVPA&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>doRecursiveFeatureElemination_bootstrapping_SVM
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>[DO NOT USE: UNDER DEVELOPEMENT!] Recursively removes features according to SVM classification weights (parallel execution).</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [dataset, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = doRecursiveFeatureElemination_bootstrapping_SVM(dataset, nmbBootstrapIterations, nmbIterations, thresholdPercentOfFeaturesOut, dataSplitter, kernelMode, costParam, paramStruct) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> [DO NOT USE: UNDER DEVELOPEMENT!] Recursively removes features according to SVM classification weights (parallel execution).
+
+ Author: Maurice Hollmann
+ Date  : 09/10
+
+ Description:
+   
+   [dataset, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = doRecursiveFeatureElemination_SVM(dataset, nmbIterations, thresholdPercentOfFeaturesOut, dataSplitter, kernelMode, costParam, [paramStruct])
+
+   This high-level function implements a recursive feature elemination (RFE) using a Support Vector Machine (SVM).
+   This means that voxels that hold no or just little information for classification are removed to recursively improve
+   classification performance. 
+   The algorithm is basically a LeaveOneOutCrossValidation and the given dataSplitter defines the test/training 
+   sets in every single run. Which  means that the  test  results  returned  with &quot;resultStruct&quot; can  be  used to  estimate 
+   the overall classification performance of the given SVM-classifier.
+
+   For every iteration the following is done:
+     For all splits(nmbSplits) in &quot;dataSplitter&quot; the data is splitted into training and test sets. In every training set the 
+     features are selected SEPERATELY according to the input parameter &quot;thresholdPercentOfFeaturesOut&quot;. And the test set is 
+     classified with the trained model.
+
+   That means there are nSplits models trained and every model has its own INDEPENDENT feature selection. For all this single 
+   selections a selectionMap is the result and these are returnd by the parameter &quot;avg_rfe_featureSelectionMap&quot;. The same holds
+   for the weights trained in every single model. This ensures that no information between test and training data is transferred.
+
+   The average maps for weights and featureSelectionMaps are returned also:
+   BUT BE AWARE: These may not be used as feature selection maps for further classification on the same dataset, because of 
+   information transfer!
+
+   To see the classification-performance during the RFE see the output on command line (If &quot;quietMode&quot; is switched off).
+   
+   The returned classification results may not be the best because always the LAST iteration sets the returned resultStruct. If
+   an intermediate iteration is best run this function again with this iteration-nmb-1 as input and then use the results.
+
+   The best performing iteration having the lowest number of features and all in between will be stored in additional info string
+   in resultStruct (May be displayed using &quot;printResultStruct(...)&quot;) and as capsuled resultStruct in field resultStruct.innerResultStruct.
+
+   If possible, the function executes parallelized depending on settings defined via easyupMVPA_init().
+
+ Parameters:
+   dataset                       - the datset to set the classIDs for
+   nmbIterations                 - iterations (how often is basic feature set reduced by &quot;thresholdPercentOfFeaturesOut&quot;)
+   thresholdPercentOfFeaturesOut - percentual value of non-zero elements in weight map that should be cut (suggestion btw. 10 and 50)
+   dataSplitter                  - describes the splitting of the data in the background LOOCV
+   kernelMode                    - Kernels: ['linear', 'polynomial', 'radial', 'sigmoid']
+   costParam                     - The slack variable C in SVM (range 0 to 1  0 = low cost, 1 = highest costs). 
+                                   It defines the costs for misclassification (How strongly are outliers punished?).
+   paramStruct                   - [optional] i.e. {&quot;degree&quot;, 3}
+
+ Returns:
+   dataset                     - In this dataset the field &quot;featureSelectionMap&quot; is updated to the result of this RFE
+   resultStruct                - The struct holding the classification results: 
+                                 resultStruct.nmbTests     (the number of samples tested for this result)
+                                 resultStruct.accuracy     (percentual value of correct predictions (correct * 100 / nmbSamples))
+                                 resultStruct.sensitivity  (TP/TP+FN = Proportion of true positives to all positives)
+                                 resultStruct.specificity  (TN/TN+FP = Proportion of true negatives to all negatives)
+                                 resultStruct.TP           (True positives = all correct predicted in class 1)
+                                 resultStruct.TN           (True negatives = all correct predicted in class 2)
+                                 resultStruct.FP           (False positives = all incorrect predicted in class 1)
+                                 resultStruct.FN           (False negatives = all incorrect predicted in class 2)
+   avg_rfe_weightMap           - Average map of the weights of the models trained (always determined in the last iteration - Dimension: Featurespace)
+   avg_rfe_featureSelectionMap - Average map of the selected features of the models trained (always determined in the last iteration - Dimension: Featurespace)
+   rfe_weightMaps              - All  all weight maps that are used in the last iteration (Dimension: Featurespace x nmbSplits)
+   rfe_featureSelectionMaps    - All feature-SelectionMaps (elements just 0 or 1) that are used in the last iteration (Dimension: Featurespace x nmbSplits)
+
+ Comments:</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="easyupMVPA_getGlobals.html" class="code" title="function [propertyValue] = easyupMVPA_getGlobals(propertyName)">easyupMVPA_getGlobals</a>	Returns values for global properties in the toolbox.</li><li><a href="printResultStruct.html" class="code" title="function printResultStruct(resultStruct)">printResultStruct</a>	Prints the content of the result struct (result of prediction, LOOCV, RFE) on the screen.</li><li><a href="selectFeaturesBySelectionMap.html" class="code" title="function [dataset, data2D] = selectFeaturesBySelectionMap(dataset)">selectFeaturesBySelectionMap</a>	Apply a featureSelection map that is stored in a dataset to this dataset.</li><li><a href="setDataset_featureSelectionMap_ByMatrix.html" class="code" title="function [dataset] = setDataset_featureSelectionMap_ByMatrix(dataset, mapMatrix)">setDataset_featureSelectionMap_ByMatrix</a>	Set the featureSelectionMap (1D or 3D) field of a dataset by a given matrix.</li><li><a href="showDataAsImage.html" class="code" title="function showDataAsImage(dataIn, infoString, tIndex)">showDataAsImage</a>	Show the data that is given as image.</li><li><a href="splitDataset.html" class="code" title="function [dataset1, dataset2] = splitDataset(dataset, vectorDS1, vectorDS2)">splitDataset</a>	Splits a dataset by selecting the elements defined by given vectors for the two result datasets.</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function [mapOut, totalNmbIn, totalNmbOut] = member_getSelectedMapByThresholdPercentOut(mapIn, thresholdPercentOfElementsOut)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% [DO NOT USE: UNDER DEVELOPEMENT!] Recursively removes features according to SVM classification weights (parallel execution).</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% Author: Maurice Hollmann</span>
+0004 <span class="comment">% Date  : 09/10</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% Description:</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%   [dataset, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = doRecursiveFeatureElemination_SVM(dataset, nmbIterations, thresholdPercentOfFeaturesOut, dataSplitter, kernelMode, costParam, [paramStruct])</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%   This high-level function implements a recursive feature elemination (RFE) using a Support Vector Machine (SVM).</span>
+0011 <span class="comment">%   This means that voxels that hold no or just little information for classification are removed to recursively improve</span>
+0012 <span class="comment">%   classification performance.</span>
+0013 <span class="comment">%   The algorithm is basically a LeaveOneOutCrossValidation and the given dataSplitter defines the test/training</span>
+0014 <span class="comment">%   sets in every single run. Which  means that the  test  results  returned  with &quot;resultStruct&quot; can  be  used to  estimate</span>
+0015 <span class="comment">%   the overall classification performance of the given SVM-classifier.</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">%   For every iteration the following is done:</span>
+0018 <span class="comment">%     For all splits(nmbSplits) in &quot;dataSplitter&quot; the data is splitted into training and test sets. In every training set the</span>
+0019 <span class="comment">%     features are selected SEPERATELY according to the input parameter &quot;thresholdPercentOfFeaturesOut&quot;. And the test set is</span>
+0020 <span class="comment">%     classified with the trained model.</span>
+0021 <span class="comment">%</span>
+0022 <span class="comment">%   That means there are nSplits models trained and every model has its own INDEPENDENT feature selection. For all this single</span>
+0023 <span class="comment">%   selections a selectionMap is the result and these are returnd by the parameter &quot;avg_rfe_featureSelectionMap&quot;. The same holds</span>
+0024 <span class="comment">%   for the weights trained in every single model. This ensures that no information between test and training data is transferred.</span>
+0025 <span class="comment">%</span>
+0026 <span class="comment">%   The average maps for weights and featureSelectionMaps are returned also:</span>
+0027 <span class="comment">%   BUT BE AWARE: These may not be used as feature selection maps for further classification on the same dataset, because of</span>
+0028 <span class="comment">%   information transfer!</span>
+0029 <span class="comment">%</span>
+0030 <span class="comment">%   To see the classification-performance during the RFE see the output on command line (If &quot;quietMode&quot; is switched off).</span>
+0031 <span class="comment">%</span>
+0032 <span class="comment">%   The returned classification results may not be the best because always the LAST iteration sets the returned resultStruct. If</span>
+0033 <span class="comment">%   an intermediate iteration is best run this function again with this iteration-nmb-1 as input and then use the results.</span>
+0034 <span class="comment">%</span>
+0035 <span class="comment">%   The best performing iteration having the lowest number of features and all in between will be stored in additional info string</span>
+0036 <span class="comment">%   in resultStruct (May be displayed using &quot;printResultStruct(...)&quot;) and as capsuled resultStruct in field resultStruct.innerResultStruct.</span>
+0037 <span class="comment">%</span>
+0038 <span class="comment">%   If possible, the function executes parallelized depending on settings defined via easyupMVPA_init().</span>
+0039 <span class="comment">%</span>
+0040 <span class="comment">% Parameters:</span>
+0041 <span class="comment">%   dataset                       - the datset to set the classIDs for</span>
+0042 <span class="comment">%   nmbIterations                 - iterations (how often is basic feature set reduced by &quot;thresholdPercentOfFeaturesOut&quot;)</span>
+0043 <span class="comment">%   thresholdPercentOfFeaturesOut - percentual value of non-zero elements in weight map that should be cut (suggestion btw. 10 and 50)</span>
+0044 <span class="comment">%   dataSplitter                  - describes the splitting of the data in the background LOOCV</span>
+0045 <span class="comment">%   kernelMode                    - Kernels: ['linear', 'polynomial', 'radial', 'sigmoid']</span>
+0046 <span class="comment">%   costParam                     - The slack variable C in SVM (range 0 to 1  0 = low cost, 1 = highest costs).</span>
+0047 <span class="comment">%                                   It defines the costs for misclassification (How strongly are outliers punished?).</span>
+0048 <span class="comment">%   paramStruct                   - [optional] i.e. {&quot;degree&quot;, 3}</span>
+0049 <span class="comment">%</span>
+0050 <span class="comment">% Returns:</span>
+0051 <span class="comment">%   dataset                     - In this dataset the field &quot;featureSelectionMap&quot; is updated to the result of this RFE</span>
+0052 <span class="comment">%   resultStruct                - The struct holding the classification results:</span>
+0053 <span class="comment">%                                 resultStruct.nmbTests     (the number of samples tested for this result)</span>
+0054 <span class="comment">%                                 resultStruct.accuracy     (percentual value of correct predictions (correct * 100 / nmbSamples))</span>
+0055 <span class="comment">%                                 resultStruct.sensitivity  (TP/TP+FN = Proportion of true positives to all positives)</span>
+0056 <span class="comment">%                                 resultStruct.specificity  (TN/TN+FP = Proportion of true negatives to all negatives)</span>
+0057 <span class="comment">%                                 resultStruct.TP           (True positives = all correct predicted in class 1)</span>
+0058 <span class="comment">%                                 resultStruct.TN           (True negatives = all correct predicted in class 2)</span>
+0059 <span class="comment">%                                 resultStruct.FP           (False positives = all incorrect predicted in class 1)</span>
+0060 <span class="comment">%                                 resultStruct.FN           (False negatives = all incorrect predicted in class 2)</span>
+0061 <span class="comment">%   avg_rfe_weightMap           - Average map of the weights of the models trained (always determined in the last iteration - Dimension: Featurespace)</span>
+0062 <span class="comment">%   avg_rfe_featureSelectionMap - Average map of the selected features of the models trained (always determined in the last iteration - Dimension: Featurespace)</span>
+0063 <span class="comment">%   rfe_weightMaps              - All  all weight maps that are used in the last iteration (Dimension: Featurespace x nmbSplits)</span>
+0064 <span class="comment">%   rfe_featureSelectionMaps    - All feature-SelectionMaps (elements just 0 or 1) that are used in the last iteration (Dimension: Featurespace x nmbSplits)</span>
+0065 <span class="comment">%</span>
+0066 <span class="comment">% Comments:</span>
+0067 <span class="comment">%</span>
+0068 <a name="_sub0" href="#_subfunctions" class="code">function [dataset, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = doRecursiveFeatureElemination_bootstrapping_SVM(dataset, nmbBootstrapIterations, nmbIterations, thresholdPercentOfFeaturesOut, dataSplitter, kernelMode, costParam, paramStruct)</a>
+0069   
+0070   <span class="keyword">if</span>( ~exist(<span class="string">'dataset'</span>,<span class="string">'var'</span>) || ~exist(<span class="string">'nmbIterations'</span>,<span class="string">'var'</span>) || ~exist(<span class="string">'thresholdPercentOfFeaturesOut'</span>,<span class="string">'var'</span>) || ~exist(<span class="string">'dataSplitter'</span>,<span class="string">'var'</span>) || ~exist(<span class="string">'kernelMode'</span>,<span class="string">'var'</span>) || ~exist(<span class="string">'costParam'</span>,<span class="string">'var'</span>)) 
+0071     error(<span class="string">'Usage of doRecursiveFeatureElemination_SVM: [dataset, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = doRecursiveFeatureElemination_SVM(dataset, nmbIterations, thresholdPercentOfFeaturesOut - [0-100%], dataSplitter, kernelMode - [linear, polynomial, radial, sigmoid] , costParam [0-1], paramStruct [optional - i.e. {&quot;degree&quot;, 3}])'</span>);
+0072   <span class="keyword">end</span>
+0073   
+0074   <span class="comment">%extractt the SVM parameter values from paramStruct</span>
+0075   <span class="keyword">if</span>( ~exist(<span class="string">'paramStruct'</span>,<span class="string">'var'</span>))
+0076     [paramStructIsValid, svmParamInfoStruct, cmdString] = getSVMParamInfo(kernelMode, costParam, {});
+0077   <span class="keyword">else</span>
+0078     [paramStructIsValid, svmParamInfoStruct, cmdString] = getSVMParamInfo(kernelMode, costParam, paramStruct);
+0079   <span class="keyword">end</span>
+0080   <span class="keyword">if</span>( ~paramStructIsValid)
+0081     error(<span class="string">'Usage of doRecursiveFeatureElemination_SVM: [dataset] = doRecursiveFeatureElemination_SVM(dataset, nmbIterations, thresholdPercentOfFeaturesOut - [0-100%], dataSplitter, kernelMode - [linear, polynomial, radial, sigmoid] , costParam [0-1], paramStruct [optional - i.e. {&quot;degree&quot;, 3}])'</span>);
+0082   <span class="keyword">end</span>
+0083   
+0084   <span class="comment">%use quiet mode (no outputs)</span>
+0085   cmdString = [cmdString, <span class="string">' -q '</span>];
+0086   
+0087   <span class="keyword">if</span>(thresholdPercentOfFeaturesOut &lt; 0 || thresholdPercentOfFeaturesOut &gt; 100)
+0088     error(<span class="string">'Usage of doRecursiveFeatureElemination_SVM: [dataset] = doRecursiveFeatureElemination_SVM(dataset, nmbIterations, thresholdPercentOfFeaturesOut - [0-100%], dataSplitter, kernelMode - [linear, polynomial, radial, sigmoid] , costParam [0-1], paramStruct [optional - i.e. {&quot;degree&quot;, 3}])'</span>);
+0089   <span class="keyword">end</span>
+0090       
+0091   localQuietMode = <a href="easyupMVPA_getGlobals.html" class="code" title="function [propertyValue] = easyupMVPA_getGlobals(propertyName)">easyupMVPA_getGlobals</a>(<span class="string">'quietMode'</span>);
+0092   
+0093   <span class="keyword">if</span>(~localQuietMode)
+0094     disp(<span class="string">'Running Recursive Feature Elemination (This may take a while!) ...'</span>);
+0095   <span class="keyword">end</span>
+0096   
+0097   <span class="comment">%extract the number of splits that are used</span>
+0098   nmbSplits = size(dataSplitter.splitMatrix,1);
+0099   
+0100   resultStruct   = {};
+0101   
+0102   <span class="comment">%check if there is a global feature selection map is given, if yes all</span>
+0103   <span class="comment">%the following steps are computed solely on these selected features</span>
+0104   <span class="keyword">if</span>(dataset.is4D)
+0105     
+0106     sizeData   = size(dataset.data);
+0107     
+0108     <span class="comment">%4D case</span>
+0109     <span class="keyword">if</span>(isfield(dataset,<span class="string">'featureSelectionMap'</span>) &amp;&amp; ~isempty(dataset.featureSelectionMap))
+0110       globalSelectionMap = dataset.featureSelectionMap;
+0111     <span class="keyword">elseif</span>(isfield(dataset,<span class="string">'mask'</span>) &amp;&amp; ~isempty(dataset.mask))
+0112       globalSelectionMap = dataset.mask;
+0113     <span class="keyword">else</span>
+0114       globalSelectionMap = ones(sizeData(1)*sizeData(2)*sizeData(3));
+0115     <span class="keyword">end</span>
+0116     
+0117     <span class="comment">%this array will hold all selection maps used for every single model</span>
+0118     <span class="comment">%in the different splits</span>
+0119     rfe_featureSelectionMaps     = zeros(sizeData(1),sizeData(2),sizeData(3),nmbSplits);
+0120     rfe_weightMaps               = zeros(sizeData(1),sizeData(2),sizeData(3),nmbSplits);
+0121     
+0122     
+0123     <span class="comment">%if nmb iterations is higher than number of features set it to nmbFeatures-1</span>
+0124     <span class="keyword">if</span>(nmbIterations &gt;= sizeData(1)*sizeData(2)*sizeData(3))
+0125       warning(<span class="string">'Number of iterations is higher than number of features. Setting to nmbFeatures - 1 !'</span>);
+0126       nmbIterations = sizeData(1)*sizeData(2)*sizeData(3) - 1;
+0127     <span class="keyword">end</span>
+0128     
+0129   <span class="keyword">elseif</span>(dataset.is2D)
+0130     
+0131     <span class="comment">%2D case</span>
+0132     <span class="keyword">if</span>(isfield(dataset,<span class="string">'featureSelectionMap'</span>) &amp;&amp; ~isempty(dataset.featureSelectionMap))
+0133       globalSelectionMap = dataset.featureSelectionMap;
+0134     <span class="keyword">elseif</span>(isfield(dataset,<span class="string">'mask'</span>) &amp;&amp; ~isempty(dataset.mask))
+0135       globalSelectionMap = dataset.mask;
+0136     <span class="keyword">else</span>
+0137       globalSelectionMap = ones(size(dataset.data,1),1);
+0138     <span class="keyword">end</span>
+0139     
+0140     <span class="comment">%this array will hold all selection maps used for every single model</span>
+0141     <span class="comment">%in the different splits</span>
+0142     sizeData   = size(dataset.data);
+0143     rfe_featureSelectionMaps     = zeros(sizeData(1),nmbSplits);
+0144     rfe_weightMaps               = zeros(sizeData(1),nmbSplits);
+0145   
+0146     <span class="comment">%if nmb iterations is higher than number of features set it to nmbFeatures-1</span>
+0147     <span class="keyword">if</span>(nmbIterations &gt;= sizeData(1))
+0148       warning(<span class="string">'Number of iterations is higher than number of features. Setting to nmbFeatures - 1 !'</span>);
+0149       nmbIterations = sizeData(1) - 1;
+0150     <span class="keyword">end</span>
+0151   <span class="keyword">else</span>
+0152     error(<span class="string">'RFE: Please check the dataset: field &quot;type&quot; is not defined!'</span>);
+0153   <span class="keyword">end</span>
+0154         
+0155   <span class="keyword">if</span>(~localQuietMode)
+0156     disp([<span class="string">'Running Recursive Feature Elemination with command string: '</span>,cmdString,<span class="string">' ...'</span>]);
+0157   <span class="keyword">end</span>
+0158     
+0159   
+0160   <span class="comment">%get the selected voxels of this iteration to show them</span>
+0161   actTotalNmbIn  = zeros(1, nmbSplits, <span class="string">'int16'</span>);
+0162   actTotalNmbOut = zeros(1, nmbSplits, <span class="string">'int16'</span>);
+0163   
+0164   
+0165   <span class="comment">%run over iterations (+1 is for the prediction of the last choice of features)</span>
+0166   <span class="keyword">for</span> i = 1:nmbIterations+1
+0167     
+0168    <span class="keyword">if</span>(~localQuietMode)
+0169       <span class="keyword">if</span>(i&lt;=nmbIterations)
+0170         disp([<span class="string">'Started iteration '</span>, num2str(i),<span class="string">' ...'</span>]);
+0171         h = waitbar((i-1)/(nmbIterations+1), [<span class="string">'Running Recursive Feature Elemination Iteration: '</span>, num2str(i)]);
+0172       <span class="keyword">else</span>
+0173         disp(<span class="string">'Started final Prediction  ...'</span>);
+0174         h = waitbar((i-1)/(nmbIterations+1), <span class="string">'Running Recursive Feature Elemination Final Prediction...'</span>);
+0175       <span class="keyword">end</span> 
+0176     <span class="keyword">end</span>     
+0177     
+0178     <span class="comment">%every iteration has its own tests over</span>
+0179     <span class="comment">%nmbOfSplits examples</span>
+0180     nmbCorrect     = 0;
+0181     nmbTests       = 0; 
+0182     nmbTruePosAll  = 0;
+0183     nmbTrueNegAll  = 0;
+0184     nmbFalsePosAll = 0;
+0185     nmbFalseNegAll = 0; 
+0186    
+0187     
+0188     
+0189     <span class="comment">%distinct parfors for 4D and 2D because of parallelization</span>
+0190     <span class="keyword">if</span>(dataset.is4D)
+0191       
+0192       <span class="comment">%******** 4D Case ************</span>
+0193       <span class="keyword">if</span>(~localQuietMode)
+0194         disp([<span class="string">'Running Leave One Out Cross Validation with command string: '</span>,cmdString,<span class="string">' ...'</span>]);
+0195          <span class="comment">% create a progress display that works also for parallel loops</span>
+0196          <span class="keyword">if</span>(nmbSplits &lt;50)
+0197            disp([<span class="string">'0%'</span>, num2str(repmat(<span class="string">' '</span>,1,nmbSplits-1)),<span class="string">'100%'</span>]);
+0198            progressIndices = [1 1:nmbSplits];
+0199          <span class="keyword">else</span>
+0200            disp([<span class="string">'0%'</span>, num2str(repmat(<span class="string">' '</span>,1,50)),<span class="string">'100%'</span>]);
+0201            <span class="comment">%create a vector with floored indicees for repetitions</span>
+0202            progressIndices = [1 1:nmbSplits];
+0203            progressIndices = floor(progressIndices*(50/nmbSplits));
+0204          <span class="keyword">end</span>
+0205          fprintf(<span class="string">'    '</span>);
+0206       <span class="keyword">end</span>
+0207       
+0208       
+0209       parfor j=1:nmbSplits
+0210                
+0211          <span class="keyword">if</span>(~localQuietMode)
+0212            <span class="keyword">if</span>(progressIndices(j)&lt;progressIndices(j+1))
+0213              fprintf(<span class="string">'\b\b*'</span>);
+0214              disp([<span class="string">''</span> 0]);
+0215            <span class="keyword">end</span>
+0216          <span class="keyword">end</span>
+0217         
+0218          <span class="comment">%at first split the dataset according to given splitting</span>
+0219          ds1Indices = dataSplitter.splitMatrix(j,:) == 1; <span class="comment">%test data</span>
+0220          ds2Indices = dataSplitter.splitMatrix(j,:) == 2; <span class="comment">%train data</span>
+0221 
+0222          [ds1, ds2] = <a href="splitDataset.html" class="code" title="function [dataset1, dataset2] = splitDataset(dataset, vectorDS1, vectorDS2)">splitDataset</a>(dataset, ds1Indices, ds2Indices );     
+0223 
+0224          <span class="comment">%the first iteration, that means there is no</span>
+0225          <span class="comment">%rfe selection map available and data can be restricted to</span>
+0226          <span class="comment">%the globalSelectionMap</span>
+0227          <span class="keyword">if</span>(i == 1)
+0228            ds1 = <a href="setDataset_featureSelectionMap_ByMatrix.html" class="code" title="function [dataset] = setDataset_featureSelectionMap_ByMatrix(dataset, mapMatrix)">setDataset_featureSelectionMap_ByMatrix</a>(ds1, globalSelectionMap);
+0229            ds2 = <a href="setDataset_featureSelectionMap_ByMatrix.html" class="code" title="function [dataset] = setDataset_featureSelectionMap_ByMatrix(dataset, mapMatrix)">setDataset_featureSelectionMap_ByMatrix</a>(ds2, globalSelectionMap);
+0230            [ds1, testData2D]  = <a href="selectFeaturesBySelectionMap.html" class="code" title="function [dataset, data2D] = selectFeaturesBySelectionMap(dataset)">selectFeaturesBySelectionMap</a>(ds1);
+0231            [ds2, trainData2D] = <a href="selectFeaturesBySelectionMap.html" class="code" title="function [dataset, data2D] = selectFeaturesBySelectionMap(dataset)">selectFeaturesBySelectionMap</a>(ds2);
+0232          <span class="keyword">else</span>
+0233            <span class="comment">%not the first iteration, we expect a rfe selection to be set for this split</span>
+0234            <span class="comment">%so restrict data to this features</span>
+0235              ds1 = <a href="setDataset_featureSelectionMap_ByMatrix.html" class="code" title="function [dataset] = setDataset_featureSelectionMap_ByMatrix(dataset, mapMatrix)">setDataset_featureSelectionMap_ByMatrix</a>(ds1, rfe_featureSelectionMaps(:,:,:,j));
+0236              ds2 = <a href="setDataset_featureSelectionMap_ByMatrix.html" class="code" title="function [dataset] = setDataset_featureSelectionMap_ByMatrix(dataset, mapMatrix)">setDataset_featureSelectionMap_ByMatrix</a>(ds2, rfe_featureSelectionMaps(:,:,:,j));
+0237              [ds1, testData2D]  = <a href="selectFeaturesBySelectionMap.html" class="code" title="function [dataset, data2D] = selectFeaturesBySelectionMap(dataset)">selectFeaturesBySelectionMap</a>(ds1);
+0238              [ds2, trainData2D] = <a href="selectFeaturesBySelectionMap.html" class="code" title="function [dataset, data2D] = selectFeaturesBySelectionMap(dataset)">selectFeaturesBySelectionMap</a>(ds2);
+0239          <span class="keyword">end</span>
+0240 
+0241          <span class="comment">%*** TRAINING ***</span>
+0242          svmModel  = svmtrain(double(ds2.classIDs)', trainData2D, cmdString);
+0243 
+0244          <span class="comment">%*** TESTING ***</span>
+0245          <span class="comment">%predict the class ID of the test data</span>
+0246          <span class="comment">%check if the model was trained with probability estimates</span>
+0247          <span class="keyword">if</span>(~isempty(svmModel.ProbA) &amp;&amp; ~isempty(svmModel.ProbB))
+0248            [predicted_labels, accuracy, probEst] = svmpredict(double(ds1.classIDs)', testData2D, svmModel, <span class="string">'-b 1'</span>);
+0249            <span class="comment">%disp(probEstimatesVector);</span>
+0250          <span class="keyword">else</span>
+0251            [predicted_labels, accuracy, probEst] = svmpredict(double(ds1.classIDs)', testData2D, svmModel); 
+0252            <span class="comment">%disp(decisionValues);</span>
+0253          <span class="keyword">end</span>
+0254 
+0255          cVec = predicted_labels' == ds1.classIDs;
+0256      
+0257          nmbTruePos  = sum(cVec(ds1.classIDs==1));
+0258          nmbTrueNeg  = sum(cVec(ds1.classIDs==0));
+0259          nmbFalsePos = sum(ds1.classIDs) - sum(predicted_labels);
+0260          <span class="keyword">if</span>(nmbFalsePos &lt; 0)
+0261            nmbFalsePos = abs(nmbFalsePos);
+0262          <span class="keyword">else</span>
+0263            nmbFalsePos = 0;
+0264          <span class="keyword">end</span>
+0265          nmbFalseNeg = length(ds1.classIDs) - nmbTrueNeg - nmbFalsePos - nmbTruePos;
+0266          nmbCorrect  = nmbCorrect+nmbTruePos+nmbTrueNeg;
+0267 
+0268          nmbTruePosAll    = nmbTruePosAll+nmbTruePos;
+0269          nmbTrueNegAll    = nmbTrueNegAll+nmbTrueNeg;
+0270          nmbFalsePosAll   = nmbFalsePosAll+nmbFalsePos;
+0271          nmbFalseNegAll   = nmbFalseNegAll+nmbFalseNeg; 
+0272          nmbTests         = nmbTests+length(ds1.classIDs);
+0273  
+0274          <span class="comment">%Do a new selection based on the weights</span>
+0275          <span class="comment">%but just for the nmb of iterations</span>
+0276          <span class="keyword">if</span>(i &lt;= nmbIterations)
+0277            <span class="comment">%*** SET THE SELECTION MAP ***</span>
+0278              <span class="comment">%extract the weights</span>
+0279              tmpWeights = zeros(sizeData(1),sizeData(2),sizeData(3),1);
+0280              weights      = svmModel.SVs' * svmModel.sv_coef;
+0281              tmpWeights(ds2.featureSelectionMap &gt;0) = weights;
+0282                           
+0283              
+0284              <span class="comment">%for selecting the best features use bootstrap</span>
+0285              <span class="comment">%tic</span>
+0286              [descrim_vec, descrimsMean, boot_se, boot_CI, boot_ipred, boot_gpred] = <span class="keyword">...</span><span class="comment"> </span>
+0287                        svm_632boot_unique( double(trainData2D), double(ds2.classIDs), nmbBootstrapIterations, 0.5, true );
+0288              <span class="comment">%toc</span>
+0289              tmpWeights(ds2.featureSelectionMap &gt;0) = abs(descrimsMean);
+0290                      
+0291              <a href="showDataAsImage.html" class="code" title="function showDataAsImage(dataIn, infoString, tIndex)">showDataAsImage</a>(tmpWeights, <span class="string">'bsWeights'</span>);        
+0292              <span class="comment">%keyboard;</span>
+0293                      
+0294              <span class="comment">%remove the features according to percentual selection threshold</span>
+0295              [weightsRes, totalNmbIn, totalNmbOut] = <a href="#_sub1" class="code" title="subfunction [mapOut, totalNmbIn, totalNmbOut] = member_getSelectedMapByThresholdPercentOut(mapIn, thresholdPercentOfElementsOut)">member_getSelectedMapByThresholdPercentOut</a>(tmpWeights, thresholdPercentOfFeaturesOut);             
+0296              
+0297              
+0298              actTotalNmbIn(j)  = totalNmbIn;
+0299              actTotalNmbOut(j) = totalNmbOut;
+0300              
+0301              featSelMap = weightsRes;
+0302              featSelMap(weightsRes&gt;0)=1;
+0303              featSelMap(weightsRes&lt;0)=1;
+0304 
+0305              rfe_featureSelectionMaps(:,:,:,j) = featSelMap;
+0306 
+0307              <span class="comment">%save the weight maps</span>
+0308              rfe_weightMaps(:,:,:,j) = weightsRes;        
+0309 
+0310           <span class="keyword">end</span> <span class="comment">% endif nmb iteration</span>
+0311           
+0312        <span class="keyword">end</span> <span class="comment">% endfor nmbSplits (parfor)</span>
+0313     
+0314        <span class="keyword">if</span>(~localQuietMode)
+0315          fprintf(<span class="string">'\n'</span>);
+0316        <span class="keyword">end</span>
+0317        
+0318     
+0319     <span class="keyword">else</span>  <span class="comment">%******** 2D Case ************</span>
+0320         
+0321       <span class="keyword">if</span>(~localQuietMode)
+0322         disp([<span class="string">'Running Leave One Out Cross Validation with command string: '</span>,cmdString,<span class="string">' ...'</span>]);
+0323         disp([<span class="string">'0%'</span>, num2str(repmat(<span class="string">' '</span>,1,nmbSplits)),<span class="string">'100%'</span>]);
+0324         disp(<span class="string">'   '</span>);
+0325       <span class="keyword">end</span>
+0326       
+0327        parfor j=1:nmbSplits
+0328                
+0329          <span class="keyword">if</span>(~localQuietMode)           
+0330            fprintf(<span class="string">'\b\b*'</span>);
+0331            disp([<span class="string">''</span> 0]);
+0332          <span class="keyword">end</span>
+0333          
+0334          <span class="comment">%at first split the dataset according to given</span>
+0335          ds1Indices = dataSplitter.splitMatrix(j,:) == 1; <span class="comment">%test data</span>
+0336          ds2Indices = dataSplitter.splitMatrix(j,:) == 2; <span class="comment">%train data</span>
+0337 
+0338          [ds1, ds2] = <a href="splitDataset.html" class="code" title="function [dataset1, dataset2] = splitDataset(dataset, vectorDS1, vectorDS2)">splitDataset</a>(dataset, ds1Indices, ds2Indices );     
+0339 
+0340          <span class="comment">%the first iteration, that means there is no</span>
+0341          <span class="comment">%rfe selection map available and data can be restricted to</span>
+0342          <span class="comment">%the globalSelectionMap</span>
+0343          <span class="keyword">if</span>(i == 1)
+0344            ds1 = <a href="setDataset_featureSelectionMap_ByMatrix.html" class="code" title="function [dataset] = setDataset_featureSelectionMap_ByMatrix(dataset, mapMatrix)">setDataset_featureSelectionMap_ByMatrix</a>(ds1, globalSelectionMap);
+0345            ds2 = <a href="setDataset_featureSelectionMap_ByMatrix.html" class="code" title="function [dataset] = setDataset_featureSelectionMap_ByMatrix(dataset, mapMatrix)">setDataset_featureSelectionMap_ByMatrix</a>(ds2, globalSelectionMap);
+0346            [ds1, testData2D]  = <a href="selectFeaturesBySelectionMap.html" class="code" title="function [dataset, data2D] = selectFeaturesBySelectionMap(dataset)">selectFeaturesBySelectionMap</a>(ds1);
+0347            [ds2, trainData2D] = <a href="selectFeaturesBySelectionMap.html" class="code" title="function [dataset, data2D] = selectFeaturesBySelectionMap(dataset)">selectFeaturesBySelectionMap</a>(ds2);
+0348          <span class="keyword">else</span>
+0349            <span class="comment">%not the first iteration, we expect a rfe selection to be set for this split</span>
+0350            <span class="comment">%so restrict data to this features</span>
+0351            ds1 = <a href="setDataset_featureSelectionMap_ByMatrix.html" class="code" title="function [dataset] = setDataset_featureSelectionMap_ByMatrix(dataset, mapMatrix)">setDataset_featureSelectionMap_ByMatrix</a>(ds1, rfe_featureSelectionMaps(:,j));
+0352            ds2 = <a href="setDataset_featureSelectionMap_ByMatrix.html" class="code" title="function [dataset] = setDataset_featureSelectionMap_ByMatrix(dataset, mapMatrix)">setDataset_featureSelectionMap_ByMatrix</a>(ds2, rfe_featureSelectionMaps(:,j));
+0353            [ds1, testData2D]  = <a href="selectFeaturesBySelectionMap.html" class="code" title="function [dataset, data2D] = selectFeaturesBySelectionMap(dataset)">selectFeaturesBySelectionMap</a>(ds1);
+0354            [ds2, trainData2D] = <a href="selectFeaturesBySelectionMap.html" class="code" title="function [dataset, data2D] = selectFeaturesBySelectionMap(dataset)">selectFeaturesBySelectionMap</a>(ds2);
+0355          <span class="keyword">end</span>
+0356 
+0357          <span class="comment">%*** TRAINING ***</span>
+0358          svmModel  = svmtrain(double(ds2.classIDs)', trainData2D, cmdString);
+0359 
+0360          <span class="comment">%*** TESTING ***</span>
+0361          <span class="comment">%predict the class ID of the test data</span>
+0362          <span class="comment">%check if the model was trained with probability estimates</span>
+0363          <span class="keyword">if</span>(~isempty(svmModel.ProbA) &amp;&amp; ~isempty(svmModel.ProbB))
+0364            [predicted_labels, accuracy, probEst] = svmpredict(double(ds1.classIDs)', testData2D, svmModel, <span class="string">'-b 1'</span>);
+0365            <span class="comment">%disp(probEstimatesVector);</span>
+0366          <span class="keyword">else</span>
+0367            [predicted_labels, accuracy, probEst] = svmpredict(double(ds1.classIDs)', testData2D, svmModel); 
+0368            <span class="comment">%disp(decisionValues);</span>
+0369          <span class="keyword">end</span>
+0370 
+0371          <span class="comment">%count correct predictions for statistics</span>
+0372          cVec = predicted_labels' == ds1.classIDs;
+0373      
+0374          nmbTruePos  = sum(cVec(ds1.classIDs==1));
+0375          nmbTrueNeg  = sum(cVec(ds1.classIDs==0));
+0376          nmbFalsePos = sum(ds1.classIDs) - sum(predicted_labels);
+0377          <span class="keyword">if</span>(nmbFalsePos &lt; 0)
+0378            nmbFalsePos = abs(nmbFalsePos);
+0379          <span class="keyword">else</span>
+0380            nmbFalsePos = 0;
+0381          <span class="keyword">end</span>
+0382          nmbFalseNeg = length(ds1.classIDs) - nmbTrueNeg - nmbFalsePos - nmbTruePos;
+0383          nmbCorrect  = nmbCorrect+nmbTruePos+nmbTrueNeg;
+0384 
+0385          nmbTruePosAll    = nmbTruePosAll+nmbTruePos;
+0386          nmbTrueNegAll    = nmbTrueNegAll+nmbTrueNeg;
+0387          nmbFalsePosAll   = nmbFalsePosAll+nmbFalsePos;
+0388          nmbFalseNegAll   = nmbFalseNegAll+nmbFalseNeg; 
+0389          nmbTests         = nmbTests+length(ds1.classIDs);
+0390 
+0391 
+0392          <span class="comment">%Do a new selection based on the weights</span>
+0393          <span class="comment">%but just for the nmb of iterations</span>
+0394          <span class="keyword">if</span>(i &lt;= nmbIterations)
+0395            <span class="comment">%*** SET THE SELECTION MAP ***</span>
+0396            
+0397              <span class="comment">%extract the weights</span>
+0398              tmpWeights = zeros(sizeData(1),1);
+0399              weights      = svmModel.SVs' * svmModel.sv_coef;
+0400              tmpWeights(ds2.featureSelectionMap &gt;0) = weights;
+0401 
+0402              <span class="comment">%remove the features according to percentual selection threshold</span>
+0403              [weightsRes, totalNmbIn, totalNmbOut] = <a href="#_sub1" class="code" title="subfunction [mapOut, totalNmbIn, totalNmbOut] = member_getSelectedMapByThresholdPercentOut(mapIn, thresholdPercentOfElementsOut)">member_getSelectedMapByThresholdPercentOut</a>(tmpWeights, thresholdPercentOfFeaturesOut);
+0404 
+0405              actTotalNmbIn(j)  = totalNmbIn;
+0406              actTotalNmbOut(j) = totalNmbOut;
+0407 
+0408              featSelMap = weightsRes;
+0409              featSelMap(weightsRes&gt;0)=1;
+0410              featSelMap(weightsRes&lt;0)=1;
+0411 
+0412              rfe_featureSelectionMaps(:,j) = featSelMap;
+0413              <span class="comment">%save the weight maps</span>
+0414              rfe_weightMaps(:,j) = weightsRes;        
+0415 
+0416           <span class="keyword">end</span> <span class="comment">% endif nmb iteration</span>
+0417 
+0418        <span class="keyword">end</span> <span class="comment">% endfor nmbSplits</span>
+0419        
+0420        <span class="keyword">if</span>(~localQuietMode)
+0421            fprintf(<span class="string">'\n'</span>);
+0422        <span class="keyword">end</span>
+0423 
+0424        
+0425     <span class="keyword">end</span> <span class="comment">%endif 4D/2D case</span>
+0426         
+0427     
+0428     <span class="comment">%For every iteration we get stat results</span>
+0429     accuracy    = nmbCorrect/nmbTests*100;
+0430     sensitivity = nmbTruePosAll/(nmbTruePosAll+nmbFalseNegAll); 
+0431     specificity = nmbTrueNegAll/(nmbTrueNegAll+nmbFalsePosAll);
+0432 
+0433     resultStruct             = {};
+0434     resultStruct.nmbTests    = nmbTests;
+0435     resultStruct.accuracy    = accuracy;
+0436     resultStruct.sensitivity = sensitivity;
+0437     resultStruct.specificity = specificity;
+0438     resultStruct.TP          = nmbTruePosAll;
+0439     resultStruct.TN          = nmbTrueNegAll;
+0440     resultStruct.FP          = nmbFalsePosAll;
+0441     resultStruct.FN          = nmbFalseNegAll;
+0442     
+0443     <span class="comment">%if(isfield(resultStruct, 'innerResultStruct') &amp;&amp; ~isempty(resultStruct.innerResultStruct))</span>
+0444     <span class="keyword">if</span>(~isfield(resultStruct, <span class="string">'innerResultStruct'</span>) || isempty(resultStruct.innerResultStruct) || accuracy &gt;= resultStruct.innerResultStruct.accuracy)
+0445       resultStruct.innerResultStruct.nmbTests    = nmbTests;
+0446       resultStruct.innerResultStruct.accuracy    = accuracy;
+0447       resultStruct.innerResultStruct.sensitivity = sensitivity;
+0448       resultStruct.innerResultStruct.specificity = specificity;
+0449       resultStruct.innerResultStruct.TP          = nmbTruePosAll;
+0450       resultStruct.innerResultStruct.TN          = nmbTrueNegAll;
+0451       resultStruct.innerResultStruct.FP          = nmbFalsePosAll;
+0452       resultStruct.innerResultStruct.FN          = nmbFalseNegAll;
+0453       resultStruct.innerResultStruct.infoString  = [<span class="string">'This struct holds RFE maximum performance results (iteration '</span>,num2str(i),<span class="string">' used nmb of features: '</span>,num2str(actTotalNmbOut(end)),<span class="string">').'</span>];
+0454     <span class="keyword">end</span>
+0455     
+0456     <span class="keyword">if</span>(isfield(resultStruct, <span class="string">'infoString'</span>))
+0457       resultStruct.infoString  = [resultStruct.infoString, <span class="string">' * '</span>, <span class="string">'RFE:Iteration '</span>, num2str(i), <span class="string">' Accuracy: '</span>, num2str(accuracy), <span class="string">'% NmbFeatures: '</span>, num2str(actTotalNmbOut(end))];
+0458     <span class="keyword">else</span>
+0459       resultStruct.infoString  = [<span class="string">'RFE:Iteration '</span>, num2str(i), <span class="string">'Accuracy: '</span>, num2str(accuracy), <span class="string">'% NmbFeatures: '</span>, num2str(actTotalNmbOut(end))];
+0460     <span class="keyword">end</span>
+0461     
+0462     
+0463     <span class="keyword">if</span>(~<a href="easyupMVPA_getGlobals.html" class="code" title="function [propertyValue] = easyupMVPA_getGlobals(propertyName)">easyupMVPA_getGlobals</a>(<span class="string">'quietMode'</span>))
+0464       close(h);
+0465       <span class="keyword">if</span>(i==1)
+0466         disp([<span class="string">'RFE with '</span>, num2str(nmbSplits),<span class="string">' Split(s). Selected all features for classification:'</span>]);
+0467       <span class="keyword">else</span>
+0468         disp([<span class="string">'RFE with '</span>, num2str(nmbSplits),<span class="string">' Split(s). Selected '</span> ,num2str(actTotalNmbOut(end)),<span class="string">' out of '</span>,num2str(actTotalNmbIn(end)),<span class="string">' features for classification:'</span>]);
+0469       <span class="keyword">end</span>
+0470       <a href="printResultStruct.html" class="code" title="function printResultStruct(resultStruct)">printResultStruct</a>(resultStruct);
+0471     <span class="keyword">end</span>
+0472     
+0473   <span class="keyword">end</span> <span class="comment">%enfor iterations</span>
+0474     
+0475   
+0476   <span class="comment">%THE LAST SUPPER</span>
+0477   <span class="comment">%create the mean images and estimate deviation</span>
+0478   <span class="keyword">if</span>(dataset.is4D)
+0479     avg_rfe_featureSelectionMap = zeros(sizeData(1),sizeData(2),sizeData(3),1);
+0480     avg_rfe_weightMap           = zeros(sizeData(1),sizeData(2),sizeData(3),1);
+0481 
+0482     parfor i=1:nmbSplits
+0483       avg_rfe_featureSelectionMap = avg_rfe_featureSelectionMap + rfe_featureSelectionMaps(:,:,:,i);
+0484       avg_rfe_weightMap           = avg_rfe_weightMap + rfe_weightMaps(:,:,:,i);
+0485     <span class="keyword">end</span>
+0486     
+0487     <span class="comment">%set the last rfe selection map for returned dataset</span>
+0488     dataset = <a href="setDataset_featureSelectionMap_ByMatrix.html" class="code" title="function [dataset] = setDataset_featureSelectionMap_ByMatrix(dataset, mapMatrix)">setDataset_featureSelectionMap_ByMatrix</a>(dataset, rfe_featureSelectionMaps(:,:,:,end));
+0489          
+0490   <span class="keyword">elseif</span>(dataset.is2D)
+0491     avg_rfe_featureSelectionMap = zeros(sizeData(1),1);
+0492     avg_rfe_weightMap           = zeros(sizeData(1),1);
+0493 
+0494     parfor i=1:nmbSplits
+0495       avg_rfe_featureSelectionMap = avg_rfe_featureSelectionMap + rfe_featureSelectionMaps(:,i);
+0496       avg_rfe_weightMap           = avg_rfe_weightMap + rfe_weightMaps(:,i);
+0497     <span class="keyword">end</span>
+0498     
+0499     <span class="comment">%set the last rfe selection map for returned dataset</span>
+0500     dataset = <a href="setDataset_featureSelectionMap_ByMatrix.html" class="code" title="function [dataset] = setDataset_featureSelectionMap_ByMatrix(dataset, mapMatrix)">setDataset_featureSelectionMap_ByMatrix</a>(dataset, rfe_featureSelectionMaps(:,end));  
+0501   <span class="keyword">end</span>
+0502   
+0503   avg_rfe_featureSelectionMap = avg_rfe_featureSelectionMap/nmbSplits;
+0504   avg_rfe_weightMap           = avg_rfe_weightMap/nmbSplits;
+0505   
+0506 <span class="keyword">end</span> <span class="comment">%end function</span>
+0507  
+0508 
+0509 
+0510 
+0511 
+0512 <span class="comment">%member function to select a certain amount of elements from a 3D map</span>
+0513 <a name="_sub1" href="#_subfunctions" class="code">function [mapOut, totalNmbIn, totalNmbOut] = member_getSelectedMapByThresholdPercentOut(mapIn, thresholdPercentOfElementsOut)</a>
+0514 
+0515   mapOut = mapIn;
+0516   
+0517   <span class="comment">%overall nmb of non-zero-elements</span>
+0518   totalNmbIn = sum(mapIn(:)~=0);
+0519   
+0520   <span class="comment">%avgWeights3D = avgWeights3D + tmpWeights3D*(1/nmbSamples);</span>
+0521   <span class="comment">%now set the rfe selection for this split to the according features</span>
+0522   <span class="comment">%nmb of voxels to throw out</span>
+0523   nmbOut = floor(totalNmbIn*thresholdPercentOfElementsOut/100);
+0524   
+0525   <span class="keyword">if</span>(nmbOut == 0)
+0526     <span class="keyword">if</span>(totalNmbIn&lt;2)
+0527       warning(<span class="string">'Could not select features by given threshold. Not enough input features.'</span>);
+0528       <span class="keyword">return</span>;
+0529     <span class="keyword">else</span>
+0530       nmbOut = 2;
+0531     <span class="keyword">end</span>  
+0532   <span class="keyword">end</span>
+0533   
+0534   <span class="comment">%a sorted array to get the value for selection</span>
+0535   tmp = sort(abs(mapIn(mapIn(:)~=0)));
+0536     
+0537   selThresh = tmp(nmbOut);
+0538   
+0539   tmpMap = abs(mapIn);
+0540   tmpMap(tmpMap&lt;selThresh) = 0;
+0541   mapOut(tmpMap==0) = 0;
+0542   
+0543   totalNmbOut = sum(mapOut(:)~=0);
+0544   
+0545 <span class="keyword">end</span> <span class="comment">%end member_getSelectedMapByThresholdPercentOut</span>
+0546</pre></div>
+<hr><address>Generated on Mon 22-Oct-2012 13:45:25 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

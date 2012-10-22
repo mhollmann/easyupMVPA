@@ -56,7 +56,7 @@
 <h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
 This function calls:
 <ul style="list-style-image:url(../matlabicon.gif)">
-<li><a href="concatDatasets.html" class="code" title="function [dataset] = concatDatasets(dataset1, dataset2)">concatDatasets</a>	Concatenates two datasets (appending in sample dimension).</li><li><a href="doZScoring.html" class="code" title="function [dataset] = doZScoring(dataset, chunkwise)">doZScoring</a>	Does Z-Scoring in sample dimension (i.e. per voxel over samples in fMRI-time series).</li><li><a href="easyupMVPA_getGlobals.html" class="code" title="function [propertyValue] = easyupMVPA_getGlobals(propertyName)">easyupMVPA_getGlobals</a>	Returns values for global properties in the toolbox.</li><li><a href="easyupMVPA_setGlobals.html" class="code" title="function [ok] = easyupMVPA_setGlobals(propertyName, propertyValue)">easyupMVPA_setGlobals</a>	Used to set values for global properties in the toolbox.</li><li><a href="selectSamples.html" class="code" title="function [dataset] = selectSamples(dataset, criterionString)">selectSamples</a>	Select a sub-dataset out of a dataset according to given criteria.</li></ul>
+<li><a href="concatDatasets.html" class="code" title="function [dataset] = concatDatasets(dataset1, dataset2)">concatDatasets</a>	Concatenates two datasets (appending in sample dimension).</li><li><a href="doZScoring.html" class="code" title="function [dataset] = doZScoring(dataset, chunkwise)">doZScoring</a>	Does Z-Scoring in sample dimension (i.e. per voxel over samples in fMRI-time series).</li><li><a href="easyupMVPA_getGlobals.html" class="code" title="function [propertyValue] = easyupMVPA_getGlobals(propertyName)">easyupMVPA_getGlobals</a>	Returns values for global properties in the toolbox.</li><li><a href="easyupMVPA_setGlobals.html" class="code" title="function [ok] = easyupMVPA_setGlobals(propertyName, propertyValue)">easyupMVPA_setGlobals</a>	Used to set values for global properties in the toolbox.</li><li><a href="selectSamples.html" class="code" title="function [dataset] = selectSamples(dataset, criterion)">selectSamples</a>	Select a sub-dataset out of a dataset according to given criteria (string or binary vector).</li></ul>
 This function is called by:
 <ul style="list-style-image:url(../matlabicon.gif)">
 <li><a href="doZScoring.html" class="code" title="function [dataset] = doZScoring(dataset, chunkwise)">doZScoring</a>	Does Z-Scoring in sample dimension (i.e. per voxel over samples in fMRI-time series).</li></ul>
@@ -119,7 +119,7 @@ This function is called by:
 0052 
 0053       <span class="comment">%loop over uniqe chunks</span>
 0054       <span class="keyword">for</span> i=1:length(uniqueChunkIDs)
-0055         tmpDS = <a href="selectSamples.html" class="code" title="function [dataset] = selectSamples(dataset, criterionString)">selectSamples</a>(dataset, [<span class="string">'chunks=='</span>, num2str(uniqueChunkIDs(i))]);
+0055         tmpDS = <a href="selectSamples.html" class="code" title="function [dataset] = selectSamples(dataset, criterion)">selectSamples</a>(dataset, [<span class="string">'chunks=='</span>, num2str(uniqueChunkIDs(i))]);
 0056         tmpDS = <a href="doZScoring.html" class="code" title="function [dataset] = doZScoring(dataset, chunkwise)">doZScoring</a>(tmpDS, false);
 0057         <span class="keyword">if</span>(i == 1)
 0058           dsAll = tmpDS;
@@ -161,7 +161,7 @@ This function is called by:
 0094       <a href="easyupMVPA_setGlobals.html" class="code" title="function [ok] = easyupMVPA_setGlobals(propertyName, propertyValue)">easyupMVPA_setGlobals</a>(<span class="string">'quietMode'</span>, true);
 0095       <span class="comment">%loop over uniqe chunks</span>
 0096       <span class="keyword">for</span> i=1:length(uniqueChunkIDs)
-0097         tmpDS = <a href="selectSamples.html" class="code" title="function [dataset] = selectSamples(dataset, criterionString)">selectSamples</a>(dataset, [<span class="string">'chunks=='</span>, num2str(uniqueChunkIDs(i))]);
+0097         tmpDS = <a href="selectSamples.html" class="code" title="function [dataset] = selectSamples(dataset, criterion)">selectSamples</a>(dataset, [<span class="string">'chunks=='</span>, num2str(uniqueChunkIDs(i))]);
 0098         tmpDS = <a href="doZScoring.html" class="code" title="function [dataset] = doZScoring(dataset, chunkwise)">doZScoring</a>(tmpDS, false);
 0099         <span class="keyword">if</span>(i == 1)
 0100           dsAll = tmpDS;
@@ -196,6 +196,6 @@ This function is called by:
 0129    
 0130 <span class="keyword">end</span>
 0131</pre></div>
-<hr><address>Generated on Tue 12-Apr-2011 12:12:55 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+<hr><address>Generated on Mon 22-Oct-2012 13:45:25 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
 </body>
 </html>

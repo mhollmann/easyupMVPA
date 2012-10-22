@@ -48,7 +48,8 @@
    dataset.chunks                 = [];
    dataset.classIDs               = [];
    dataset.mask                   = [];
-   dataset.featureSelectionMap    = []; 
+   dataset.featureSelectionMap    = [];
+   dataset.processingHistory      = {};
 
  Parameters:
 
@@ -65,7 +66,7 @@ This function calls:
 </ul>
 This function is called by:
 <ul style="list-style-image:url(../matlabicon.gif)">
-<li><a href="averageFeaturesInROIs.html" class="code" title="function [dataset, dataset2D] = averageFeaturesInROIs(dataset, roiMap)">averageFeaturesInROIs</a>	Set the mask (1D or 3D) field of a dataset by a given matrix.</li><li><a href="doRecursiveFeatureElemination_bootStrap_SVM.html" class="code" title="function [dataset, resultStruct] = doRecursiveFeatureElemination_bootStrap_SVM(dataset, nmbBootSteps)">doRecursiveFeatureElemination_bootStrap_SVM</a>	(UNDER CONSTRUCTION) Recursively removes features according to SVM classification weights obtained by bootstrapping.</li><li><a href="splitDataset.html" class="code" title="function [dataset1, dataset2] = splitDataset(dataset, vectorDS1, vectorDS2)">splitDataset</a>	Splits a dataset by selecting the elements defined by given vectors for the two result datasets.</li></ul>
+<li><a href="averageFeaturesInROIs.html" class="code" title="function [dataset, dataset2D] = averageFeaturesInROIs(dataset, roiMap)">averageFeaturesInROIs</a>	Set the mask (1D or 3D) field of a dataset by a given matrix.</li><li><a href="doRecursiveFeatureElemination_bootStrap_SVM.html" class="code" title="function [dataset, resultStruct] = doRecursiveFeatureElemination_bootStrap_SVM(dataset, nmbBootSteps)">doRecursiveFeatureElemination_bootStrap_SVM</a>	[DO NOT USE: UNDER DEVELOPEMENT!] Recursively removes features according to SVM classification weights obtained by bootstrapping.</li><li><a href="doSearchlightLOOCV_SVM.html" class="code" title="function [datasetOut, resultAccuracyMap, resultStruct] = doSearchlightLOOCV_SVM(dataset, searchlightDiameter, dataSplitter, svmType, kernelMode, costParam, paramStruct)">doSearchlightLOOCV_SVM</a>	!UNDER CONSTRUCTION! Implements a Searchlight Classification using One Out Cross Validation (LOOCV) with a SVM Classifier (parallel execution).</li><li><a href="splitDataset.html" class="code" title="function [dataset1, dataset2] = splitDataset(dataset, vectorDS1, vectorDS2)">splitDataset</a>	Splits a dataset by selecting the elements defined by given vectors for the two result datasets.</li></ul>
 <!-- crossreference -->
 
 
@@ -93,30 +94,32 @@ This function is called by:
 0020 <span class="comment">%   dataset.classIDs               = [];</span>
 0021 <span class="comment">%   dataset.mask                   = [];</span>
 0022 <span class="comment">%   dataset.featureSelectionMap    = [];</span>
-0023 <span class="comment">%</span>
-0024 <span class="comment">% Parameters:</span>
-0025 <span class="comment">%</span>
-0026 <span class="comment">% Returns:</span>
-0027 <span class="comment">%</span>
-0028 <span class="comment">%   dataset          -&gt; empty dataset</span>
-0029 <span class="comment">%</span>
-0030 <span class="comment">% Comments:</span>
-0031 <span class="comment">%</span>
-0032 <a name="_sub0" href="#_subfunctions" class="code">function [dataset] = getEmpty2DDataset()</a>
-0033 
-0034   dataset = {};
-0035   
-0036   dataset.type = <span class="string">'dataset2D'</span>;
-0037   dataset.is4D = false;
-0038   dataset.is2D = true;
-0039 
-0040   dataset.data                   = [];
-0041   dataset.chunks                 = [];
-0042   dataset.classIDs               = [];
-0043   dataset.mask                   = [];
-0044   dataset.featureSelectionMap    = [];
-0045   
-0046 <span class="keyword">end</span></pre></div>
-<hr><address>Generated on Tue 12-Apr-2011 12:12:55 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+0023 <span class="comment">%   dataset.processingHistory      = {};</span>
+0024 <span class="comment">%</span>
+0025 <span class="comment">% Parameters:</span>
+0026 <span class="comment">%</span>
+0027 <span class="comment">% Returns:</span>
+0028 <span class="comment">%</span>
+0029 <span class="comment">%   dataset          -&gt; empty dataset</span>
+0030 <span class="comment">%</span>
+0031 <span class="comment">% Comments:</span>
+0032 <span class="comment">%</span>
+0033 <a name="_sub0" href="#_subfunctions" class="code">function [dataset] = getEmpty2DDataset()</a>
+0034 
+0035   dataset = {};
+0036   
+0037   dataset.type = <span class="string">'dataset2D'</span>;
+0038   dataset.is4D = false;
+0039   dataset.is2D = true;
+0040 
+0041   dataset.data                   = [];
+0042   dataset.chunks                 = [];
+0043   dataset.classIDs               = [];
+0044   dataset.mask                   = [];
+0045   dataset.featureSelectionMap    = [];
+0046   dataset.processingHistory      = {};
+0047   
+0048 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 22-Oct-2012 13:45:25 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
 </body>
 </html>

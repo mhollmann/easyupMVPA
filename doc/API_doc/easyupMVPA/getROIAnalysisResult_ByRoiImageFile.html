@@ -44,7 +44,7 @@
 <h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
 This function calls:
 <ul style="list-style-image:url(../matlabicon.gif)">
-<li><a href="selectSamples.html" class="code" title="function [dataset] = selectSamples(dataset, criterionString)">selectSamples</a>	Select a sub-dataset out of a dataset according to given criteria.</li><li><a href="showDataAsImage.html" class="code" title="function showDataAsImage(dataIn, infoString, tIndex)">showDataAsImage</a>	Show the data that is given as image.</li></ul>
+<li><a href="selectSamples.html" class="code" title="function [dataset] = selectSamples(dataset, criterion)">selectSamples</a>	Select a sub-dataset out of a dataset according to given criteria (string or binary vector).</li><li><a href="showDataAsImage.html" class="code" title="function showDataAsImage(dataIn, infoString, tIndex)">showDataAsImage</a>	Show the data that is given as image.</li></ul>
 This function is called by:
 <ul style="list-style-image:url(../matlabicon.gif)">
 </ul>
@@ -93,7 +93,7 @@ This function is called by:
 0038  
 0039  <span class="keyword">for</span> j=1:nmbOfClasses
 0040    
-0041    ds = <a href="selectSamples.html" class="code" title="function [dataset] = selectSamples(dataset, criterionString)">selectSamples</a>(dataset, [<span class="string">'classIDs=='</span>, num2str(uniqueClasses(j))]);
+0041    ds = <a href="selectSamples.html" class="code" title="function [dataset] = selectSamples(dataset, criterion)">selectSamples</a>(dataset, [<span class="string">'classIDs=='</span>, num2str(uniqueClasses(j))]);
 0042    nmbSamples = length(ds.classIDs);
 0043       
 0044    <span class="keyword">for</span> i=1:nmbSamples
@@ -111,6 +111,6 @@ This function is called by:
 0056  
 0057  keyboard;
 0058 <span class="keyword">end</span></pre></div>
-<hr><address>Generated on Tue 12-Apr-2011 12:12:55 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+<hr><address>Generated on Mon 22-Oct-2012 13:45:25 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
 </body>
 </html>

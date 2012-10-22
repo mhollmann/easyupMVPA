@@ -158,12 +158,20 @@ This function is called by:
 0092   
 0093   t = toc;
 0094   
-0095   <span class="keyword">if</span>(~<a href="easyupMVPA_getGlobals.html" class="code" title="function [propertyValue] = easyupMVPA_getGlobals(propertyName)">easyupMVPA_getGlobals</a>(<span class="string">'quietMode'</span>))
-0096     disp([<span class="string">'Done temporal filtering (Time needed was: '</span>,num2str(t), <span class="string">' sec).'</span>]);
-0097   <span class="keyword">end</span> 
-0098   
-0099 <span class="keyword">end</span>
-0100</pre></div>
-<hr><address>Generated on Tue 12-Apr-2011 12:12:55 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+0095   histString = [<span class="string">'High-Pass Filtering. SamplingFreq: '</span>, num2str(samplingFrequency), <span class="string">' CutoffFreq: '</span>, num2str(cutoffFreq)];
+0096   
+0097   <span class="keyword">if</span>(isfield(dataset,<span class="string">'processingHistory'</span>) &amp;&amp; ~isempty(dataset.processingHistory))  
+0098     dataset.processingHistory(1,size(dataset.processingHistory,2)+1) = {histString};
+0099   <span class="keyword">else</span>
+0100     dataset.processingHistory = [{histString}];
+0101   <span class="keyword">end</span>
+0102   
+0103   <span class="keyword">if</span>(~<a href="easyupMVPA_getGlobals.html" class="code" title="function [propertyValue] = easyupMVPA_getGlobals(propertyName)">easyupMVPA_getGlobals</a>(<span class="string">'quietMode'</span>))
+0104     disp([<span class="string">'Done temporal filtering (Time needed was: '</span>,num2str(t), <span class="string">' sec).'</span>]);
+0105   <span class="keyword">end</span> 
+0106   
+0107 <span class="keyword">end</span>
+0108</pre></div>
+<hr><address>Generated on Mon 22-Oct-2012 13:45:25 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
 </body>
 </html>

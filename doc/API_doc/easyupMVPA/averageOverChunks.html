@@ -92,12 +92,12 @@ This function is called by:
 0029   maxChunkID      = max(dataset.chunks);
 0030   uniqueChunkIDs  = unique(dataset.chunks);
 0031   
-0032   <span class="keyword">if</span>(isfield(dataset, <span class="string">'type'</span>) &amp;&amp;  strcmp(dataset.type,<span class="string">'dataset2D'</span>))
+0032   <span class="keyword">if</span>(dataset.is2D)
 0033     
-0034       size2d      = size(dataset.data2D);
+0034       size2d      = size(dataset.data);
 0035       newData2D   = zeros(size2d(1), length(uniqueChunkIDs));
-0036       newChunks   = zeros(1,length(uniqueChunkIDs), <span class="string">'uint8'</span>);
-0037       newClassIDs = zeros(1,length(uniqueChunkIDs), <span class="string">'uint8'</span>);
+0036       newChunks   = zeros(1,length(uniqueChunkIDs), <span class="string">'uint16'</span>);
+0037       newClassIDs = zeros(1,length(uniqueChunkIDs), <span class="string">'uint16'</span>);
 0038       d2DIndex    = 1;
 0039 
 0040       <span class="comment">%loop over every chunk in dataset</span>
@@ -109,7 +109,7 @@ This function is called by:
 0046         <span class="comment">%is id inside chunks?</span>
 0047         <span class="keyword">if</span>(sum(chunkRefs) &gt; 0)
 0048           <span class="comment">%average over this chunk id</span>
-0049           avg = mean(dataset.data2D(:,chunkRefs),2);
+0049           avg = mean(dataset.data(:,chunkRefs),2);
 0050           newData2D(:,d2DIndex) = avg;
 0051           <span class="comment">%set id for new chunks</span>
 0052           tmpChunks = dataset.chunks(chunkRefs);
@@ -121,14 +121,14 @@ This function is called by:
 0058         <span class="keyword">end</span>
 0059 
 0060       <span class="keyword">end</span>
-0061       dataset.data2D   = newData2D;
+0061       dataset.data = newData2D;
 0062   
-0063   <span class="keyword">elseif</span>(isfield(dataset, <span class="string">'type'</span>) &amp;&amp;  strcmp(dataset.type,<span class="string">'dataset4D'</span>))
+0063   <span class="keyword">elseif</span>(dataset.is4D)
 0064     
-0065       size4d      = size(dataset.data4D);
+0065       size4d      = size(dataset.data);
 0066       newData4D   = zeros(size4d(1), size4d(2), size4d(3), length(uniqueChunkIDs));
-0067       newChunks   = zeros(1,length(uniqueChunkIDs), <span class="string">'uint8'</span>);
-0068       newClassIDs = zeros(1,length(uniqueChunkIDs), <span class="string">'uint8'</span>);
+0067       newChunks   = zeros(1,length(uniqueChunkIDs), <span class="string">'uint16'</span>);
+0068       newClassIDs = zeros(1,length(uniqueChunkIDs), <span class="string">'uint16'</span>);
 0069       d4DIndex    = 1;
 0070 
 0071       <span class="comment">%loop over every chunk in dataset</span>
@@ -140,7 +140,7 @@ This function is called by:
 0077         <span class="comment">%is id inside chunks?</span>
 0078         <span class="keyword">if</span>(sum(chunkRefs) &gt; 0)
 0079           <span class="comment">%average over this chunk id</span>
-0080           avg = mean(dataset.data4D(:,:,:,chunkRefs),4);
+0080           avg = mean(dataset.data(:,:,:,chunkRefs),4);
 0081           newData4D(:,:,:,d4DIndex) = avg;
 0082           <span class="comment">%set id for new chunks</span>
 0083           tmpChunks = dataset.chunks(chunkRefs);
@@ -152,7 +152,7 @@ This function is called by:
 0089         <span class="keyword">end</span>
 0090 
 0091       <span class="keyword">end</span>
-0092       dataset.data4D   = newData4D;
+0092       dataset.data = newData4D;
 0093     
 0094   <span class="keyword">else</span> 
 0095     
@@ -166,6 +166,6 @@ This function is called by:
 0103   <a href="checkDataset.html" class="code" title="function [ok] = checkDataset(dataset)">checkDataset</a>(dataset);
 0104   
 0105 <span class="keyword">end</span> <span class="comment">% end function</span></pre></div>
-<hr><address>Generated on Tue 12-Apr-2011 12:12:55 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+<hr><address>Generated on Mon 22-Oct-2012 13:45:25 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
 </body>
 </html>

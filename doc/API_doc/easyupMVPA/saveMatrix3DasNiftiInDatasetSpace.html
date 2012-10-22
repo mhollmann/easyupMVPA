@@ -109,7 +109,7 @@ This function is called by:
 0043   <span class="comment">%set the 4th dimension to 1 because it is just a 3D array</span>
 0044   niiHdr.dime.dim(5) = 1;
 0045   
-0046   [pathstr, name, ext, versn] = fileparts(hdrFilename);
+0046   [pathstr, name, ext] = fileparts(hdrFilename);
 0047   
 0048   <span class="keyword">if</span>( ~strcmp(ext,<span class="string">'.hdr'</span>) )
 0049     disp(<span class="string">'INFO: saveMatrix3DasNiftiInDatasetSpace: Extension of header filename was set to: .hdr !'</span> );
@@ -142,6 +142,6 @@ This function is called by:
 0076   
 0077 
 0078 <span class="keyword">end</span></pre></div>
-<hr><address>Generated on Tue 12-Apr-2011 12:12:55 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+<hr><address>Generated on Mon 22-Oct-2012 13:45:25 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
 </body>
 </html>
