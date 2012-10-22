@@ -6,35 +6,42 @@
 % Description:
 function [messageStack] = testEasyupMVPA()
 
+  tic;
+  
+  %supress graphics output?
+  graphOut = false;
 
   %set scopes to check to true:
   scopesToCheck = struct(...
-    'check_dataCreation',            false,...
-    'check_preprocessing',           false,...
-    'check_sampleSelection',         false,...
-    'check_simpleClassificationSVM', false,...
-    'check_simpleClassificationRVM', false,...
-    'check_LOOCV_SVM',               false,...
-    'check_RFE_SVM',                 false,...
-    'check_RFE_BOOTSTRAP_SVM',       false,...
-    'check_Searchlight_SVM',         false,...
-    'check_Configurator',            false,...
-    'check_regression',              true);
+    'check_dataCreation',            1,...
+    'check_preprocessing',           0,...
+    'check_sampleSelection',         0,...
+    'check_simpleClassificationSVM', 1,...
+    'check_simpleClassificationRVM', 0,...
+    'check_LOOCV_SVM',               1,...
+    'check_RFE_SVM',                 0,...
+    'check_RFE_BOOTSTRAP_SVM',       0,...
+    'check_Searchlight_SVM',         0,...
+    'check_Configurator',            0,...
+    'check_regression',              1);
   
   
   messageStack = struct('testScope', '', 'testMessage', '');
   msgIndex     = 1;
+  errorCount = 0;
   fs = filesep();
   testFuncPath = fileparts(which('testEasyupMVPA'));
   dir_data = [testFuncPath, fs, 'testData', fs];
-  easyupMVPA_init();
+  easyupMVPA_init('nmbCores', 2);
     
   
   wPath = which('easyupMVPA_init');
   [pathstr] = fileparts(wPath);
   addpath(genpath(pathstr));
   
-  %% Scope preparation
+  
+  
+  %% Scope preparation - always excecuted
   
   %creates variable datasetTest
   load([dir_data, 'datasetTest.mat']);
@@ -44,7 +51,9 @@ function [messageStack] = testEasyupMVPA()
   grayMatterMaskNii  = load_untouch_nii(grayMatterMaskFile);
   grayMatterMask     = grayMatterMaskNii.img;
   
-  showDataAsImage(grayMatterMask, 'gm_mask');
+  if(graphOut)
+    showDataAsImage(grayMatterMask, 'gm_mask');
+  end
   
   %mask files to use
   rois = {'lDLPFC_post_glm.nii', 'rDLPFC_post_glm.nii', 'lCaudateHead_glm.nii', 'rCaudateHead_glm.nii', ...
@@ -64,13 +73,16 @@ function [messageStack] = testEasyupMVPA()
     dataNii.img = int16(dataNii.img);
     roi3D(dataNii.img~=0) = i;
   end
+  
   disp('Done loading rois ...');
-  showDataAsImage(roi3D, 'roi3D');
+  if(graphOut)
+    showDataAsImage(roi3D, 'roi3D');
+  end
   
   [datasetTest, datasetTest2D] = averageFeaturesInROIs(datasetTest, roi3D);
   
   messageStack(msgIndex).testScope   = 'preparation';
-  messageStack(msgIndex).testMessage = 'feature averaging features in dataset 4D ... OK';
+  messageStack(msgIndex).testMessage = 'feature averaging features in dataset 4D ... PASSED';
   msgIndex =  msgIndex + 1;
   
   
@@ -97,9 +109,12 @@ if(scopesToCheck.check_dataCreation || scopesToCheck.check_preprocessing)
   %set a brain mask
   dataset = setDataset_mask_ByImageFile(dataset, [dir_data,'brainMask_53_63_46.hdr']);
   printDatasetInfo(dataset);
+  
   %show the image and the mask
-  showDataAsImage(dataset.data, 'First timepoint in data', 1);
-  showDataAsImage(dataset.mask, 'Dataset mask');
+  if(graphOut)
+    showDataAsImage(dataset.data, 'First timepoint in data', 1);
+    showDataAsImage(dataset.mask, 'Dataset mask');
+  end
   
   %check this scope for 4D
   sizeData = size(dataset.data);
@@ -108,6 +123,7 @@ if(scopesToCheck.check_dataCreation || scopesToCheck.check_preprocessing)
     messageStack(msgIndex).testScope   = 'dataCreation';
     messageStack(msgIndex).testMessage = 'ERROR: creation 4D by nifti images ... FAILED! Dimension mismatch!';
     msgIndex =  msgIndex + 1;
+    errorCount = errorCount +1;
     ok = false;
   end
   
@@ -115,12 +131,13 @@ if(scopesToCheck.check_dataCreation || scopesToCheck.check_preprocessing)
     messageStack(msgIndex).testScope   = 'dataCreation';
     messageStack(msgIndex).testMessage = 'ERROR: creation 4D by nifti images ... FAILED! Unspecified error while checking dataset!';
     msgIndex =  msgIndex + 1;
+    errorCount = errorCount +1;
     ok = false;
   end
   
   if(ok)
     messageStack(msgIndex).testScope   = 'dataCreation';
-    messageStack(msgIndex).testMessage = 'creation 4D by nifti images ... OK';
+    messageStack(msgIndex).testMessage = 'creation 4D by nifti images ... PASSED';
     msgIndex =  msgIndex + 1;
   end
 
@@ -166,7 +183,7 @@ if(scopesToCheck.check_dataCreation || scopesToCheck.check_preprocessing)
   
   if(scopeSelOK)
     messageStack(msgIndex).testScope   = 'dataCreation';
-    messageStack(msgIndex).testMessage = 'sample selection in data 4D ... OK';
+    messageStack(msgIndex).testMessage = 'sample selection in data 4D ... PASSED';
     msgIndex =  msgIndex + 1;
   end
 
@@ -179,29 +196,36 @@ end %endif check scope
   
 if(scopesToCheck.check_preprocessing)
   
-  %Plot timecourse of a single voxel
-  figure(10);
 
   dataset = selectSamples(datasetTest, 'index<=30');  
-  
   a = dataset.data(20,20,20,:);
-  subplot(3,1,1); plot(a(:));
   
   %linear detrending
   dataset = doLinearDetrending(dataset, [3 4]);
-  
   printDatasetInfo(dataset);
+  b = dataset.data(20,20,20,:);
   
-  a = dataset.data(20,20,20,:);
-  subplot(3,1,2); plot(a(:));
 
   %highpass-filtering (Take a careful look at your design - it is possible that useful frequencies are removed!)
   %Usage: doHighpassFiltering(dataset, cutoffFreq, TR)
   %In this case just a very low freq of more than 300 seconds is the cutoff, because of trial design(look at classIDs)
   dataset = doHighpassFiltering(dataset, 0.5, 1/300);
  
-  a = dataset.data(20,20,20,:);
-  subplot(3,1,3); plot(a(:));
+  c = dataset.data(20,20,20,:);
+  
+  %Plot timecourse of a single voxel
+  if(graphOut)
+    figureID = 'easyup_unitTest_preprocFig';
+    if(isempty(findobj('Tag', figureID)))    
+        resFig = figure('Tag', figureID, 'Name', 'Results for preprocessing');
+    else
+        figure(findobj('Tag', figureID));
+    end
+
+    subplot(3,1,1); plot(a(:));
+    subplot(3,1,2); plot(b(:));
+    subplot(3,1,3); plot(c(:));
+  end
   
   printDatasetInfo(dataset);
    
@@ -217,7 +241,7 @@ if(scopesToCheck.check_sampleSelection)
   
   if(ok)
     messageStack(msgIndex).testScope   = 'sampleSelection';
-    messageStack(msgIndex).testMessage = 'sample selection dataset 4D ... OK';
+    messageStack(msgIndex).testMessage = 'sample selection dataset 4D ... PASSED';
     msgIndex =  msgIndex + 1;
   end
 end %endif scope   
@@ -233,53 +257,57 @@ if(scopesToCheck.check_simpleClassificationSVM)
   %single samples
   dsTrain = selectSamples(datasetTest2D, 'index~=1');
   dsTest  = selectSamples(datasetTest2D, 'index==1');
-  [svmModel, weights] = train_SVM(dsTrain, 'linear', 0.5);
+  [svmModel, weights] = train_SVM(dsTrain, 'classification', 'linear', 0.5);
   [resultStruct] = predict_SVM(dsTest, svmModel);
   printResultStruct(resultStruct);
   
   %more samples
   dsTrain = selectSamples(datasetTest2D, 'index<=20');
   dsTest  = selectSamples(datasetTest2D, 'index>20');
-  [svmModel, weights] = train_SVM(dsTrain, 'linear', 0.5);
+  [svmModel, weights] = train_SVM(dsTrain, 'classification', 'linear', 0.5);
   [resultStruct] = predict_SVM(dsTest, svmModel);
   printResultStruct(resultStruct);
   
   messageStack(msgIndex).testScope   = testScope;
-  messageStack(msgIndex).testMessage = 'feature averaging features in dataset 4D ... OK';
+  messageStack(msgIndex).testMessage = 'feature averaging features in dataset 4D ... PASSED';
   msgIndex =  msgIndex + 1;
 
+  %keyboard;
+  
   if(resultStruct.accuracy == 25)
     messageStack(msgIndex).testScope   = testScope;
-    messageStack(msgIndex).testMessage = 'classification result dataset 2D ... OK';
+    messageStack(msgIndex).testMessage = 'classification result dataset 2D ... PASSED';
     msgIndex =  msgIndex + 1;
   else
     messageStack(msgIndex).testScope   = testScope;
     messageStack(msgIndex).testMessage = 'ERROR: check classification result dataset 2D ... FAILED';
     msgIndex =  msgIndex + 1;
+    errorCount = errorCount +1;
   end
   
   %** classification in 4D **
   %single samples
   dsTrain = selectSamples(datasetTest, 'index~=1');
   dsTest  = selectSamples(datasetTest, 'index==1');
-  [svmModel, weights] = train_SVM(dsTrain, 'linear', 0.5);
+  [svmModel, weights] = train_SVM(dsTrain, 'classification', 'linear', 0.5);
   [resultStruct] = predict_SVM(dsTest, svmModel);
   printResultStruct(resultStruct);
   
   dsTrain = selectSamples(datasetTest, 'index<=30');
   dsTest  = selectSamples(datasetTest, 'index>30');
-  [svmModel, weights] = train_SVM(dsTrain, 'linear', 0.5);
+  [svmModel, weights] = train_SVM(dsTrain, 'classification', 'linear', 0.5);
   [resultStruct] = predict_SVM(dsTest, svmModel);
   printResultStruct(resultStruct);
   
   if(resultStruct.accuracy == 80)
     messageStack(msgIndex).testScope   = testScope;
-    messageStack(msgIndex).testMessage = 'classification result dataset 4D ... OK';
+    messageStack(msgIndex).testMessage = 'classification result dataset 4D ... PASSED';
     msgIndex =  msgIndex + 1;
   else
     messageStack(msgIndex).testScope   = testScope;
     messageStack(msgIndex).testMessage = 'ERROR: check classification result dataset 4D ... FAILED';
     msgIndex =  msgIndex + 1;
+    errorCount = errorCount +1;
   end
   
   
@@ -289,7 +317,7 @@ if(scopesToCheck.check_simpleClassificationSVM)
   
   dsTrain.mask = [];
   dsTest.mask = [];
-  [svmModel, weights] = train_SVM(dsTrain, 'linear', 0.5);
+  [svmModel, weights] = train_SVM(dsTrain, 'classification', 'linear', 0.5);
   [resultStruct] = predict_SVM(dsTest, svmModel);
   printResultStruct(resultStruct);
   
@@ -306,7 +334,6 @@ if(scopesToCheck.check_simpleClassificationRVM)
   disp('********** SCOPE: simpleClassificationRVM ************');
   testScope = 'simpleClassificationRVM';
   
-  %keyboard;
   
   %** classification in 4D **
   datasetTestRVM = setDataset_mask_ByMatrix(datasetTest, roi3D);
@@ -319,7 +346,7 @@ if(scopesToCheck.check_simpleClassificationRVM)
   [resultStruct] = predict_RVM(dsTest, rvmModel);
   printResultStruct(resultStruct);
   
-  return
+  %return
   %keyboard
   
   %** classification in 2D **
@@ -335,7 +362,7 @@ if(scopesToCheck.check_simpleClassificationRVM)
 %   printResultStruct(resultStruct);
   
 %   messageStack(msgIndex).testScope   = testScope;
-%   messageStack(msgIndex).testMessage = 'feature averaging features in dataset 4D ... OK';
+%   messageStack(msgIndex).testMessage = 'feature averaging features in dataset 4D ... PASSED';
 %   msgIndex =  msgIndex + 1;
   
   
@@ -357,12 +384,13 @@ if(scopesToCheck.check_LOOCV_SVM)
   
   if(isequal(splitterOE.splitMatrix,repmat([1 2], 1, 20)) && isequal(size(splitterOSO.splitMatrix), [40 40]))
     messageStack(msgIndex).testScope   = testScope;
-    messageStack(msgIndex).testMessage = 'check splitter generation dataset 4D ... OK';
+    messageStack(msgIndex).testMessage = 'check splitter generation dataset 4D ... PASSED';
     msgIndex =  msgIndex + 1;
   else
     messageStack(msgIndex).testScope   = testScope;
     messageStack(msgIndex).testMessage = 'ERROR: check splitter generation dataset 4D ... FAILED';
-    msgIndex =  msgIndex + 1;    
+    msgIndex =  msgIndex + 1;
+    errorCount = errorCount +1;
   end
   
   
@@ -382,18 +410,19 @@ if(scopesToCheck.check_LOOCV_SVM)
   %LOOCV 4D including mask
   datasetTestLOOCV = setDataset_mask_ByMatrix(datasetTest, roi3D);
   tic
-  [datasetX, resultStruct, avgWeights3D] = doLeaveOneOutCrossValidation_SVM(datasetTestLOOCV, splitterOSO, 'linear', 0.5);
+  [datasetX, resultStruct, avgWeights3D] = doLeaveOneOutCrossValidation_SVM(datasetTestLOOCV, splitterOSO, 'classification', 'linear', 0.5);
   tN = toc;
   printResultStruct(resultStruct);
     
   if(resultStruct.accuracy == 80)
     messageStack(msgIndex).testScope   = testScope;
-    messageStack(msgIndex).testMessage = ['LOOCV classification result dataset 4D (Time needed:',num2str(tN),')... OK'];
+    messageStack(msgIndex).testMessage = ['LOOCV classification result dataset 4D (Time needed:',num2str(tN),')... PASSED'];
     msgIndex =  msgIndex + 1;
   else
     messageStack(msgIndex).testScope   = testScope;
     messageStack(msgIndex).testMessage = 'ERROR: check LOOCV classification result dataset 4D ... FAILED';
     msgIndex =  msgIndex + 1;
+    errorCount = errorCount +1;
   end
 
   
@@ -403,27 +432,29 @@ if(scopesToCheck.check_LOOCV_SVM)
   
   if(isequal(splitterOE.splitMatrix,repmat([1 2], 1, 20)) && isequal(size(splitterOSO.splitMatrix), [40 40]))
     messageStack(msgIndex).testScope   = testScope;
-    messageStack(msgIndex).testMessage = 'check splitter generation dataset 2D ... OK';
+    messageStack(msgIndex).testMessage = 'check splitter generation dataset 2D ... PASSED';
     msgIndex =  msgIndex + 1;
   else
     messageStack(msgIndex).testScope   = testScope;
     messageStack(msgIndex).testMessage = 'ERROR: check splitter generation dataset 2D ... FAILED';
-    msgIndex =  msgIndex + 1;    
+    msgIndex =  msgIndex + 1; 
+    errorCount = errorCount +1;
   end
   
   
   %LOOCV 2D
-  [datasetTest2DX, resultStruct, avgWeights1D] = doLeaveOneOutCrossValidation_SVM(datasetTest2D, splitterOSO, 'linear', 0.5);
+  [datasetTest2DX, resultStruct, avgWeights1D] = doLeaveOneOutCrossValidation_SVM(datasetTest2D, splitterOSO, 'classification', 'linear', 0.5);
   printResultStruct(resultStruct);
   
   if(single(resultStruct.accuracy) == 55)
     messageStack(msgIndex).testScope   = testScope;
-    messageStack(msgIndex).testMessage = 'LOOCV classification result dataset 2D ... OK';
+    messageStack(msgIndex).testMessage = 'LOOCV classification result dataset 2D ... PASSED';
     msgIndex =  msgIndex + 1;
   else
     messageStack(msgIndex).testScope   = testScope;
     messageStack(msgIndex).testMessage = 'ERROR: check LOOCV classification result dataset 2D ... FAILED';
     msgIndex =  msgIndex + 1;
+    errorCount = errorCount +1;
   end
   
   
@@ -433,17 +464,18 @@ if(scopesToCheck.check_LOOCV_SVM)
   tDS  = setDataset_mask_ByMatrix(tDS, [0 1 1 1 0 0 0 0 1 1 1 ]);
   printDatasetInfo(tDS);
    
-  [datasetTest2DX, resultStruct, avgWeights1D] = doLeaveOneOutCrossValidation_SVM(tDS, splitterOSO, 'linear', 0.5);
+  [datasetTest2DX, resultStruct, avgWeights1D] = doLeaveOneOutCrossValidation_SVM(tDS, splitterOSO, 'classification', 'linear', 0.5);
   printResultStruct(resultStruct);
  
   if(single(resultStruct.accuracy) == 42.5)
     messageStack(msgIndex).testScope   = testScope;
-    messageStack(msgIndex).testMessage = 'LOOCV classification result dataset 2D  inc. mask... OK';
+    messageStack(msgIndex).testMessage = 'LOOCV classification result dataset 2D  inc. mask... PASSED';
     msgIndex =  msgIndex + 1;
   else
     messageStack(msgIndex).testScope   = testScope;
     messageStack(msgIndex).testMessage = 'ERROR: check LOOCV classification result dataset 2D inc. mask ... FAILED';
     msgIndex =  msgIndex + 1;
+    errorCount = errorCount +1;
   end
 
   
@@ -469,34 +501,36 @@ if(scopesToCheck.check_RFE_SVM)
 
   tic
   [ds, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = ...
-      doRecursiveFeatureElemination_SVM(datasetTest, 3, 45, splitterOSO, 'linear', 0.5);
+      doRecursiveFeatureElemination_SVM(datasetTest, 3, 45, splitterOSO, 'classification', 'linear', 0.5);
   toc
   printResultStruct(resultStruct);
   
    if(resultStruct.accuracy == 82.5)
     messageStack(msgIndex).testScope   = testScope;
-    messageStack(msgIndex).testMessage = 'RFE classification result dataset 4D ... OK';
+    messageStack(msgIndex).testMessage = 'RFE classification result dataset 4D ... PASSED';
     msgIndex =  msgIndex + 1;
   else
     messageStack(msgIndex).testScope   = testScope;
     messageStack(msgIndex).testMessage = 'ERROR: check RFE classification result dataset 4D ... FAILED';
     msgIndex =  msgIndex + 1;
+    errorCount = errorCount +1;
    end
   
    tic
    [ds, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = ...
-   doRecursiveFeatureElemination_SVM(datasetTest2D, 2, 25, splitterOSO, 'linear', 0.5);
+   doRecursiveFeatureElemination_SVM(datasetTest2D, 2, 25, splitterOSO, 'classification', 'linear', 0.5);
    toc  
    printResultStruct(resultStruct);
   
    if(single(resultStruct.accuracy) == 55)
     messageStack(msgIndex).testScope   = testScope;
-    messageStack(msgIndex).testMessage = 'RFE classification result dataset 2D ... OK';
+    messageStack(msgIndex).testMessage = 'RFE classification result dataset 2D ... PASSED';
     msgIndex =  msgIndex + 1;
   else
     messageStack(msgIndex).testScope   = testScope;
     messageStack(msgIndex).testMessage = 'ERROR: check RFE classification result dataset 2D ... FAILED';
     msgIndex =  msgIndex + 1;
+    errorCount = errorCount +1;
    end
 end %endif scope  
    
@@ -541,11 +575,10 @@ if(scopesToCheck.check_Searchlight_SVM)
   
   splitterOSO = getDataSplitter(datasetTest, 'oneSampleOut');
   splitterOCO = getDataSplitter(datasetTest, 'oneChunkOut');
-  [dsX, resAccuracyMap, resultStruct] = doSearchlightLOOCV_SVM(datasetTest, 3, splitterOCO, 'linear', 0.5);
+  [dsX, resAccuracyMap, resultStruct] = doSearchlightLOOCV_SVM(datasetTest, 3, splitterOCO, 'classification', 'linear', 0.5);
   
   
   showDataAsImage(resAccuracyMap, 'searchlightAccuracy');
-  keyboard;
   
 end
 
@@ -553,7 +586,7 @@ end
 
 
 
-%% Scope Configurator
+%% Scope: Configurator
   
 if(scopesToCheck.check_Configurator)
   
@@ -568,17 +601,10 @@ if(scopesToCheck.check_Configurator)
   %{'MT3T','PF5T','QC1T','RSDT','SL7T','SMWT','WC8T'};
   
   conditions = {'crave_tasty','ncrave_tasty'};%,'crave_ntasty','ncrave_ntasty' 
-  
-  
   comparisons = [12]; %12 = ct vs nct ; 12 34 = ct vs nct und cnt vs ncnt
-  
-
   cpu_cores = 2;
 
   % --  SCANS -----------
-  
-  
-  
   dataFileFormat = 'data.nii'; 
   spm_betaformat = 0; 
   runs(1).directory = 's1'; 
@@ -602,7 +628,6 @@ if(scopesToCheck.check_Configurator)
 
   % --  ONSETS, DURATIONS, DATA GROUPING -----------
   useSpmBetaFiles = 0; 
-  
   
   %given in seconds
   sameTrialDurations = 3;
@@ -635,17 +660,9 @@ if(scopesToCheck.check_Configurator)
   %chunks, runs, samples, or e.g. split3 
   loocvSplitMethod = 'chunks';
 
-
   % -- GROUP STATS
   secondLevelSmoothingFWHM = 4; %nach der classification wird fuer die gruppenstat gesmootht.
   accuracymapsavename = 'accmap';
-
-
-
-
-  % --  ---------------- -----------
-  % --  DON'T EDIT BELOW -----------
-  % --  ---------------- -----------
 
   %-- init
   easyupMVPA_init('nmbCores', cpu_cores, 'quietMode', false);
@@ -674,69 +691,102 @@ end %end check configurator
 
 
 
-
+%% Scope: Regression
 if(scopesToCheck.check_regression)
   
-<<<<<<< .mine
+  testScope = 'REGRESSION';
+  
+  %load the bodyfat example 
+  dataFile_SVMStyle = fullfile(dir_data, 'bodyfat_scaled.txt'); 
+  [bfValues,bfInData] = libsvmread(dataFile_SVMStyle);
+  
+  
+  %create 2D dataset
+  regDS = getEmpty2DDataset();
+  regDS = setDataset_data_ByMatrix(regDS, bfInData');
+  
+  
+  regDS = setDataset_classIDs_ByVector(regDS, bfValues);
+  regDS = setDataset_chunks_ByVector(regDS, [1:length(bfValues)]);
+  
+  printDatasetInfo(regDS);
+  
+  dsTrain = selectSamples(regDS, 'index <= 200');
+  [svmModel, weights] = train_SVM(dsTrain, 'regression_epsilon', 'linear', 1, {'epsilon', 0.01});
 
-    x = [3 8 2 4 9 9 10 12];
-    y = [1 -3; 1 5; 2 -5; 2 6; 1 8; 1 9; 2 11; 2 12];
+  dsTest = selectSamples(regDS, 'index > 200');
+  [resultStruct, probEstimates] = predict_SVM(dsTest, svmModel);  
   
-    testData = [1 4; 3 14; 2 9; 2 4];
+  printResultStruct(resultStruct);
+  
+  %compute correlation of predicted and real results
+  cMatrix = corrcoef(resultStruct.predictedClassIDs, dsTest.classIDs);
+  if(cMatrix(1,2) > 0.9775)
+    messageStack(msgIndex).testScope   = testScope;
+    messageStack(msgIndex).testMessage = 'Simple Regression 2D ... PASSED';
+    msgIndex =  msgIndex + 1;
+  else
+    messageStack(msgIndex).testScope   = testScope;
+    messageStack(msgIndex).testMessage = 'ERROR: Simple Regression 2D ... FAILED';
+    msgIndex =  msgIndex + 1;    
+    errorCount = errorCount +1;
+  end
+  
+  if(graphOut)
     
-    model = svmtrain(y,x','-s 3 -t 2 -n 0.5 -c 1');
-    zz = svmpredict(x(1:4)', testData, model);
+    figureID = 'easyup_unitTest_regressionFig';
+    if(isempty(findobj('Tag', figureID)))    
+        resFig = figure('Tag', figureID, 'Name', 'Results for easyup unit test regression');
+    else
+        figure(findobj('Tag', figureID));
+    end
   
-    keyboard;
-%     N = 100;
-%     M = 1;
-%     t = randn(N,1);
-% 
-%     clear r
-%     m = 1:10:100;
-%     for M = m
-%     x = [t];
-%     for ii=1:M-1
-%         x = [x  t+ii*randn(N,1)/2];
-%     end
-% 
-%     %keyboard;
-%     x = member_normalize(x);
-% 
-%     % t1 = randn(N,1);
-%     % t2 = randn(N,1);
-%     % x = [t1 t2];
-%     % y = 3*t1 - 5*t2;
-%     y = 2*t + randn(N,1)/2 + 7;
-% 
-%     % corrcoef([x y]);
-%     % 
-%     % b= glmfit(x,y);
-%     for ii = 1
-%         for jj=1
-%             tic;model = svmtrain(y(1:N/2),x(1:N/2,:),['-s 4 -t 2 -n ' num2str(ii/2) ' -c ' num2str(1)]);toc
-%             tic;zz=svmpredict(y(N/2+1:end),x(N/2+1:end,:),model);toc
-%             tmp = corrcoef(zz, y(N/2+1:end));
-%             r(1+(M-1)/10) = tmp(2);
-%         end
-%     end
-% 
-%     end
-% 
-%     w = model.SVs' * model.sv_coef
-%     b = -model.rho
-% 
-%     hold on;plot(m, r, 'ro-');xlabel('# of dimension'); ylabel('r')
-%     figure('color','w');plot(m, r, 'ro-');
-% 
-%     figure('color','w');plot(x(1:N/2,:), y(1:N/2), 'b.');
-%     hold on;plot(x(N/2+1:end,:), zz, 'r.');
-%     xlabel('x')
-%     ylabel('y')
-%     legend({'training','test'})
-% 
-%     figure('color','w'); plot(zz, y(N/2+1:end), '.'); axis equal;axis square;
-%     figure('color','w'); plot(zz - y(N/2+1:end), '.')
+    hold on;
+    plot(resultStruct.predictedClassIDs, '-r');
+    plot(bfValues(201:end), '-b');
+    legend('predicted', 'data', 2);
+    hold off;
+  end
+  
+  
+  %LOOCV regression
+  splitterOSO = getDataSplitter(regDS, 'oneSampleOut');
+  [regDSX, resultStruct, avgWeights] = doLeaveOneOutCrossValidation_SVM(regDS, splitterOSO, 'regression_epsilon', 'linear', 1, {'epsilon', 0.01});
+  
+  printResultStruct(resultStruct);
+  
+  %compute correlation of predicted and real results
+  cMatrix = corrcoef(resultStruct.predictedClassIDs, regDS.classIDs);
+  
+  disp('LOOCV correlation: ');
+  disp(cMatrix(1,2));
+  
+  if(cMatrix(1,2) > 0.947)
+    messageStack(msgIndex).testScope   = testScope;
+    messageStack(msgIndex).testMessage = 'LOOCV Regression 2D ... PASSED';
+    msgIndex =  msgIndex + 1;
+  else
+    messageStack(msgIndex).testScope   = testScope;
+    messageStack(msgIndex).testMessage = 'ERROR: LOOCV Regression 2D ... FAILED';
+    msgIndex =  msgIndex + 1;    
+    errorCount = errorCount +1;
+  end
+  
+  if(graphOut)
+    
+    figureID = 'easyup_unitTest_regressionLOOCVFig';
+    if(isempty(findobj('Tag', figureID)))    
+        resFig = figure('Tag', figureID, 'Name', 'Results for easyup unit test regression');
+    else
+        figure(findobj('Tag', figureID));
+    end
+  
+    hold on;
+    plot(resultStruct.predictedClassIDs, '-r');
+    plot(bfValues, '-b');
+    legend('predicted', 'data', 2);
+    hold off;
+  end
 
 
 end % end scope regression
@@ -748,94 +798,7 @@ end % end scope regression
 
 
 
-
-
-
-
-
-
-
-  
-=======
-
-    x = [3 8 2 4 9 9 10 12];
-    y = [1 -3; 1 5; 2 -5; 2 6; 1 8; 1 9; 2 11; 2 12];
-  
-    testData = [1 4; 3 14; 2 9; 2 4];
-    
-    model = svmtrain(double(y),double(x'),'-s 3 -t 0 -n 0.5 -c 1');
-    zz = svmpredict(double(x(1:4)'), double(testData), model);
-  
-    %keyboard;
-%     N = 100;
-%     M = 1;
-%     t = randn(N,1);
-% 
-%     clear r
-%     m = 1:10:100;
-%     for M = m
-%     x = [t];
-%     for ii=1:M-1
-%         x = [x  t+ii*randn(N,1)/2];
-%     end
-% 
-%     %keyboard;
-%     x = member_normalize(x);
-% 
-%     % t1 = randn(N,1);
-%     % t2 = randn(N,1);
-%     % x = [t1 t2];
-%     % y = 3*t1 - 5*t2;
-%     y = 2*t + randn(N,1)/2 + 7;
-% 
-%     % corrcoef([x y]);
-%     % 
-%     % b= glmfit(x,y);
-%     for ii = 1
-%         for jj=1
-%             tic;model = svmtrain(y(1:N/2),x(1:N/2,:),['-s 4 -t 2 -n ' num2str(ii/2) ' -c ' num2str(1)]);toc
-%             tic;zz=svmpredict(y(N/2+1:end),x(N/2+1:end,:),model);toc
-%             tmp = corrcoef(zz, y(N/2+1:end));
-%             r(1+(M-1)/10) = tmp(2);
-%         end
-%     end
-% 
-%     end
-% 
-%     w = model.SVs' * model.sv_coef
-%     b = -model.rho
-% 
-%     hold on;plot(m, r, 'ro-');xlabel('# of dimension'); ylabel('r')
-%     figure('color','w');plot(m, r, 'ro-');
-% 
-%     figure('color','w');plot(x(1:N/2,:), y(1:N/2), 'b.');
-%     hold on;plot(x(N/2+1:end,:), zz, 'r.');
-%     xlabel('x')
-%     ylabel('y')
-%     legend({'training','test'})
-% 
-%     figure('color','w'); plot(zz, y(N/2+1:end), '.'); axis equal;axis square;
-%     figure('color','w'); plot(zz - y(N/2+1:end), '.')
-
-
-end % end scope regression
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
->>>>>>> .r211
+  disp(' ');
   disp('************ TEST MESSAGES ***************')
   disp(' ');
   disp('Checked Scopes:');
@@ -853,6 +816,15 @@ end % end scope regression
   for i=1:size(messageStack,2)
     disp(['Scope: ',messageStack(i).testScope,': ',messageStack(i).testMessage]);
   end  
+  disp(' ');
+  
+  if(errorCount==0)
+    disp('Finished test with no errors!');
+  else
+    disp(['Finished test with ',num2str(errorCount), ' error(s)!']);
+  end
+  disp(' ');
+  toc
   
   
 end

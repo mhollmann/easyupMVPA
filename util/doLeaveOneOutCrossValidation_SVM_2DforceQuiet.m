@@ -54,12 +54,7 @@ function [dataset, resultStruct] = doLeaveOneOutCrossValidation_SVM_2DforceQuiet
      ds2Indices = splitMatrix(i,:) == 2; %train data
 
      [ds1, ds2] = splitDataset(dataset, ds1Indices, ds2Indices );
-     
-     
-     %MHFIXME just for check if balancing worked out
-%      disp(length(find(ds2.classIDs==1)));
-%      disp(length(find(ds2.classIDs==0)));
-      
+           
      %train on all samples with one left out
      svmModel  = svmtrain(double(ds2.classIDs)', double(ds2.data)', svmCommandString);
      

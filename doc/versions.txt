@@ -1,0 +1,17 @@
+
+
+easyupMVPA - Versions
+=====================
+
+
+V 1.1 (20.10.2012)
+------------------
+- Regression is included
+  - classID are now double not uint8
+
+
+
+V 1.0 (15.10.2011)
+------------------
+- Stable first version
+- Just classification
