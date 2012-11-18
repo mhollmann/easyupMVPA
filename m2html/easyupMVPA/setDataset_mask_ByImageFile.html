@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of setDataset_mask_ByImageFile</title>
+  <meta name="keywords" content="setDataset_mask_ByImageFile">
+  <meta name="description" content="Set the mask field of 4D datasets by a given nifti-file.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">easyupMVPA</a> &gt; setDataset_mask_ByImageFile.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for easyupMVPA&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>setDataset_mask_ByImageFile
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Set the mask field of 4D datasets by a given nifti-file.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [dataset] = setDataset_mask_ByImageFile(dataset, maskImageFile) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Set the mask field of 4D datasets by a given nifti-file.
+
+ Author: Maurice Hollmann
+ Date  : 08/10
+
+ Description:
+ This methods sets a mask for the dataset (in example for excluding non-brain voxels). 
+ The mask has to be in 3D space. All non-zero elements in mask image are included in mask.
+
+ Parameters:
+   dataset        - the datset to set the mask for
+   maskImageFile  - string: the image file (3D image as .nii or .hdr) image is containing non-zero and zero elements - non-zero = include , zero = exclude
+
+ Returns:
+   dataset   - the datset with included mask (this mask just contains zeros and ones)
+
+ Comments:</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="checkDataset.html" class="code" title="function [ok] = checkDataset(dataset)">checkDataset</a>	Checks a given dataset for correctness (i.e. size of defined matrices).</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% Set the mask field of 4D datasets by a given nifti-file.</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% Author: Maurice Hollmann</span>
+0004 <span class="comment">% Date  : 08/10</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% Description:</span>
+0007 <span class="comment">% This methods sets a mask for the dataset (in example for excluding non-brain voxels).</span>
+0008 <span class="comment">% The mask has to be in 3D space. All non-zero elements in mask image are included in mask.</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">% Parameters:</span>
+0011 <span class="comment">%   dataset        - the datset to set the mask for</span>
+0012 <span class="comment">%   maskImageFile  - string: the image file (3D image as .nii or .hdr) image is containing non-zero and zero elements - non-zero = include , zero = exclude</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">% Returns:</span>
+0015 <span class="comment">%   dataset   - the datset with included mask (this mask just contains zeros and ones)</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">% Comments:</span>
+0018 <span class="comment">%</span>
+0019 <a name="_sub0" href="#_subfunctions" class="code">function [dataset] = setDataset_mask_ByImageFile(dataset, maskImageFile)</a>
+0020 
+0021   <span class="keyword">if</span>(~exist(<span class="string">'dataset'</span>,<span class="string">'var'</span>) || ~exist(<span class="string">'maskImageFile'</span>,<span class="string">'var'</span>))
+0022       error(<span class="string">'Usage of setDataset_mask_ByImageFile: [dataset] = setDataset_mask_ByImageFile(dataset, maskImageFile [string pointing to the file (.nii or .hdr)]'</span>);
+0023   <span class="keyword">end</span>
+0024   
+0025   <span class="keyword">if</span>(isfield(dataset, <span class="string">'mask'</span>) &amp;&amp; ~isempty(dataset.mask))
+0026     tmpMask = dataset.mask;
+0027   <span class="keyword">else</span>  
+0028     tmpMask = [];
+0029   <span class="keyword">end</span>
+0030   
+0031   <span class="comment">%Load all the data in the filelist and concatenate in dataset.data4D</span>
+0032   disp(<span class="string">'INFO: setDataset_mask3D_ByImageFile: Loading mask image file ...'</span>);
+0033   disp(maskImageFile);
+0034     
+0035   <span class="comment">%check existance of the file</span>
+0036   <span class="keyword">if</span>(~exist(maskImageFile, <span class="string">'file'</span>))
+0037     error([<span class="string">'Could not read mask image file: '</span>, maskImageFile]);
+0038   <span class="keyword">end</span>
+0039     
+0040   <span class="comment">%Read the data (nii or hdr)</span>
+0041   <span class="comment">%the nii loading function is slightly changed for better memory performance</span>
+0042   dataNii = load_nii(maskImageFile);
+0043   
+0044   <span class="comment">%check dimensions</span>
+0045   sizeData = size(dataset.data);
+0046   sizeMask = size(dataNii.img);
+0047   
+0048   <span class="keyword">if</span>(sizeData(1)~=sizeMask(1) || sizeData(2)~=sizeMask(2) || sizeData(3)~=sizeMask(3))
+0049       error(<span class="string">'The dimensions of maskImageFile do not fit the space of dataset.data!'</span>);
+0050   <span class="keyword">end</span>
+0051   dataNii.img(dataNii.img&gt;0)=1;
+0052   dataNii.img(dataNii.img&lt;0)=1;
+0053   dataset.mask = dataNii.img;
+0054   
+0055   
+0056   <span class="comment">%check dataset</span>
+0057   <span class="keyword">if</span>(~<a href="checkDataset.html" class="code" title="function [ok] = checkDataset(dataset)">checkDataset</a>(dataset))
+0058     dataset.mask = tmpMask;
+0059     error(<span class="string">'Could not set field mask, dataset.mask is unchanged!'</span>);
+0060   <span class="keyword">end</span>
+0061     
+0062 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 22-Oct-2012 13:45:25 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

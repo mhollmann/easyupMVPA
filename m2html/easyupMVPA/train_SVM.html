@@ -1,0 +1,172 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of train_SVM</title>
+  <meta name="keywords" content="train_SVM">
+  <meta name="description" content="Simple training of a dataset based on the given dataset using a Support Vector Machine (SVM).">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">easyupMVPA</a> &gt; train_SVM.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for easyupMVPA&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>train_SVM
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Simple training of a dataset based on the given dataset using a Support Vector Machine (SVM).</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [svmModel, weights] = train_SVM(dataset, svmType, kernelMode, costParam, paramStruct) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Simple training of a dataset based on the given dataset using a Support Vector Machine (SVM).
+
+ Author: Maurice Hollmann
+ Date  : 09/10
+
+ Description:
+  This high-level function trains a Support Vector Machine (SVM). The return value svmModel may be used
+  to predict data based on the model learned here.
+
+
+ Parameters:
+   dataset        - The dataset to work on 2D or 4D (all samples are included in LOOCV)
+   svmType        - Types:
+                     ['classification', 'regression_epsilon', 'regression_nu']
+
+   kernelMode     - Kernels: 
+                     ['linear', 'polynomial', 'radial', 'sigmoid']
+                         linear               : u'*v
+                         polynomial           : (gamma*u'*v + coef0)^degree
+                         radial basis function: exp(-gamma*|u-v|^2)
+                         sigmoid              : tanh(gamma*u'*v + coef0)
+
+   costParam      - The slack variable C in SVM (range 0 to 1  0 = low cost, 1 = highest costs). 
+                    It defines the costs for misclassification (How strongly are outliers punished?).
+   paramStruct    - example: {'degree', 3, 'gamma', 0.02, 'probEstimates', 1}
+                    possible fields:
+                    'degree'        : default=3    Describes the exponent in polynomial kernel function
+                    'gamma'         : default=1/k  The gamma-factor in kernel function
+                    'coef0'         : default=0    The coefficient summand in kernel function
+                    'nu'            : default
+                    'probEstimates' : default=0    1 if probabilistic estimates should be computed, 0 if not
+ 
+
+ Returns:
+   svmModel       - a struct containing all model data describing the libsvm model
+   weights        - 1D or 3D map of the weights extracted for the trained model
+
+ Comments:</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="selectFeaturesBySelectionMap.html" class="code" title="function [dataset, data2D] = selectFeaturesBySelectionMap(dataset)">selectFeaturesBySelectionMap</a>	Apply a featureSelection map that is stored in a dataset to this dataset.</li><li><a href="setDataset_featureSelectionMap_ByMatrix.html" class="code" title="function [dataset] = setDataset_featureSelectionMap_ByMatrix(dataset, mapMatrix)">setDataset_featureSelectionMap_ByMatrix</a>	Set the featureSelectionMap (1D or 3D) field of a dataset by a given matrix.</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% Simple training of a dataset based on the given dataset using a Support Vector Machine (SVM).</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% Author: Maurice Hollmann</span>
+0004 <span class="comment">% Date  : 09/10</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% Description:</span>
+0007 <span class="comment">%  This high-level function trains a Support Vector Machine (SVM). The return value svmModel may be used</span>
+0008 <span class="comment">%  to predict data based on the model learned here.</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">% Parameters:</span>
+0012 <span class="comment">%   dataset        - The dataset to work on 2D or 4D (all samples are included in LOOCV)</span>
+0013 <span class="comment">%   svmType        - Types:</span>
+0014 <span class="comment">%                     ['classification', 'regression_epsilon', 'regression_nu']</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">%   kernelMode     - Kernels:</span>
+0017 <span class="comment">%                     ['linear', 'polynomial', 'radial', 'sigmoid']</span>
+0018 <span class="comment">%                         linear               : u'*v</span>
+0019 <span class="comment">%                         polynomial           : (gamma*u'*v + coef0)^degree</span>
+0020 <span class="comment">%                         radial basis function: exp(-gamma*|u-v|^2)</span>
+0021 <span class="comment">%                         sigmoid              : tanh(gamma*u'*v + coef0)</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">%   costParam      - The slack variable C in SVM (range 0 to 1  0 = low cost, 1 = highest costs).</span>
+0024 <span class="comment">%                    It defines the costs for misclassification (How strongly are outliers punished?).</span>
+0025 <span class="comment">%   paramStruct    - example: {'degree', 3, 'gamma', 0.02, 'probEstimates', 1}</span>
+0026 <span class="comment">%                    possible fields:</span>
+0027 <span class="comment">%                    'degree'        : default=3    Describes the exponent in polynomial kernel function</span>
+0028 <span class="comment">%                    'gamma'         : default=1/k  The gamma-factor in kernel function</span>
+0029 <span class="comment">%                    'coef0'         : default=0    The coefficient summand in kernel function</span>
+0030 <span class="comment">%                    'nu'            : default</span>
+0031 <span class="comment">%                    'probEstimates' : default=0    1 if probabilistic estimates should be computed, 0 if not</span>
+0032 <span class="comment">%</span>
+0033 <span class="comment">%</span>
+0034 <span class="comment">% Returns:</span>
+0035 <span class="comment">%   svmModel       - a struct containing all model data describing the libsvm model</span>
+0036 <span class="comment">%   weights        - 1D or 3D map of the weights extracted for the trained model</span>
+0037 <span class="comment">%</span>
+0038 <span class="comment">% Comments:</span>
+0039 <span class="comment">%</span>
+0040 <a name="_sub0" href="#_subfunctions" class="code">function [svmModel, weights] = train_SVM(dataset, svmType, kernelMode, costParam, paramStruct)</a>
+0041 
+0042   <span class="keyword">if</span>( ~exist(<span class="string">'dataset'</span>,<span class="string">'var'</span>) || ~exist(<span class="string">'svmType'</span>,<span class="string">'var'</span>) || ~exist(<span class="string">'kernelMode'</span>,<span class="string">'var'</span>) || ~exist(<span class="string">'costParam'</span>,<span class="string">'var'</span>)) 
+0043     error(<span class="string">'Usage of train_SVM: [svmModel, weights] = train_SVM(dataset, svmType - [classification, regression_epsilon, regression_nu], kernelMode - [linear, polynomial, radial, sigmoid] , costParam [0-1], paramStruct [optional - i.e. {&quot;degree&quot;, 3}])'</span>);
+0044   <span class="keyword">end</span>
+0045   
+0046   <span class="comment">%extractt the SVM parameter values from paramStruct</span>
+0047   <span class="keyword">if</span>( ~exist(<span class="string">'paramStruct'</span>,<span class="string">'var'</span>))
+0048     [paramStructIsValid, svmParamInfoStruct, cmdString] = getSVMParamInfo(svmType, kernelMode, costParam, {});
+0049   <span class="keyword">else</span>
+0050     [paramStructIsValid, svmParamInfoStruct, cmdString] = getSVMParamInfo(svmType, kernelMode, costParam, paramStruct);
+0051   <span class="keyword">end</span>
+0052   <span class="keyword">if</span>(~paramStructIsValid)
+0053     error(<span class="string">'Usage of train_SVM: [svmModel, weights3D] = train_SVM(dataset, svmType - [classification, regression_epsilon, regression_nu], kernelMode - [linear, polynomial, radial, sigmoid] , costParam [0-1], paramStruct [optional - i.e. {&quot;degree&quot;, 3}])'</span>);
+0054   <span class="keyword">end</span>
+0055   
+0056   <span class="comment">%use quiet mode (no outputs)</span>
+0057   cmdString = [cmdString, <span class="string">' -q '</span>];
+0058   
+0059   sizeData   = size(dataset.data);
+0060   <span class="keyword">if</span>(isfield(dataset,<span class="string">'featureSelectionMap'</span>) &amp;&amp; ~isempty(dataset.featureSelectionMap))
+0061     [dataset, trainData2D] = <a href="selectFeaturesBySelectionMap.html" class="code" title="function [dataset, data2D] = selectFeaturesBySelectionMap(dataset)">selectFeaturesBySelectionMap</a>(dataset);
+0062   <span class="keyword">elseif</span>(isfield(dataset,<span class="string">'mask'</span>) &amp;&amp; ~isempty(dataset.mask))
+0063     dataset = <a href="setDataset_featureSelectionMap_ByMatrix.html" class="code" title="function [dataset] = setDataset_featureSelectionMap_ByMatrix(dataset, mapMatrix)">setDataset_featureSelectionMap_ByMatrix</a>(dataset, dataset.mask);
+0064     [dataset, trainData2D] = <a href="selectFeaturesBySelectionMap.html" class="code" title="function [dataset, data2D] = selectFeaturesBySelectionMap(dataset)">selectFeaturesBySelectionMap</a>(dataset);
+0065   <span class="keyword">else</span>
+0066     <span class="comment">%all features are used</span>
+0067     <span class="keyword">if</span>(dataset.is2D)
+0068      dataset = <a href="setDataset_featureSelectionMap_ByMatrix.html" class="code" title="function [dataset] = setDataset_featureSelectionMap_ByMatrix(dataset, mapMatrix)">setDataset_featureSelectionMap_ByMatrix</a>(dataset, ones(sizeData(1:end-1),1));
+0069     <span class="keyword">else</span>
+0070      dataset = <a href="setDataset_featureSelectionMap_ByMatrix.html" class="code" title="function [dataset] = setDataset_featureSelectionMap_ByMatrix(dataset, mapMatrix)">setDataset_featureSelectionMap_ByMatrix</a>(dataset, ones(sizeData(1:end-1))); 
+0071     <span class="keyword">end</span>
+0072     [dataset, trainData2D] = <a href="selectFeaturesBySelectionMap.html" class="code" title="function [dataset, data2D] = selectFeaturesBySelectionMap(dataset)">selectFeaturesBySelectionMap</a>(dataset);
+0073   <span class="keyword">end</span>
+0074 
+0075   weights = zeros(sizeData(1:end-1));
+0076 
+0077   <span class="comment">%train on all samples inside the set</span>
+0078   svmModel  = svmtrain(double(dataset.classIDs)', trainData2D, cmdString);
+0079   <span class="comment">%svmModel.svmType = svmType;</span>
+0080   
+0081   <span class="comment">%extract the weights</span>
+0082   weights_ = svmModel.SVs' * svmModel.sv_coef;
+0083   weights(find(dataset.featureSelectionMap &gt;0 )) = weights_;  
+0084 
+0085 <span class="keyword">end</span>
+0086 
+0087 
+0088</pre></div>
+<hr><address>Generated on Mon 22-Oct-2012 13:45:25 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

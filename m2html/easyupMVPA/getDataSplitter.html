@@ -1,0 +1,432 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getDataSplitter</title>
+  <meta name="keywords" content="getDataSplitter">
+  <meta name="description" content="Returns a defined data splitter used in LOOCV or RFE.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">easyupMVPA</a> &gt; getDataSplitter.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for easyupMVPA&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>getDataSplitter
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Returns a defined data splitter used in LOOCV or RFE.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [dataSplitter] = getDataSplitter(dataset, splitterType, pattern, balanced) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Returns a defined data splitter used in LOOCV or RFE.
+
+ Author: Maurice Hollmann
+ Date  : 09/10
+
+ Description:
+
+   [dataSplitter] = getDataSplitter(dataset, splitterType [one of: &quot;oneSampleOut&quot;, &quot;oneChunkOut&quot;, &quot;oddEvenSamples&quot;, &quot;oddEvenChunks&quot;, &quot;repeatPattern&quot;, &quot;custom&quot;], [pattern])
+
+   Using this method the data can be split into &quot;not in use&quot;, &quot;training&quot; and &quot;test&quot; parts for a repeated analysis (like LOOCV or RFE).
+   The result is a struct, that describes the whole splitting in a 2D matrix (nmbSplits x nmbSamples).
+   Coding in splitMatrix: 0 = exclude, 1 = test, 2 = train.
+
+   Please consider that the number of splits can be lower than the number of samples.
+ 
+   Splitter Types = &quot;oneSampleOut&quot; 
+                    &quot;oneChunkOut&quot; 
+                    &quot;oddEvenSamples&quot;
+                    &quot;oddEvenChunks&quot;
+                    &quot;repeatPattern&quot; 
+                    &quot;custom&quot;
+ 
+   There are following possibilities to split the data:
+
+   1. splitterType == 'oneSampleOut'
+
+      This is the typical split for a one sample out cross validation. It creates nmbSamples splits where
+      in every split all samples are training-samples except one. 
+      First split : first sample is test - rest is training
+      Second split: just second sample is test - rest (including first sample) is training   
+      and so on ...
+
+      Example: chunks:       [1 2 1 3 2 3]
+               splitMatrix:   1 2 2 2 2 2
+                              2 1 2 2 2 2
+                              2 2 1 2 2 2
+                              2 2 2 1 2 2
+                              2 2 2 2 1 2
+                              2 2 2 2 2 1
+
+   2. splitterType == 'oneChunkOut'
+
+      This extract a split-pattern that selects all chunks with the same id
+      and iterates the test dataset inside this set. The other samples in the
+      same chunk are not included in the training data.
+
+      Example: chunks:       [1 2 1 3 2 3]
+               splitMatrix:   1 2 1 2 2 2
+                              2 1 2 2 1 2
+                              2 2 2 1 2 1
+                              
+
+   3. splitterType == 'oddEvenSamples'
+ 
+      Splits the samples in two parts. 
+      odd sample numbers  = test
+      even sample numbers = training
+
+      Example: Two adjacent samples belong to one run. 
+               Call: getDataSplitter(dataset, 'oddEven')
+
+               samples (nmb):  [1 2 3 4 5 6]
+               splitMatrix:     2 1 2 1 2 1
+
+
+   4. splitterType == 'oddEvenChunks'
+ 
+      Splits the samples in two parts. 
+      odd chunk numbers  = test
+      even chunk numbers = training
+
+      Example: Two adjacent samples belong to one run. 
+               Call: getDataSplitter(dataset, 'oddEven')
+
+               chunks:         [1 1 2 3 2 3 3 4 4]
+               splitMatrix:     1 1 2 1 2 1 1 2 2
+
+
+   5. splitterType == 'repeatPattern'
+ 
+      May be used for excluding samples from training if they are in the same
+      run as the test sample. In this condition it is possible to exclude samples 
+      e.g. if you dont want to include the third sample of every run use 
+      pattern: [1 1 0 1] (Here one run consists of 4 samples).
+
+      Example: Two adjacent samples belong to one run. 
+               Call: getDataSplitter(dataset, 'repeatPattern', [1 1])
+               chunks:       [1 2 1 2 1 2]
+               splitMatrix:   1 0 2 2 2 2
+                              0 1 2 2 2 2
+                              2 2 1 0 2 2
+                              2 2 0 1 2 2
+                              2 2 2 2 1 0
+                              2 2 2 2 0 1
+
+   6. splitterType == 'custom'
+
+      This option may be used for arbitrary splitting. The given pattern must be 2D with the size
+      N x nmbSamples, where N must be &gt; 0. The pattern has to contain just 0, 1 or 2 (0 = exclude, 1 = test, 2 = train).
+
+ Parameters:
+   dataset       - the dataset to print info 
+   splitterType  - string one of: &quot;oneSampleOut&quot; &quot;oneChunkOut&quot; &quot;repeatPattern&quot; &quot;custom&quot;
+   pattern       - the split pattern
+                    in splitterType &quot;repeatPattern&quot; pattern must be in dimensions [1 n] and just contain elements 0 (non-use) and 1 (use)
+                    in splitterType &quot;custom&quot;        pattern must be in dimensions [nmbSamples nmbSamples] and just contain elements 0 (non-used), 1 (test), or 2 (training) 
+
+ Returns:
+   dataSplitter  - a struct with the fields: splitterType and splitMatrix
+
+ Comments:</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="doRecursiveFeatureElemination_SVM_nestedLOOCV.html" class="code" title="function [dataset, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = doRecursiveFeatureElemination_SVM_nestedLOOCV(dataset, nmbIterations, thresholdPercentOfFeaturesOut, nmbSplitsLOOCV, dataSplitter, kernelMode, costParam, paramStruct)">doRecursiveFeatureElemination_SVM_nestedLOOCV</a>	! DEPRECATED ! Recursively removes features according to SVM classification weights from LOOCV.</li><li><a href="doRecursiveFeatureElemination_bootStrap_SVM.html" class="code" title="function [dataset, resultStruct] = doRecursiveFeatureElemination_bootStrap_SVM(dataset, nmbBootSteps)">doRecursiveFeatureElemination_bootStrap_SVM</a>	[DO NOT USE: UNDER DEVELOPEMENT!] Recursively removes features according to SVM classification weights obtained by bootstrapping.</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% Returns a defined data splitter used in LOOCV or RFE.</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% Author: Maurice Hollmann</span>
+0004 <span class="comment">% Date  : 09/10</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% Description:</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%   [dataSplitter] = getDataSplitter(dataset, splitterType [one of: &quot;oneSampleOut&quot;, &quot;oneChunkOut&quot;, &quot;oddEvenSamples&quot;, &quot;oddEvenChunks&quot;, &quot;repeatPattern&quot;, &quot;custom&quot;], [pattern])</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%   Using this method the data can be split into &quot;not in use&quot;, &quot;training&quot; and &quot;test&quot; parts for a repeated analysis (like LOOCV or RFE).</span>
+0011 <span class="comment">%   The result is a struct, that describes the whole splitting in a 2D matrix (nmbSplits x nmbSamples).</span>
+0012 <span class="comment">%   Coding in splitMatrix: 0 = exclude, 1 = test, 2 = train.</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">%   Please consider that the number of splits can be lower than the number of samples.</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">%   Splitter Types = &quot;oneSampleOut&quot;</span>
+0017 <span class="comment">%                    &quot;oneChunkOut&quot;</span>
+0018 <span class="comment">%                    &quot;oddEvenSamples&quot;</span>
+0019 <span class="comment">%                    &quot;oddEvenChunks&quot;</span>
+0020 <span class="comment">%                    &quot;repeatPattern&quot;</span>
+0021 <span class="comment">%                    &quot;custom&quot;</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">%   There are following possibilities to split the data:</span>
+0024 <span class="comment">%</span>
+0025 <span class="comment">%   1. splitterType == 'oneSampleOut'</span>
+0026 <span class="comment">%</span>
+0027 <span class="comment">%      This is the typical split for a one sample out cross validation. It creates nmbSamples splits where</span>
+0028 <span class="comment">%      in every split all samples are training-samples except one.</span>
+0029 <span class="comment">%      First split : first sample is test - rest is training</span>
+0030 <span class="comment">%      Second split: just second sample is test - rest (including first sample) is training</span>
+0031 <span class="comment">%      and so on ...</span>
+0032 <span class="comment">%</span>
+0033 <span class="comment">%      Example: chunks:       [1 2 1 3 2 3]</span>
+0034 <span class="comment">%               splitMatrix:   1 2 2 2 2 2</span>
+0035 <span class="comment">%                              2 1 2 2 2 2</span>
+0036 <span class="comment">%                              2 2 1 2 2 2</span>
+0037 <span class="comment">%                              2 2 2 1 2 2</span>
+0038 <span class="comment">%                              2 2 2 2 1 2</span>
+0039 <span class="comment">%                              2 2 2 2 2 1</span>
+0040 <span class="comment">%</span>
+0041 <span class="comment">%   2. splitterType == 'oneChunkOut'</span>
+0042 <span class="comment">%</span>
+0043 <span class="comment">%      This extract a split-pattern that selects all chunks with the same id</span>
+0044 <span class="comment">%      and iterates the test dataset inside this set. The other samples in the</span>
+0045 <span class="comment">%      same chunk are not included in the training data.</span>
+0046 <span class="comment">%</span>
+0047 <span class="comment">%      Example: chunks:       [1 2 1 3 2 3]</span>
+0048 <span class="comment">%               splitMatrix:   1 2 1 2 2 2</span>
+0049 <span class="comment">%                              2 1 2 2 1 2</span>
+0050 <span class="comment">%                              2 2 2 1 2 1</span>
+0051 <span class="comment">%</span>
+0052 <span class="comment">%</span>
+0053 <span class="comment">%   3. splitterType == 'oddEvenSamples'</span>
+0054 <span class="comment">%</span>
+0055 <span class="comment">%      Splits the samples in two parts.</span>
+0056 <span class="comment">%      odd sample numbers  = test</span>
+0057 <span class="comment">%      even sample numbers = training</span>
+0058 <span class="comment">%</span>
+0059 <span class="comment">%      Example: Two adjacent samples belong to one run.</span>
+0060 <span class="comment">%               Call: getDataSplitter(dataset, 'oddEven')</span>
+0061 <span class="comment">%</span>
+0062 <span class="comment">%               samples (nmb):  [1 2 3 4 5 6]</span>
+0063 <span class="comment">%               splitMatrix:     2 1 2 1 2 1</span>
+0064 <span class="comment">%</span>
+0065 <span class="comment">%</span>
+0066 <span class="comment">%   4. splitterType == 'oddEvenChunks'</span>
+0067 <span class="comment">%</span>
+0068 <span class="comment">%      Splits the samples in two parts.</span>
+0069 <span class="comment">%      odd chunk numbers  = test</span>
+0070 <span class="comment">%      even chunk numbers = training</span>
+0071 <span class="comment">%</span>
+0072 <span class="comment">%      Example: Two adjacent samples belong to one run.</span>
+0073 <span class="comment">%               Call: getDataSplitter(dataset, 'oddEven')</span>
+0074 <span class="comment">%</span>
+0075 <span class="comment">%               chunks:         [1 1 2 3 2 3 3 4 4]</span>
+0076 <span class="comment">%               splitMatrix:     1 1 2 1 2 1 1 2 2</span>
+0077 <span class="comment">%</span>
+0078 <span class="comment">%</span>
+0079 <span class="comment">%   5. splitterType == 'repeatPattern'</span>
+0080 <span class="comment">%</span>
+0081 <span class="comment">%      May be used for excluding samples from training if they are in the same</span>
+0082 <span class="comment">%      run as the test sample. In this condition it is possible to exclude samples</span>
+0083 <span class="comment">%      e.g. if you dont want to include the third sample of every run use</span>
+0084 <span class="comment">%      pattern: [1 1 0 1] (Here one run consists of 4 samples).</span>
+0085 <span class="comment">%</span>
+0086 <span class="comment">%      Example: Two adjacent samples belong to one run.</span>
+0087 <span class="comment">%               Call: getDataSplitter(dataset, 'repeatPattern', [1 1])</span>
+0088 <span class="comment">%               chunks:       [1 2 1 2 1 2]</span>
+0089 <span class="comment">%               splitMatrix:   1 0 2 2 2 2</span>
+0090 <span class="comment">%                              0 1 2 2 2 2</span>
+0091 <span class="comment">%                              2 2 1 0 2 2</span>
+0092 <span class="comment">%                              2 2 0 1 2 2</span>
+0093 <span class="comment">%                              2 2 2 2 1 0</span>
+0094 <span class="comment">%                              2 2 2 2 0 1</span>
+0095 <span class="comment">%</span>
+0096 <span class="comment">%   6. splitterType == 'custom'</span>
+0097 <span class="comment">%</span>
+0098 <span class="comment">%      This option may be used for arbitrary splitting. The given pattern must be 2D with the size</span>
+0099 <span class="comment">%      N x nmbSamples, where N must be &gt; 0. The pattern has to contain just 0, 1 or 2 (0 = exclude, 1 = test, 2 = train).</span>
+0100 <span class="comment">%</span>
+0101 <span class="comment">% Parameters:</span>
+0102 <span class="comment">%   dataset       - the dataset to print info</span>
+0103 <span class="comment">%   splitterType  - string one of: &quot;oneSampleOut&quot; &quot;oneChunkOut&quot; &quot;repeatPattern&quot; &quot;custom&quot;</span>
+0104 <span class="comment">%   pattern       - the split pattern</span>
+0105 <span class="comment">%                    in splitterType &quot;repeatPattern&quot; pattern must be in dimensions [1 n] and just contain elements 0 (non-use) and 1 (use)</span>
+0106 <span class="comment">%                    in splitterType &quot;custom&quot;        pattern must be in dimensions [nmbSamples nmbSamples] and just contain elements 0 (non-used), 1 (test), or 2 (training)</span>
+0107 <span class="comment">%</span>
+0108 <span class="comment">% Returns:</span>
+0109 <span class="comment">%   dataSplitter  - a struct with the fields: splitterType and splitMatrix</span>
+0110 <span class="comment">%</span>
+0111 <span class="comment">% Comments:</span>
+0112 <span class="comment">%</span>
+0113 <a name="_sub0" href="#_subfunctions" class="code">function [dataSplitter] = getDataSplitter(dataset, splitterType, pattern, balanced)</a>
+0114 
+0115    dataSplitter = struct(<span class="string">'splitterType'</span>, <span class="string">''</span>, <span class="string">'splitMatrix'</span>, []);
+0116    
+0117    <span class="keyword">if</span>( ~exist(<span class="string">'dataset'</span>,<span class="string">'var'</span>) || ~exist(<span class="string">'splitterType'</span>,<span class="string">'var'</span>) ) 
+0118     error(<span class="string">'Usage of getDataSplitter: [dataSplitter] = getDataSplitter(dataset, splitterType [one of: &quot;oneSampleOut&quot;, &quot;oneChunkOut&quot;, &quot;oddEvenSamples&quot;, &quot;oddEvenChunks&quot;, &quot;repeatPattern&quot;, &quot;custom&quot;], [pattern])'</span>);
+0119    <span class="keyword">end</span>
+0120       
+0121    lengthSet = length(dataset.classIDs);
+0122    
+0123    
+0124    <span class="keyword">if</span>(~exist(<span class="string">'balanced'</span>, <span class="string">'var'</span>))
+0125      <span class="keyword">if</span>(~exist(<span class="string">'pattern'</span>, <span class="string">'var'</span>))
+0126        balanced = false;
+0127      <span class="keyword">elseif</span>(isscalar(pattern))
+0128        balanced = pattern;
+0129      <span class="keyword">end</span>
+0130    <span class="keyword">end</span>
+0131    
+0132    
+0133    <span class="comment">%check for splitter type</span>
+0134    <span class="keyword">if</span>(strcmp(splitterType, <span class="string">'oneSampleOut'</span>))
+0135      
+0136      dataSplitter.splitterType = <span class="string">'oneSampleOut'</span>;
+0137      dataSplitter.splitMatrix = ones(lengthSet, lengthSet, <span class="string">'uint8'</span>);
+0138      dataSplitter.splitMatrix(:) = 2;
+0139      <span class="keyword">for</span> i=1:lengthSet
+0140        dataSplitter.splitMatrix(i,i) = 1;
+0141      <span class="keyword">end</span>
+0142      
+0143    <span class="keyword">elseif</span>(strcmp(splitterType, <span class="string">'oneChunkOut'</span>))
+0144      
+0145      dataSplitter.splitterType = <span class="string">'oneChunkOut'</span>;
+0146      
+0147      <span class="comment">%get unique elements in chunks</span>
+0148      uniqueElements = unique(dataset.chunks);
+0149      
+0150      dataSplitter.splitMatrix    = zeros(length(uniqueElements), lengthSet, <span class="string">'uint8'</span>);
+0151      dataSplitter.splitMatrix(:) = 2;
+0152      smIndexY = 1;
+0153      
+0154      <span class="comment">%loop over unique chunk elements</span>
+0155      <span class="keyword">for</span> i = 1:length(uniqueElements)
+0156        sel = dataset.chunks == uniqueElements(i);
+0157        dataSplitter.splitMatrix(i, sel) = 1;
+0158      <span class="keyword">end</span>
+0159      
+0160    <span class="keyword">elseif</span>(strcmp(splitterType, <span class="string">'oddEvenSamples'</span>))  
+0161      
+0162      dataSplitter.splitterType  = <span class="string">'oddEvenSamples'</span>;
+0163      dataSplitter.splitMatrix   = ones(1,size(dataset.chunks,2),<span class="string">'uint8'</span>);
+0164      
+0165      nmbArr = 1:size(dataset.chunks,2);
+0166      dataSplitter.splitMatrix(~mod(nmbArr,2)) = 2;
+0167      
+0168    <span class="keyword">elseif</span>(strcmp(splitterType, <span class="string">'oddEvenChunks'</span>))
+0169      
+0170      dataSplitter.splitterType  = <span class="string">'oddEvenChunks'</span>;
+0171      dataSplitter.splitMatrix   = ones(1,size(dataset.chunks,2),<span class="string">'uint8'</span>);
+0172      
+0173      dataSplitter.splitMatrix(~mod(dataset.chunks,2)) = 2;
+0174      
+0175    <span class="keyword">elseif</span>(strcmp(splitterType, <span class="string">'repeatPattern'</span>))
+0176      
+0177      <span class="keyword">if</span>(~exist(<span class="string">'pattern'</span>,<span class="string">'var'</span>) || size(pattern,1)&gt;1 || size(find(pattern&gt;1),2)&gt;0 || size(find(pattern&lt;0),2)&gt;0 )
+0178        error(<span class="string">'getDataSplitter: for splitter Type &quot;repeatPattern&quot; the argument &quot;pattern&quot; must be defined and in dimensions [1 n] and just contain elements 0 and 1!'</span>);
+0179      <span class="keyword">end</span>
+0180      
+0181      dataSplitter.splitterType = <span class="string">'repeatPattern'</span>;
+0182     
+0183      dataSplitter.splitMatrix    = zeros(lengthSet, lengthSet, <span class="string">'uint8'</span>);
+0184      dataSplitter.splitMatrix(:) = 2;
+0185      smIndexY  = 1;
+0186      lengthPat = length(pattern);
+0187      
+0188      nmbRuns = floor(lengthSet/lengthPat);
+0189      
+0190      <span class="comment">%all zero entriess in patternVector will be set to zero in</span>
+0191      <span class="comment">%the resulting splitMatrix</span>
+0192      <span class="keyword">for</span> i=1:nmbRuns
+0193        indexX = (i-1)*lengthPat+1;
+0194        <span class="keyword">for</span> j=1:lengthPat
+0195          dataSplitter.splitMatrix(smIndexY,indexX:indexX+lengthPat-1) = 0;
+0196          <span class="keyword">if</span>(pattern(j) == 1)
+0197            dataSplitter.splitMatrix(smIndexY,indexX+j-1) = 1;
+0198          <span class="keyword">end</span>
+0199          smIndexY = smIndexY+1;
+0200        <span class="keyword">end</span>
+0201      <span class="keyword">end</span>
+0202      
+0203    <span class="keyword">elseif</span>(strcmp(splitterType, <span class="string">'custom'</span>))
+0204      
+0205      <span class="keyword">if</span>(~exist(<span class="string">'pattern'</span>,<span class="string">'var'</span>) || size(pattern,2)~=lengthSet || ~isempty(find(pattern&gt;2)) || ~isempty(find(pattern&lt;0)) )
+0206        error(<span class="string">'getDataSplitter: for splitter Type &quot;custom&quot; the argument &quot;pattern&quot; must be defined, and in dimensions [N nmbSamples] and just contain elements 0, 1, or 2!)'</span>);
+0207      <span class="keyword">end</span>
+0208      
+0209      dataSplitter.splitterType = <span class="string">'custom'</span>;
+0210      dataSplitter.splitMatrix  = pattern;
+0211      
+0212    <span class="keyword">else</span>
+0213      error(<span class="string">'Usage of getDataSplitter: [dataSplitter] = getDataSplitter(splitterType [one of: &quot;oneSampleOut&quot;, &quot;oneChunkOut&quot;, &quot;oddEvenSamples&quot;, &quot;oddEvenChunks&quot;, &quot;repeatPattern&quot;, &quot;custom&quot;], [pattern])'</span>);
+0214    <span class="keyword">end</span>
+0215    
+0216    
+0217    <span class="comment">%remove all splits that are containing no 1 and 2 in parallel</span>
+0218    smIndexY = 1;
+0219    <span class="keyword">for</span> i=1:size(dataSplitter.splitMatrix, 1)
+0220      line = dataSplitter.splitMatrix(i,:);
+0221      nmbOnes = size(line(line==1),2);
+0222      nmbTwos = size(line(line==2),2);
+0223      <span class="keyword">if</span>(nmbOnes&gt;=1 &amp;&amp; nmbTwos &gt;= 1)
+0224        resMat(smIndexY, :) = line;
+0225        smIndexY = smIndexY+1;
+0226      <span class="keyword">end</span>
+0227    <span class="keyword">end</span>
+0228    dataSplitter.splitMatrix = resMat;
+0229    
+0230    
+0231    
+0232    <span class="comment">%now balance the training-samples if intended</span>
+0233    <span class="comment">%that means the training set should always have</span>
+0234    <span class="comment">%the same number of samples in each class</span>
+0235    <span class="keyword">if</span>(balanced)
+0236      
+0237      uniqueClassIDs  = unique(dataset.classIDs);
+0238      <span class="keyword">if</span>(length(uniqueClassIDs)~=2)
+0239        error(<span class="string">'getDataSplitter: Sorry, at the moment the creation of balanced sets is possible just for 2-class problems!'</span>);
+0240      <span class="keyword">end</span>
+0241      c1ID = uniqueClassIDs(1);
+0242      c2ID = uniqueClassIDs(2);
+0243      
+0244      <span class="keyword">for</span> i=1:size(dataSplitter.splitMatrix, 1)
+0245         smline =  dataSplitter.splitMatrix(i,:);
+0246         <span class="comment">%collect all necessary indices</span>
+0247         trainSamples = find(smline==2);
+0248         C1Samples    = find(dataset.classIDs==c1ID);
+0249         C2Samples    = find(dataset.classIDs==c2ID);
+0250         
+0251         intersectTsC1 = intersect(trainSamples,C1Samples);
+0252         intersectTsC2 = intersect(trainSamples,C2Samples);
+0253         
+0254         <span class="keyword">if</span>(length(intersectTsC1)&gt;length(intersectTsC2))
+0255           <span class="comment">%set the randomly picked number of C1's to zero</span>
+0256           randIndices = randperm(length(intersectTsC1));
+0257           smline(intersectTsC1(randIndices(1:(length(intersectTsC1)-length(intersectTsC2))))) = 0;
+0258         <span class="keyword">elseif</span>(length(intersectTsC2)&gt;length(intersectTsC1))
+0259           <span class="comment">%set the randomly picked number of C2's to zero</span>
+0260           randIndices = randperm(length(intersectTsC2));
+0261           smline(intersectTsC2(randIndices(1:(length(intersectTsC2)-length(intersectTsC1))))) = 0;
+0262         <span class="keyword">end</span>
+0263         
+0264         <span class="comment">%check if still enough training samples are available</span>
+0265         <span class="keyword">if</span>(find(smline==2)&lt;2)
+0266           error(<span class="string">'getDataSplitter: Sorry, balancing leads to training sample number lower than 2!'</span>);
+0267         <span class="keyword">end</span>
+0268         
+0269         dataSplitter.splitMatrix(i,:) = smline;
+0270      <span class="keyword">end</span> <span class="comment">%endfor</span>
+0271      
+0272      
+0273    <span class="keyword">end</span> <span class="comment">%end if balanced</span>
+0274      
+0275 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 22-Oct-2012 13:45:25 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

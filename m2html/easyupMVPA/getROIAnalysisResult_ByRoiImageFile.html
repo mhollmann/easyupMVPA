@@ -1,0 +1,116 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getROIAnalysisResult_ByRoiImageFile</title>
+  <meta name="keywords" content="getROIAnalysisResult_ByRoiImageFile">
+  <meta name="description" content="DEPRECATED!">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">easyupMVPA</a> &gt; getROIAnalysisResult_ByRoiImageFile.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for easyupMVPA&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>getROIAnalysisResult_ByRoiImageFile
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>DEPRECATED!</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [roiAnalysisResult] = getROIAnalysisResult_ByRoiImageFile(dataset, hdrFilename) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> DEPRECATED!
+
+ Author: Maurice Hollmann
+ Date  : 09/10
+
+ Description:
+
+ Parameters:
+
+ Returns:
+
+ Comments:</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="selectSamples.html" class="code" title="function [dataset] = selectSamples(dataset, criterion)">selectSamples</a>	Select a sub-dataset out of a dataset according to given criteria (string or binary vector).</li><li><a href="showDataAsImage.html" class="code" title="function showDataAsImage(dataIn, infoString, tIndex)">showDataAsImage</a>	Show the data that is given as image.</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% DEPRECATED!</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% Author: Maurice Hollmann</span>
+0004 <span class="comment">% Date  : 09/10</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% Description:</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">% Parameters:</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">% Returns:</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">% Comments:</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">%</span>
+0015 <a name="_sub0" href="#_subfunctions" class="code">function [roiAnalysisResult] = getROIAnalysisResult_ByRoiImageFile(dataset, hdrFilename)</a>
+0016 
+0017  roiAnalysisResult = struct(<span class="string">'meanValuesClasses'</span>, []);
+0018  
+0019  nmbSamples = length(dataset.classIDs);
+0020  
+0021  <span class="comment">%Read the data (nii or hdr)</span>
+0022  <span class="comment">%the nii loading function is slightly changed for better memory performance</span>
+0023  dataNii = load_untouch_nii(hdrFilename);
+0024  roiMask = dataNii.img;
+0025  
+0026  <a href="showDataAsImage.html" class="code" title="function showDataAsImage(dataIn, infoString, tIndex)">showDataAsImage</a>(roiMask, <span class="string">'Mask'</span>);
+0027  
+0028  nmbVoxelsInROI = numel(find(roiMask&gt;0));
+0029  
+0030  <span class="comment">%ROI infos</span>
+0031  disp([<span class="string">'Roi mask with '</span>,num2str(nmbVoxelsInROI),<span class="string">' elements...'</span>]);
+0032  
+0033  uniqueClasses        = unique(dataset.classIDs);
+0034  nmbOfClasses         = length(uniqueClasses);
+0035  meanValuesClassesTmp = zeros(nmbOfClasses, nmbSamples);
+0036  
+0037  meanValuesClasses = {};
+0038  
+0039  <span class="keyword">for</span> j=1:nmbOfClasses
+0040    
+0041    ds = <a href="selectSamples.html" class="code" title="function [dataset] = selectSamples(dataset, criterion)">selectSamples</a>(dataset, [<span class="string">'classIDs=='</span>, num2str(uniqueClasses(j))]);
+0042    nmbSamples = length(ds.classIDs);
+0043       
+0044    <span class="keyword">for</span> i=1:nmbSamples
+0045      masked_funcData3D_ROI = ds.data4D(:,:,:,i);
+0046      masked_funcData3D_ROI(roiMask == 0) = 0;
+0047      meanROI     = sum(masked_funcData3D_ROI(:)) / nmbVoxelsInROI;
+0048      meanValuesClassesTmp(j,i) = meanROI;
+0049      disp(meanROI);
+0050    <span class="keyword">end</span>
+0051    
+0052    meanValuesClasses{j} = meanValuesClassesTmp(:);
+0053  <span class="keyword">end</span>
+0054  
+0055  roiAnalysisResult.meanValuesClasses = meanValuesClasses;
+0056  
+0057  keyboard;
+0058 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 22-Oct-2012 13:45:25 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

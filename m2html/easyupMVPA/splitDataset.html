@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of splitDataset</title>
+  <meta name="keywords" content="splitDataset">
+  <meta name="description" content="Splits a dataset by selecting the elements defined by given vectors for the two result datasets.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">easyupMVPA</a> &gt; splitDataset.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for easyupMVPA&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>splitDataset
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Splits a dataset by selecting the elements defined by given vectors for the two result datasets.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [dataset1, dataset2] = splitDataset(dataset, vectorDS1, vectorDS2) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Splits a dataset by selecting the elements defined by given vectors for the two result datasets.
+
+ Author: Maurice Hollmann
+ Date  : 08/10
+
+ Description:
+ Lowlevel function for splitting a dataset by giving two non-overlaping vectors. The vectors contain zeros and ones, where 
+ one means the sample is included and zero it is not.
+
+
+ Parameters:
+   dataset     - the dataset to split
+   vectorDS1   - a vector of the length of number of samples containing zeros and ones, elements with ones will be included in ds1
+   vectorDS2   - a vector of the length of number of samples containing zeros and ones, elements with ones will be included in ds2
+
+ Returns:
+   dataset    - the filtered datset
+
+ Comments:</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="getEmpty2DDataset.html" class="code" title="function [dataset] = getEmpty2DDataset()">getEmpty2DDataset</a>	Returns an empty 2D dataset (i.e. for EEG-data).</li><li><a href="getEmpty4DDataset.html" class="code" title="function [dataset] = getEmpty4DDataset()">getEmpty4DDataset</a>	Returns an empty 4D dataset (i.e. for fMRI-data).</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="doLeaveOneOutCrossValidation_SVM.html" class="code" title="function [dataset, resultStruct, avgWeights] = doLeaveOneOutCrossValidation_SVM(dataset, dataSplitter, svmType, kernelMode, costParam, paramStruct)">doLeaveOneOutCrossValidation_SVM</a>	Implements a Leave One Out Cross Validation (LOOCV) using a Support Vector Machine Classifier (parallel execution).</li><li><a href="doRecursiveFeatureElemination_SVM.html" class="code" title="function [dataset, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = doRecursiveFeatureElemination_SVM(dataset, nmbIterations, thresholdPercentOfFeaturesOut, dataSplitter, svmType, kernelMode, costParam, paramStruct)">doRecursiveFeatureElemination_SVM</a>	Recursively removes features according to SVM classification weights (parallel execution).</li><li><a href="doRecursiveFeatureElemination_SVM_nestedLOOCV.html" class="code" title="function [dataset, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = doRecursiveFeatureElemination_SVM_nestedLOOCV(dataset, nmbIterations, thresholdPercentOfFeaturesOut, nmbSplitsLOOCV, dataSplitter, kernelMode, costParam, paramStruct)">doRecursiveFeatureElemination_SVM_nestedLOOCV</a>	! DEPRECATED ! Recursively removes features according to SVM classification weights from LOOCV.</li><li><a href="doRecursiveFeatureElemination_bootstrapping_SVM.html" class="code" title="function [dataset, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = doRecursiveFeatureElemination_bootstrapping_SVM(dataset, nmbBootstrapIterations, nmbIterations, thresholdPercentOfFeaturesOut, dataSplitter, kernelMode, costParam, paramStruct)">doRecursiveFeatureElemination_bootstrapping_SVM</a>	[DO NOT USE: UNDER DEVELOPEMENT!] Recursively removes features according to SVM classification weights (parallel execution).</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% Splits a dataset by selecting the elements defined by given vectors for the two result datasets.</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% Author: Maurice Hollmann</span>
+0004 <span class="comment">% Date  : 08/10</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% Description:</span>
+0007 <span class="comment">% Lowlevel function for splitting a dataset by giving two non-overlaping vectors. The vectors contain zeros and ones, where</span>
+0008 <span class="comment">% one means the sample is included and zero it is not.</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">% Parameters:</span>
+0012 <span class="comment">%   dataset     - the dataset to split</span>
+0013 <span class="comment">%   vectorDS1   - a vector of the length of number of samples containing zeros and ones, elements with ones will be included in ds1</span>
+0014 <span class="comment">%   vectorDS2   - a vector of the length of number of samples containing zeros and ones, elements with ones will be included in ds2</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">% Returns:</span>
+0017 <span class="comment">%   dataset    - the filtered datset</span>
+0018 <span class="comment">%</span>
+0019 <span class="comment">% Comments:</span>
+0020 <span class="comment">%</span>
+0021 <a name="_sub0" href="#_subfunctions" class="code">function [dataset1, dataset2] = splitDataset(dataset, vectorDS1, vectorDS2)</a>
+0022   
+0023   <span class="comment">%check if the vectors are overlapping</span>
+0024   
+0025   sumV = vectorDS1+vectorDS2;
+0026   <span class="keyword">if</span>(~(length(vectorDS1)==length(vectorDS2)) || sum(sumV&gt;1))
+0027    error(<span class="string">'The vectors describing the split must be of equal length and non-overlapping!'</span>);
+0028   <span class="keyword">end</span>  
+0029     
+0030   
+0031   <span class="keyword">if</span>(dataset.is4D)
+0032     
+0033     dataset1 = <a href="getEmpty4DDataset.html" class="code" title="function [dataset] = getEmpty4DDataset()">getEmpty4DDataset</a>();
+0034     dataset2 = <a href="getEmpty4DDataset.html" class="code" title="function [dataset] = getEmpty4DDataset()">getEmpty4DDataset</a>();
+0035 
+0036     vectorDS1 = logical(vectorDS1);
+0037     vectorDS2 = logical(vectorDS2);
+0038 
+0039     dataset1.data                  = dataset.data(:,:,:, vectorDS1);
+0040     dataset1.chunks                = dataset.chunks(vectorDS1);
+0041     dataset1.classIDs              = dataset.classIDs(vectorDS1);
+0042     dataset1.mask                  = dataset.mask;
+0043     dataset1.featureSelectionMap   = dataset.featureSelectionMap;
+0044     dataset1.dataFilelist          = dataset.dataFilelist;
+0045 
+0046     dataset2.data                  = dataset.data(:,:,:, vectorDS2);
+0047     dataset2.chunks                = dataset.chunks(vectorDS2);
+0048     dataset2.classIDs              = dataset.classIDs(vectorDS2);
+0049     dataset2.mask                  = dataset.mask;
+0050     dataset2.featureSelectionMap   = dataset.featureSelectionMap;
+0051     dataset2.dataFilelist          = dataset.dataFilelist;
+0052     
+0053   <span class="keyword">elseif</span>(dataset.is2D)
+0054     
+0055     dataset1 = <a href="getEmpty2DDataset.html" class="code" title="function [dataset] = getEmpty2DDataset()">getEmpty2DDataset</a>();
+0056     dataset2 = <a href="getEmpty2DDataset.html" class="code" title="function [dataset] = getEmpty2DDataset()">getEmpty2DDataset</a>();
+0057 
+0058     vectorDS1 = logical(vectorDS1);
+0059     vectorDS2 = logical(vectorDS2);
+0060 
+0061     dataset1.data                = dataset.data(:,vectorDS1);
+0062     dataset1.chunks              = dataset.chunks(vectorDS1);
+0063     dataset1.classIDs            = dataset.classIDs(vectorDS1);
+0064     dataset1.mask                = dataset.mask;
+0065     dataset1.featureSelectionMap = dataset.featureSelectionMap;
+0066 
+0067     dataset2.data                = dataset.data(:, vectorDS2);
+0068     dataset2.chunks              = dataset.chunks(vectorDS2);
+0069     dataset2.classIDs            = dataset.classIDs(vectorDS2);
+0070     dataset2.mask                = dataset.mask;
+0071     dataset2.featureSelectionMap = dataset.featureSelectionMap;
+0072     
+0073   <span class="keyword">else</span>
+0074     disp(<span class="string">'SPLIT DATASET: Please check the dataset: &quot;type&quot; is not correctly defined!'</span>);
+0075   <span class="keyword">end</span>
+0076   
+0077   
+0078 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 22-Oct-2012 13:45:25 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of train_RVM</title>
+  <meta name="keywords" content="train_RVM">
+  <meta name="description" content="(UNDER CONSTRUCTION) Simple training of a dataset based on the given dataset using a Relevance Vector Machine (RVM).">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">easyupMVPA</a> &gt; train_RVM.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for easyupMVPA&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>train_RVM
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>(UNDER CONSTRUCTION) Simple training of a dataset based on the given dataset using a Relevance Vector Machine (RVM).</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [rvmModel, weights] = train_RVM(dataset, kernelType, kernelWidth, paramStruct) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> (UNDER CONSTRUCTION) Simple training of a dataset based on the given dataset using a Relevance Vector Machine (RVM).
+
+ Author: Maurice Hollmann
+ Date  : 09/10
+
+ Description:
+  This high-level function trains a Rupport Vector Machine (RVM). The return value rvmModel may be used
+  to predict data based on the model learned here.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="selectFeaturesBySelectionMap.html" class="code" title="function [dataset, data2D] = selectFeaturesBySelectionMap(dataset)">selectFeaturesBySelectionMap</a>	Apply a featureSelection map that is stored in a dataset to this dataset.</li><li><a href="setDataset_featureSelectionMap_ByMatrix.html" class="code" title="function [dataset] = setDataset_featureSelectionMap_ByMatrix(dataset, mapMatrix)">setDataset_featureSelectionMap_ByMatrix</a>	Set the featureSelectionMap (1D or 3D) field of a dataset by a given matrix.</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% (UNDER CONSTRUCTION) Simple training of a dataset based on the given dataset using a Relevance Vector Machine (RVM).</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% Author: Maurice Hollmann</span>
+0004 <span class="comment">% Date  : 09/10</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% Description:</span>
+0007 <span class="comment">%  This high-level function trains a Rupport Vector Machine (RVM). The return value rvmModel may be used</span>
+0008 <span class="comment">%  to predict data based on the model learned here.</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">%</span>
+0012 <a name="_sub0" href="#_subfunctions" class="code">function [rvmModel, weights] = train_RVM(dataset, kernelType, kernelWidth, paramStruct)</a>
+0013 
+0014   <span class="keyword">if</span>(strcmp(kernelType, <span class="string">'gauss'</span>))
+0015     kernelType = <span class="string">'+gauss'</span>;
+0016   <span class="keyword">end</span>
+0017 
+0018   <span class="keyword">if</span>( ~exist(<span class="string">'dataset'</span>,<span class="string">'var'</span>))<span class="comment">% || ~exist('kernelMode','var') )</span>
+0019     error(<span class="string">'Usage of train_RVM: UPDATE!!!!!! [svmModel, weights3D] = train_SVM(dataset, kernelMode - [linear, polynomial, radial, sigmoid] , costParam [0-1], paramStruct [optional - i.e. {&quot;degree&quot;, 3}])'</span>);
+0020   <span class="keyword">end</span>
+0021 
+0022   
+0023   <span class="comment">%get the data as 2D array by using the selection-map or the mask</span>
+0024   sizeData   = size(dataset.data);
+0025   <span class="keyword">if</span>(isfield(dataset,<span class="string">'featureSelectionMap'</span>) &amp;&amp; ~isempty(dataset.featureSelectionMap))
+0026     [dataset, trainData2D] = <a href="selectFeaturesBySelectionMap.html" class="code" title="function [dataset, data2D] = selectFeaturesBySelectionMap(dataset)">selectFeaturesBySelectionMap</a>(dataset);
+0027   <span class="keyword">elseif</span>(isfield(dataset,<span class="string">'mask'</span>) &amp;&amp; ~isempty(dataset.mask))
+0028     dataset = <a href="setDataset_featureSelectionMap_ByMatrix.html" class="code" title="function [dataset] = setDataset_featureSelectionMap_ByMatrix(dataset, mapMatrix)">setDataset_featureSelectionMap_ByMatrix</a>(dataset, dataset.mask);
+0029     [dataset, trainData2D] = <a href="selectFeaturesBySelectionMap.html" class="code" title="function [dataset, data2D] = selectFeaturesBySelectionMap(dataset)">selectFeaturesBySelectionMap</a>(dataset);
+0030   <span class="keyword">else</span>
+0031     <span class="comment">%all features are used</span>
+0032     <span class="keyword">if</span>(dataset.is2D)
+0033      dataset = <a href="setDataset_featureSelectionMap_ByMatrix.html" class="code" title="function [dataset] = setDataset_featureSelectionMap_ByMatrix(dataset, mapMatrix)">setDataset_featureSelectionMap_ByMatrix</a>(dataset, ones(sizeData(1:end-1),1));
+0034     <span class="keyword">else</span>
+0035      dataset = <a href="setDataset_featureSelectionMap_ByMatrix.html" class="code" title="function [dataset] = setDataset_featureSelectionMap_ByMatrix(dataset, mapMatrix)">setDataset_featureSelectionMap_ByMatrix</a>(dataset, ones(sizeData(1:end-1))); 
+0036     <span class="keyword">end</span>
+0037     [dataset, trainData2D] = <a href="selectFeaturesBySelectionMap.html" class="code" title="function [dataset, data2D] = selectFeaturesBySelectionMap(dataset)">selectFeaturesBySelectionMap</a>(dataset);
+0038   <span class="keyword">end</span>
+0039 
+0040   
+0041   <span class="comment">%keyboard;</span>
+0042   
+0043   
+0044   <span class="comment">% *************Modelling using SPARSE BAYES 1.00**********************************</span>
+0045 <span class="comment">%   maxIts    = 500;</span>
+0046 <span class="comment">%   monIts  = round(maxIts/10);</span>
+0047 <span class="comment">%   initAlpha    = (1/N)^2;</span>
+0048 <span class="comment">%   initBeta    = 0;    % setting to zero for classification</span>
+0049 <span class="comment">%   %train the RVM</span>
+0050 <span class="comment">%   [weights, used, marginal, alpha, beta, gamma] = sbl_rvm(X,t,initAlpha,initBeta,kType,kWidth, maxIts, monIts);</span>
+0051 <span class="comment">%</span>
+0052 <span class="comment">%</span>
+0053 <span class="comment">%    %at first apply kernel to the training set</span>
+0054 <span class="comment">%    %nmbSamples x fspacedim</span>
+0055 <span class="comment">%</span>
+0056 <span class="comment">%    %extract basis set for given kernel</span>
+0057 <span class="comment">%    basisSet    = sbl_kernelFunction(trainData2D,trainData2D,kType,kWidth);</span>
+0058 <span class="comment">%</span>
+0059 <span class="comment">%    [weights, used, marginal, alpha, beta, gamma]    = sbl_estimate(basisSet,double(dataset.classIDs'),alpha,beta,maxIts,monIts);</span>
+0060 <span class="comment">%    keyboard;</span>
+0061 <span class="comment">%</span>
+0062 <span class="comment">%    rvmModel = {};</span>
+0063 <span class="comment">%    rvmModel.kernelType      = kType;</span>
+0064 <span class="comment">%    rvmModel.kernelWidth     = kWidth;</span>
+0065 <span class="comment">%    rvmModel.relevantIndices = PARAMETER.Relevant;</span>
+0066 <span class="comment">%    %rvmModel.weights         = weights;</span>
+0067 <span class="comment">%    rvmModel.weights         = PARAMETER.Value;</span>
+0068 <span class="comment">%    rvmModel.X               = trainData2D;</span>
+0069 <span class="comment">%    rvmModel.t               = double(dataset.classIDs');</span>
+0070    
+0071    
+0072   
+0073   
+0074   
+0075 
+0076 
+0077   <span class="comment">% *************Modelling using SPARSE BAYES 2.00**********************************</span>
+0078    
+0079   <span class="comment">% - we set the diagnostics level to 2 (reasonable)</span>
+0080   <span class="comment">% - we will monitor the progress every 10 iterations</span>
+0081   <span class="comment">%   pSparse        = 0.90;</span>
+0082   <span class="comment">%</span>
+0083    rvmOptions = SB2_UserOptions(<span class="string">'iterations'</span>,800,<span class="keyword">...</span>
+0084                                               <span class="string">'diagnosticLevel'</span>, 4,<span class="keyword">...</span>
+0085                                                <span class="string">'monitor'</span>, 10);
+0086   <span class="comment">%extract basis set for given kernel</span>
+0087   basisSet    = sbl_kernelFunction(trainData2D,trainData2D,kernelType,kernelWidth); 
+0088 
+0089   
+0090   <span class="comment">%Bernoulli fo 2 class classification</span>
+0091   [PARAMETER, HYPERPARAMETER, DIAGNOSTIC] = SparseBayes(<span class="string">'Bernoulli'</span>, basisSet, double(dataset.classIDs'), rvmOptions);
+0092   
+0093   
+0094   <span class="comment">%[PARAMETER, HYPERPARAMETER, DIAGNOSTIC] = SparseBayes('Gaussian', basisSet, double(dataset.classIDs'), rvmOptions);</span>
+0095   
+0096 <span class="comment">%   %</span>
+0097 <span class="comment">%   % Manipulate the returned weights for convenience later</span>
+0098 <span class="comment">%   %</span>
+0099    <span class="comment">%weights = zeros(length(dataset.classIDs),1);</span>
+0100    <span class="comment">%weights(PARAMETER.Relevant)    = PARAMETER.Value;</span>
+0101    weights = [];
+0102    
+0103    
+0104    relevantIndices = PARAMETER.Relevant;
+0105    
+0106    <span class="keyword">if</span> kernelType(1)==<span class="string">'+'</span>    
+0107     <span class="comment">% Take account of bias if originally used ...</span>
+0108     relevantIndices    = relevantIndices - 1;
+0109     <span class="keyword">if</span> relevantIndices(1)~=0
+0110       <span class="comment">% ... and if pruned ...</span>
+0111       kernelType(1)    = [];
+0112     <span class="keyword">else</span>
+0113       relevantIndices(1)    = [];
+0114     <span class="keyword">end</span>
+0115   <span class="keyword">end</span>
+0116    
+0117    
+0118    rvmModel = {};
+0119    rvmModel.kernelType      = kernelType;
+0120    rvmModel.kernelWidth     = kernelWidth;
+0121    rvmModel.relevantIndices = relevantIndices;
+0122    rvmModel.weights         = PARAMETER.Value;
+0123    <span class="comment">%rvmModel.X               = trainData2D;</span>
+0124    rvmModel.sparseTrainData = trainData2D(rvmModel.relevantIndices,:);
+0125    rvmModel.trainClassIDs   = double(dataset.classIDs');
+0126    
+0127    
+0128  
+0129    
+0130   <span class="comment">% keyboard;</span>
+0131    
+0132   
+0133   <span class="comment">% ***********************************************</span>
+0134 
+0135 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 22-Oct-2012 13:45:25 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

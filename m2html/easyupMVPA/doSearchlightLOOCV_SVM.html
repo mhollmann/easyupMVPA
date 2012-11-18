@@ -1,0 +1,248 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of doSearchlightLOOCV_SVM</title>
+  <meta name="keywords" content="doSearchlightLOOCV_SVM">
+  <meta name="description" content="!UNDER CONSTRUCTION! Implements a Searchlight Classification using One Out Cross Validation (LOOCV) with a SVM Classifier (parallel execution).">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">easyupMVPA</a> &gt; doSearchlightLOOCV_SVM.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for easyupMVPA&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>doSearchlightLOOCV_SVM
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>!UNDER CONSTRUCTION! Implements a Searchlight Classification using One Out Cross Validation (LOOCV) with a SVM Classifier (parallel execution).</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [datasetOut, resultAccuracyMap, resultStruct] = doSearchlightLOOCV_SVM(dataset, searchlightDiameter, dataSplitter, svmType, kernelMode, costParam, paramStruct) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> !UNDER CONSTRUCTION! Implements a Searchlight Classification using One Out Cross Validation (LOOCV) with a SVM Classifier (parallel execution).
+
+ Author: Maurice Hollmann
+ Date  : 05/11
+
+ Description:
+
+   [dataset, resultStruct] = doLeaveOneOutCrossValidation_SVM_2DforceQuiet(dataset, dataSplitter, svmCommandString)
+
+   Just 4D dataset input!
+   It is recommended to use a mask including just grey matter to reduce computation time!
+
+
+ Parameters:
+   dataset        - The dataset to work on  (all samples are included in LOOCV)
+   dataSplitter   - describes the splitting of the data in LOOCV
+   svmType        - Types:
+                     ['classification', 'regression_epsilon', 'regression_nu']
+   kernelMode     - Kernels: ['linear', 'polynomial', 'radial', 'sigmoid']
+   costParam      - The slack variable C in SVM (range 0 to 1  0 = low cost, 1 = highest costs). 
+                    It defines the costs for misclassification (How strongly are outliers punished?)
+   paramStruct    - [optional] - i.e. {&quot;degree&quot;, 3}
+
+ Returns:
+   dataset            - the datset that has been the input
+   resultAccuracyMap  - a 3D map with the results of searchlight classification for each voxel
+   resultStruct       - The struct holding the classification results: 
+                        resultStruct.nmbTests     (the number of samples tested for this result)
+                        resultStruct.accuracy     (percentual value of correct predictions (correct * 100 / nmbSamples))
+                        resultStruct.sensitivity  (TP/TP+FN = Proportion of true positives to all positives)
+                        resultStruct.specificity  (TN/TN+FP = Proportion of true negatives to all negatives)
+                        resultStruct.TP           (True positives = all correct predicted in class 1)
+                        resultStruct.TN           (True negatives = all correct predicted in class 2)
+                        resultStruct.FP           (False positives = all incorrect predicted in class 1)
+                        resultStruct.FN           (False negatives = all incorrect predicted in class 2)
+
+ Comments:</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="easyupMVPA_getGlobals.html" class="code" title="function [propertyValue] = easyupMVPA_getGlobals(propertyName)">easyupMVPA_getGlobals</a>	Returns values for global properties in the toolbox.</li><li><a href="getEmpty2DDataset.html" class="code" title="function [dataset] = getEmpty2DDataset()">getEmpty2DDataset</a>	Returns an empty 2D dataset (i.e. for EEG-data).</li><li><a href="getSearchlightAdjacencyMatrix.html" class="code" title="function [sp] = getSearchlightAdjacencyMatrix(dataset, searchlightDiameter)">getSearchlightAdjacencyMatrix</a>	</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% !UNDER CONSTRUCTION! Implements a Searchlight Classification using One Out Cross Validation (LOOCV) with a SVM Classifier (parallel execution).</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% Author: Maurice Hollmann</span>
+0004 <span class="comment">% Date  : 05/11</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% Description:</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%   [dataset, resultStruct] = doLeaveOneOutCrossValidation_SVM_2DforceQuiet(dataset, dataSplitter, svmCommandString)</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%   Just 4D dataset input!</span>
+0011 <span class="comment">%   It is recommended to use a mask including just grey matter to reduce computation time!</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">% Parameters:</span>
+0015 <span class="comment">%   dataset        - The dataset to work on  (all samples are included in LOOCV)</span>
+0016 <span class="comment">%   dataSplitter   - describes the splitting of the data in LOOCV</span>
+0017 <span class="comment">%   svmType        - Types:</span>
+0018 <span class="comment">%                     ['classification', 'regression_epsilon', 'regression_nu']</span>
+0019 <span class="comment">%   kernelMode     - Kernels: ['linear', 'polynomial', 'radial', 'sigmoid']</span>
+0020 <span class="comment">%   costParam      - The slack variable C in SVM (range 0 to 1  0 = low cost, 1 = highest costs).</span>
+0021 <span class="comment">%                    It defines the costs for misclassification (How strongly are outliers punished?)</span>
+0022 <span class="comment">%   paramStruct    - [optional] - i.e. {&quot;degree&quot;, 3}</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">% Returns:</span>
+0025 <span class="comment">%   dataset            - the datset that has been the input</span>
+0026 <span class="comment">%   resultAccuracyMap  - a 3D map with the results of searchlight classification for each voxel</span>
+0027 <span class="comment">%   resultStruct       - The struct holding the classification results:</span>
+0028 <span class="comment">%                        resultStruct.nmbTests     (the number of samples tested for this result)</span>
+0029 <span class="comment">%                        resultStruct.accuracy     (percentual value of correct predictions (correct * 100 / nmbSamples))</span>
+0030 <span class="comment">%                        resultStruct.sensitivity  (TP/TP+FN = Proportion of true positives to all positives)</span>
+0031 <span class="comment">%                        resultStruct.specificity  (TN/TN+FP = Proportion of true negatives to all negatives)</span>
+0032 <span class="comment">%                        resultStruct.TP           (True positives = all correct predicted in class 1)</span>
+0033 <span class="comment">%                        resultStruct.TN           (True negatives = all correct predicted in class 2)</span>
+0034 <span class="comment">%                        resultStruct.FP           (False positives = all incorrect predicted in class 1)</span>
+0035 <span class="comment">%                        resultStruct.FN           (False negatives = all incorrect predicted in class 2)</span>
+0036 <span class="comment">%</span>
+0037 <span class="comment">% Comments:</span>
+0038 <span class="comment">%</span>
+0039 <a name="_sub0" href="#_subfunctions" class="code">function [datasetOut, resultAccuracyMap, resultStruct] = doSearchlightLOOCV_SVM(dataset, searchlightDiameter, dataSplitter, svmType, kernelMode, costParam, paramStruct)</a>
+0040 
+0041   
+0042   <span class="comment">%extractt the SVM parameter values from paramStruct</span>
+0043   <span class="keyword">if</span>( ~exist(<span class="string">'paramStruct'</span>,<span class="string">'var'</span>))
+0044     [paramStructIsValid, svmParamInfoStruct, cmdString] = getSVMParamInfo(svmType, kernelMode, costParam, {});
+0045   <span class="keyword">else</span>
+0046     [paramStructIsValid, svmParamInfoStruct, cmdString] = getSVMParamInfo(svmType, kernelMode, costParam, paramStruct);
+0047   <span class="keyword">end</span>
+0048   <span class="keyword">if</span>( ~paramStructIsValid)
+0049     error([<span class="string">'Usage of doLeaveOneOutCrossValidation_SVM: [datasetOut, resultAccuracyMap3D, resultStruct] = doSearchlightLOOCV_SVM(dataset, searchlightDiameter, dataSplitter, svmType - [classification, regression_epsilon, regression_nu]'</span>, <span class="keyword">...</span><span class="comment"> </span>
+0050           <span class="string">'kernelMode - [linear, polynomial, radial, sigmoid] , costParam [0-1], paramStruct [optional - i.e. {&quot;degree&quot;, 3}])'</span>]);
+0051   <span class="keyword">end</span>
+0052   
+0053   tic
+0054   
+0055   <span class="comment">%for each voxel extract all voxels in the searchlight volume</span>
+0056   <span class="comment">%and do a LOOCV on these...</span>
+0057   datasetOut = [];
+0058   resultStruct = [];
+0059   
+0060   <span class="keyword">if</span>(dataset.is4D)
+0061     sizeData   = size(dataset.data);
+0062     <span class="comment">%4D case</span>
+0063     <span class="keyword">if</span>(isfield(dataset,<span class="string">'featureSelectionMap'</span>) &amp;&amp; ~isempty(dataset.featureSelectionMap))
+0064       globalSelectionMap = dataset.featureSelectionMap;
+0065     <span class="keyword">elseif</span>(isfield(dataset,<span class="string">'mask'</span>) &amp;&amp; ~isempty(dataset.mask))
+0066       globalSelectionMap = dataset.mask;
+0067     <span class="keyword">else</span>
+0068       globalSelectionMap = ones(sizeData(1),sizeData(2),sizeData(3));
+0069     <span class="keyword">end</span>
+0070 
+0071       <span class="comment">%get the adjacency matrix</span>
+0072       adjMatrix = <a href="getSearchlightAdjacencyMatrix.html" class="code" title="function [sp] = getSearchlightAdjacencyMatrix(dataset, searchlightDiameter)">getSearchlightAdjacencyMatrix</a>(dataset, searchlightDiameter);
+0073       sl_numEl  = length(adjMatrix(adjMatrix&gt;0));
+0074       adjMatrix = repmat(adjMatrix, [1, 1, 1, sizeData(4)]);
+0075   <span class="keyword">elseif</span>(dataset.is2D)
+0076   <span class="keyword">end</span>
+0077   
+0078   <span class="comment">%now move through all voxels in feature selection mask</span>
+0079   indVec = find(globalSelectionMap&gt;0);
+0080   
+0081   <span class="comment">%performanceMatrices = zeros(sizeData(1),sizeData(2),sizeData(3));</span>
+0082   searchlightRadius = floor(searchlightDiameter/2);
+0083   dataDim4 = sizeData(4);
+0084   
+0085   <span class="comment">%use as 1D because of parfor</span>
+0086   resultAccuracyVec = zeros(1,length(indVec));
+0087    
+0088   
+0089    localQuietMode = <a href="easyupMVPA_getGlobals.html" class="code" title="function [propertyValue] = easyupMVPA_getGlobals(propertyName)">easyupMVPA_getGlobals</a>(<span class="string">'quietMode'</span>);
+0090    
+0091    <span class="keyword">if</span>(~localQuietMode)
+0092      disp([<span class="string">'Running Searchlight Leave One Out Cross Validation with command string: '</span>,cmdString,<span class="string">' ...'</span>]);
+0093      
+0094      <span class="comment">% create a progress display that works also for parallel loops</span>
+0095      <span class="keyword">if</span>(length(indVec) &lt;50)
+0096        disp([<span class="string">'0%'</span>, num2str(repmat(<span class="string">' '</span>,1,length(indVec)-1)),<span class="string">'100%'</span>]);
+0097        progressIndices = [1 1:length(indVec)];
+0098      <span class="keyword">else</span>
+0099        disp([<span class="string">'0%'</span>, num2str(repmat(<span class="string">' '</span>,1,50)),<span class="string">'100%'</span>]);
+0100        <span class="comment">%create a vector with floored indicees for repetitions</span>
+0101        progressIndices = [1 1:length(indVec)];
+0102        progressIndices = floor(progressIndices*(50/length(indVec)));
+0103      <span class="keyword">end</span>
+0104      fprintf(<span class="string">'    '</span>);   
+0105    <span class="keyword">end</span>
+0106   
+0107   
+0108   
+0109   
+0110   
+0111   
+0112   <span class="comment">%disp(length(indVec));</span>
+0113   <span class="comment">%for i=1:length(indVec)</span>
+0114   parfor i=1:length(indVec)
+0115     
+0116     <span class="comment">%disp(i)</span>
+0117     
+0118     
+0119     data3D = [];
+0120 
+0121     <span class="keyword">if</span>(~localQuietMode)
+0122       <span class="keyword">if</span>(progressIndices(i)&lt;progressIndices(i+1))
+0123         fprintf(<span class="string">'\b\b*'</span>);
+0124         disp([<span class="string">''</span> 0]);
+0125       <span class="keyword">end</span>
+0126     <span class="keyword">end</span>
+0127     
+0128     <span class="comment">%place the searchlight</span>
+0129     [indX,indY,indZ] = ind2sub(size(globalSelectionMap), indVec(i));
+0130     
+0131     <span class="comment">%try because of possible invalid indicees</span>
+0132     <span class="keyword">try</span>
+0133       <span class="comment">%extract the data (at first the whole cubic volume)</span>
+0134       data3D = dataset.data(indX-searchlightRadius:indX+searchlightRadius,<span class="keyword">...</span>
+0135                             indY-searchlightRadius:indY+searchlightRadius,<span class="keyword">...</span>
+0136                             indZ-searchlightRadius:indZ+searchlightRadius,:);
+0137     <span class="keyword">catch</span>
+0138       <span class="keyword">continue</span>;
+0139     <span class="keyword">end</span>
+0140     
+0141     <span class="comment">%data2D = reshape(data3D(adjMatrix&gt;0), sl_numEl, dataDim4);</span>
+0142     
+0143     ds2D = <a href="getEmpty2DDataset.html" class="code" title="function [dataset] = getEmpty2DDataset()">getEmpty2DDataset</a>();
+0144     ds2D.data       = reshape(data3D(adjMatrix&gt;0), sl_numEl, dataDim4);
+0145     ds2D.chunks     = dataset.chunks;
+0146     ds2D.classIDs   = dataset.classIDs;
+0147     
+0148     <span class="comment">%printDatasetInfo(ds2D);</span>
+0149     <span class="comment">%tic</span>
+0150     <span class="comment">%disp(size(data2D));</span>
+0151     [ds, sl_resStruct] = doLeaveOneOutCrossValidation_SVM_2DforceQuiet(ds2D, dataSplitter, cmdString);
+0152     <span class="comment">%toc</span>
+0153     <span class="comment">%disp(sl_resStruct.accuracy);</span>
+0154     
+0155     resultAccuracyVec(i) = sl_resStruct.accuracy;
+0156     
+0157   <span class="keyword">end</span>
+0158   
+0159   toc
+0160   
+0161   resultAccuracyMap = zeros(sizeData(1), sizeData(2), sizeData(3));
+0162   resultAccuracyMap(find(globalSelectionMap&gt;0)) = resultAccuracyVec;  
+0163   
+0164   
+0165 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 22-Oct-2012 13:45:25 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

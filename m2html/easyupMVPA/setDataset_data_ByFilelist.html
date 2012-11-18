@@ -1,0 +1,206 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of setDataset_data_ByFilelist</title>
+  <meta name="keywords" content="setDataset_data_ByFilelist">
+  <meta name="description" content="Set the data field of a dataset by a given list of nifti-files.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">easyupMVPA</a> &gt; setDataset_data_ByFilelist.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for easyupMVPA&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>setDataset_data_ByFilelist
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Set the data field of a dataset by a given list of nifti-files.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [dataset] = setDataset_data_ByFilelist(dataset, fileList) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Set the data field of a dataset by a given list of nifti-files.
+
+ Author: Maurice Hollmann
+ Date  : 08/10
+
+ Description:
+
+   [dataset] = setDataset_data_ByFilelist(dataset, fileList)
+
+   This methods sets the data (timeseries of 3D images) for the dataset. The given fileList
+   can be a character array or a cellstr array. The fileList is expected to contain the .hdr or .nii files
+   in nifti-format.
+
+   The fileList can contain either 3D images or 4D images (but not in a mixed fashion).
+
+ Parameters:
+   dataset   - the datset to set the data field and data_3DNiftiHdr for
+   fileList  - the filelist as char array or cellstr array (3D or 4D images as .nii or .hdr)
+
+ Returns:
+   dataset   - the datset with included data4D and data_3DNiftiHdr - struct
+
+ Comments:</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="easyupMVPA_getGlobals.html" class="code" title="function [propertyValue] = easyupMVPA_getGlobals(propertyName)">easyupMVPA_getGlobals</a>	Returns values for global properties in the toolbox.</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% Set the data field of a dataset by a given list of nifti-files.</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% Author: Maurice Hollmann</span>
+0004 <span class="comment">% Date  : 08/10</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% Description:</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%   [dataset] = setDataset_data_ByFilelist(dataset, fileList)</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%   This methods sets the data (timeseries of 3D images) for the dataset. The given fileList</span>
+0011 <span class="comment">%   can be a character array or a cellstr array. The fileList is expected to contain the .hdr or .nii files</span>
+0012 <span class="comment">%   in nifti-format.</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">%   The fileList can contain either 3D images or 4D images (but not in a mixed fashion).</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">% Parameters:</span>
+0017 <span class="comment">%   dataset   - the datset to set the data field and data_3DNiftiHdr for</span>
+0018 <span class="comment">%   fileList  - the filelist as char array or cellstr array (3D or 4D images as .nii or .hdr)</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">% Returns:</span>
+0021 <span class="comment">%   dataset   - the datset with included data4D and data_3DNiftiHdr - struct</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">% Comments:</span>
+0024 <span class="comment">%</span>
+0025 <a name="_sub0" href="#_subfunctions" class="code">function [dataset] = setDataset_data_ByFilelist(dataset, fileList)</a>
+0026 
+0027   <span class="keyword">if</span>( ~exist(<span class="string">'dataset'</span>,<span class="string">'var'</span>) || ~exist(<span class="string">'fileList'</span>,<span class="string">'var'</span>) ) 
+0028     error(<span class="string">'Usage of setDataset_data_ByFilelist: [dataset] = setDataset_data_ByFilelist(dataset, fileList)'</span>);
+0029   <span class="keyword">end</span>
+0030   
+0031   <span class="keyword">if</span>(isempty(fileList))
+0032     error(<span class="string">'Given filelist is empty, please check your file-selection!'</span>);
+0033   <span class="keyword">end</span>
+0034   
+0035   <span class="comment">%check which type the filelist is</span>
+0036   <span class="comment">%2 types are supported: 1. char array and 2. cellstr array</span>
+0037   <span class="keyword">if</span>(ischar(fileList))
+0038     fileList = cellstr(fileList);
+0039   <span class="keyword">end</span>
+0040   
+0041   <span class="keyword">if</span>(~iscellstr(fileList))
+0042     error(<span class="string">'Check input type for filelist! Supported types are: character array and cellstr array!'</span>);
+0043   <span class="keyword">end</span>
+0044   
+0045   dataset.data = [];
+0046   
+0047    
+0048   <span class="keyword">if</span>(~<a href="easyupMVPA_getGlobals.html" class="code" title="function [propertyValue] = easyupMVPA_getGlobals(propertyName)">easyupMVPA_getGlobals</a>(<span class="string">'quietMode'</span>))
+0049     disp(<span class="string">'INFO: setDataset_data_ByFilelist: Loading image files ...'</span>);
+0050   <span class="keyword">end</span>
+0051   
+0052   
+0053   <span class="comment">%Load the first file and check for 3D or 4D</span>
+0054   <span class="comment">%It is expected that if the first is 3D all the rest is 3D too and vice versa</span>
+0055   fileString = fileList{1};
+0056   <span class="comment">%check existance of the file</span>
+0057   <span class="keyword">if</span>(~exist(fileString, <span class="string">'file'</span>) )
+0058     error([<span class="string">'Could not read image file: '</span>, fileString]);
+0059   <span class="keyword">end</span>
+0060   <span class="keyword">if</span>(~<a href="easyupMVPA_getGlobals.html" class="code" title="function [propertyValue] = easyupMVPA_getGlobals(propertyName)">easyupMVPA_getGlobals</a>(<span class="string">'quietMode'</span>))
+0061         disp([<span class="string">'Loading file: '</span>, fileString]);
+0062   <span class="keyword">end</span>
+0063   <span class="comment">%Read the data (nii or hdr)</span>
+0064   <span class="comment">%the nii loading function is slightly changed for better memory performance</span>
+0065   dataNii = load_untouch_nii(fileString);
+0066   sizeIMG = size(dataNii.img);
+0067   
+0068   
+0069   <span class="comment">%CASE 3D</span>
+0070   <span class="keyword">if</span>(length(sizeIMG) == 3)
+0071     
+0072     <span class="comment">%use preallocation, because of speed and memory performance</span>
+0073     dataset.data = zeros(sizeIMG(1), sizeIMG(2), sizeIMG(3), size(fileList,1),<span class="string">'int16'</span>);
+0074     dataset.data(:,:,:,1)   = dataNii.img;
+0075     dataset.data_3DNiftiHdr = dataNii.hdr;
+0076     
+0077     <span class="comment">%load all data and store in data</span>
+0078     <span class="keyword">for</span> i = 2:size(fileList,1)
+0079       fileString = fileList{i};
+0080       <span class="keyword">if</span>(~<a href="easyupMVPA_getGlobals.html" class="code" title="function [propertyValue] = easyupMVPA_getGlobals(propertyName)">easyupMVPA_getGlobals</a>(<span class="string">'quietMode'</span>))
+0081         disp([<span class="string">'Loading file: '</span>, fileString]);
+0082       <span class="keyword">end</span>
+0083 
+0084       <span class="comment">%check existance of the file</span>
+0085       <span class="keyword">if</span>(~exist(fileString, <span class="string">'file'</span>) )
+0086         error([<span class="string">'Could not read image file: '</span>, fileString]);
+0087       <span class="keyword">end</span>
+0088 
+0089       <span class="comment">%Read the data (nii or hdr)</span>
+0090       <span class="comment">%the nii loading function is slightly changed for better memory performance</span>
+0091       dataNii = load_untouch_nii(fileString);
+0092       dataset.data(:,:,:,i)   = dataNii.img;
+0093       
+0094     <span class="keyword">end</span><span class="comment">%endfor</span>
+0095     
+0096   <span class="comment">%CASE 4D</span>
+0097   <span class="keyword">elseif</span>(length(sizeIMG) == 4)
+0098     
+0099     <span class="comment">%set the data of the image loaded already</span>
+0100     dataset.data            = dataNii.img;
+0101     dataset.data_3DNiftiHdr = dataNii.hdr;
+0102        
+0103     <span class="comment">%Load all the data in the filelist and concatenate in dataset.data</span>
+0104     <span class="keyword">for</span> i=2:size(fileList,1)
+0105       fileString = fileList{i};
+0106 
+0107       <span class="keyword">if</span>(~<a href="easyupMVPA_getGlobals.html" class="code" title="function [propertyValue] = easyupMVPA_getGlobals(propertyName)">easyupMVPA_getGlobals</a>(<span class="string">'quietMode'</span>))
+0108         disp([<span class="string">'Loading file: '</span>, fileString]);
+0109       <span class="keyword">end</span>
+0110 
+0111       <span class="comment">%check existance of the file</span>
+0112       <span class="keyword">if</span>(~exist(fileString, <span class="string">'file'</span>) )
+0113         error([<span class="string">'Could not read image file: '</span>, fileString]);
+0114       <span class="keyword">end</span>
+0115 
+0116       <span class="comment">%Read the data (nii or hdr)</span>
+0117       <span class="comment">%the nii loading function is slightly changed for better memory performance</span>
+0118       dataNii = load_untouch_nii(fileString);
+0119       dataset.data = cat(4, dataset.data, dataNii.img);
+0120     
+0121     <span class="keyword">end</span> <span class="comment">%endfor</span>
+0122     
+0123   <span class="keyword">else</span>
+0124       error(<span class="string">'Unrecognized dimensions for image data (3D or 4D expected)!'</span>);  
+0125   <span class="keyword">end</span>
+0126     
+0127     
+0128   <span class="comment">%check 4th dimension of given data</span>
+0129   <span class="keyword">if</span>(size(dataset.data, 4) &lt; 1)
+0130     disp(<span class="string">'ERROR: setDataset_data_ByFilelist: Please check the dimensions! The , 4th dimension is bel 1 ! This dimension should be your number of samples (timesteps, scans)!)'</span>);
+0131     dataset.data = [];
+0132     <span class="keyword">return</span>;
+0133   <span class="keyword">end</span>
+0134   
+0135   dataset.dataFilelist = fileList;
+0136   
+0137 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 22-Oct-2012 13:45:25 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of saveMatrix3DasNiftiInDatasetSpace</title>
+  <meta name="keywords" content="saveMatrix3DasNiftiInDatasetSpace">
+  <meta name="description" content="Save a 3D matrix as nifti-image, according to nifti-hdr info in dataset.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">easyupMVPA</a> &gt; saveMatrix3DasNiftiInDatasetSpace.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for easyupMVPA&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>saveMatrix3DasNiftiInDatasetSpace
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Save a 3D matrix as nifti-image, according to nifti-hdr info in dataset.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function saveMatrix3DasNiftiInDatasetSpace(dataset, matrix3D, hdrFilename, scaleFactor) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Save a 3D matrix as nifti-image, according to nifti-hdr info in dataset.
+ 
+ Author: Maurice Hollmann
+ Date  : 08/10
+
+ Description:
+
+ saveMatrix3DasNiftiInDatasetSpace(dataset, matrix3D, hdrFilename, [scaleFactor])
+
+ This methods saves a 3D matrix as Nifti-hdr/img in the 3D space of a single volume of the dataset with type dataset4D. 
+ The written file will be in Analyze-Nifti HDR/IMG Format. If file already exists it will be overwritten.
+
+ This function can just be used with datasets of type: dataset4D.
+
+ Parameters:
+   dataset     - the datset that defines the space (by field data_3DNiftiHdr)
+   matrix3D    - the 3D matrix to save
+   hdrFilename - filename of the header
+   scaleFactor - [optional] a scale factor multiplied with dataset (this scaling is directly applied and NOT written in header)
+
+ Returns:
+
+ Comments:</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% Save a 3D matrix as nifti-image, according to nifti-hdr info in dataset.</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% Author: Maurice Hollmann</span>
+0004 <span class="comment">% Date  : 08/10</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% Description:</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">% saveMatrix3DasNiftiInDatasetSpace(dataset, matrix3D, hdrFilename, [scaleFactor])</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">% This methods saves a 3D matrix as Nifti-hdr/img in the 3D space of a single volume of the dataset with type dataset4D.</span>
+0011 <span class="comment">% The written file will be in Analyze-Nifti HDR/IMG Format. If file already exists it will be overwritten.</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">% This function can just be used with datasets of type: dataset4D.</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">% Parameters:</span>
+0016 <span class="comment">%   dataset     - the datset that defines the space (by field data_3DNiftiHdr)</span>
+0017 <span class="comment">%   matrix3D    - the 3D matrix to save</span>
+0018 <span class="comment">%   hdrFilename - filename of the header</span>
+0019 <span class="comment">%   scaleFactor - [optional] a scale factor multiplied with dataset (this scaling is directly applied and NOT written in header)</span>
+0020 <span class="comment">%</span>
+0021 <span class="comment">% Returns:</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">% Comments:</span>
+0024 <span class="comment">%</span>
+0025 <span class="comment">%</span>
+0026 <a name="_sub0" href="#_subfunctions" class="code">function saveMatrix3DasNiftiInDatasetSpace(dataset, matrix3D, hdrFilename, scaleFactor)</a>
+0027 
+0028   <span class="keyword">if</span>( ~exist(<span class="string">'dataset'</span>,<span class="string">'var'</span>) || ~exist(<span class="string">'matrix3D'</span>,<span class="string">'var'</span>) || ~exist(<span class="string">'hdrFilename'</span>,<span class="string">'var'</span>)) 
+0029     error(<span class="string">'Usage of saveMatrix3DasNiftiInDatasetSpace: saveMatrix3DasNiftiInDatasetSpace(dataset, matrix3D (3D matrix), hdrFilename (filename of the header), scaleFactor (optional)  )'</span>);
+0030   <span class="keyword">end</span>
+0031 
+0032   <span class="keyword">if</span>( ~dataset.is4D)
+0033      error(<span class="string">'Function saveMatrix3DasNiftiInDatasetSpace can just be used for 4D datasets! '</span>);
+0034   <span class="keyword">end</span>
+0035 
+0036   <span class="comment">%scale if necessary</span>
+0037   <span class="keyword">if</span>(exist(<span class="string">'scaleFactor'</span>,<span class="string">'var'</span>))
+0038     matrix3D = matrix3D*scaleFactor;
+0039   <span class="keyword">end</span>
+0040     
+0041   niiHdr = dataset.data_3DNiftiHdr;
+0042 
+0043   <span class="comment">%set the 4th dimension to 1 because it is just a 3D array</span>
+0044   niiHdr.dime.dim(5) = 1;
+0045   
+0046   [pathstr, name, ext] = fileparts(hdrFilename);
+0047   
+0048   <span class="keyword">if</span>( ~strcmp(ext,<span class="string">'.hdr'</span>) )
+0049     disp(<span class="string">'INFO: saveMatrix3DasNiftiInDatasetSpace: Extension of header filename was set to: .hdr !'</span> );
+0050     ext = <span class="string">'.hdr'</span>;
+0051   <span class="keyword">end</span>
+0052   fileNameHDR = [pathstr, filesep(),name, ext];
+0053   
+0054   
+0055   <span class="keyword">if</span>(~exist(pathstr,<span class="string">'dir'</span>))
+0056     error(<span class="string">'The given PATH in HDR-filename is not existant. Hdr-filename is not valid.'</span>);
+0057   <span class="keyword">end</span>
+0058   
+0059   <span class="comment">%save the hdr data</span>
+0060   fid_writefile_4d_hdr = fopen(fileNameHDR, <span class="string">'w'</span>);
+0061   
+0062   <span class="comment">%if field magic does not exist the data is old analyze-style</span>
+0063   <span class="keyword">if</span>(isfield(niiHdr.hist, <span class="string">'magic'</span>))
+0064     niiHdr.hist.magic = <span class="string">'ni1'</span>;
+0065     save_untouch_nii_hdr(niiHdr, fid_writefile_4d_hdr);
+0066   <span class="keyword">else</span>
+0067     save_untouch0_nii_hdr(niiHdr, fid_writefile_4d_hdr);
+0068   <span class="keyword">end</span>
+0069     
+0070   fclose(fid_writefile_4d_hdr);
+0071 
+0072   <span class="comment">%save the img data</span>
+0073   fid_writefile_4d_img = fopen([pathstr, filesep(), name, <span class="string">'.img'</span>], <span class="string">'w'</span>);
+0074   fwrite(fid_writefile_4d_img, matrix3D, <span class="string">'int16'</span>);
+0075   fclose(fid_writefile_4d_img);
+0076   
+0077 
+0078 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 22-Oct-2012 13:45:25 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

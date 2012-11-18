@@ -1,0 +1,178 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of selectSamples</title>
+  <meta name="keywords" content="selectSamples">
+  <meta name="description" content="Select a sub-dataset out of a dataset according to given criteria (string or binary vector).">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">easyupMVPA</a> &gt; selectSamples.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for easyupMVPA&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>selectSamples
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Select a sub-dataset out of a dataset according to given criteria (string or binary vector).</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [dataset] = selectSamples(dataset, criterion) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Select a sub-dataset out of a dataset according to given criteria (string or binary vector).
+
+ Author: Maurice Hollmann
+ Date  : 04/11
+
+ Description:
+ This methods selects samples from the dataset. The selection criterion 
+ is given as a string or a binary vector. It refers always to index, chunks 
+ or classIDs if given as a string and always to index if given as a vector.
+
+  Selection given as string:
+  ds = selectSamples(ds, 'index &lt;= 500')
+  ds = selectSamples(ds, 'chunks &gt; 0')
+  ds = selectSamples(ds, 'chunks &gt; 0 &amp; classIDs &lt; 2')
+  ds = selectSamples(ds, 'chunks &gt; 0 | classIDs &lt; 2')
+  ds = selectSamples(ds, 'chunks == 1')
+
+  Selection given as vector:
+  ds = selectSamples(ds, [0 1 1 0 0 0 1]) !!Here the vector must have the length of the number of samples in ds!!
+
+
+ Parameters:
+   dataset       - the datset to set the classIDs for
+   criterion     - selection criterion (string or vector) that will be evaluated as given 
+                   (i.e. 'index &lt;= 500' or 'dataset.chunks &gt;= 30' or a vector of ones and zeros)
+
+ Returns:
+   dataset   - the datset with excluded samples
+
+ Comments:</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="doZScoring.html" class="code" title="function [dataset] = doZScoring(dataset, chunkwise)">doZScoring</a>	Does Z-Scoring in sample dimension (i.e. per voxel over samples in fMRI-time series).</li><li><a href="getROIAnalysisResult_ByRoiImageFile.html" class="code" title="function [roiAnalysisResult] = getROIAnalysisResult_ByRoiImageFile(dataset, hdrFilename)">getROIAnalysisResult_ByRoiImageFile</a>	DEPRECATED!</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% Select a sub-dataset out of a dataset according to given criteria (string or binary vector).</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% Author: Maurice Hollmann</span>
+0004 <span class="comment">% Date  : 04/11</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% Description:</span>
+0007 <span class="comment">% This methods selects samples from the dataset. The selection criterion</span>
+0008 <span class="comment">% is given as a string or a binary vector. It refers always to index, chunks</span>
+0009 <span class="comment">% or classIDs if given as a string and always to index if given as a vector.</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">%  Selection given as string:</span>
+0012 <span class="comment">%  ds = selectSamples(ds, 'index &lt;= 500')</span>
+0013 <span class="comment">%  ds = selectSamples(ds, 'chunks &gt; 0')</span>
+0014 <span class="comment">%  ds = selectSamples(ds, 'chunks &gt; 0 &amp; classIDs &lt; 2')</span>
+0015 <span class="comment">%  ds = selectSamples(ds, 'chunks &gt; 0 | classIDs &lt; 2')</span>
+0016 <span class="comment">%  ds = selectSamples(ds, 'chunks == 1')</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">%  Selection given as vector:</span>
+0019 <span class="comment">%  ds = selectSamples(ds, [0 1 1 0 0 0 1]) !!Here the vector must have the length of the number of samples in ds!!</span>
+0020 <span class="comment">%</span>
+0021 <span class="comment">%</span>
+0022 <span class="comment">% Parameters:</span>
+0023 <span class="comment">%   dataset       - the datset to set the classIDs for</span>
+0024 <span class="comment">%   criterion     - selection criterion (string or vector) that will be evaluated as given</span>
+0025 <span class="comment">%                   (i.e. 'index &lt;= 500' or 'dataset.chunks &gt;= 30' or a vector of ones and zeros)</span>
+0026 <span class="comment">%</span>
+0027 <span class="comment">% Returns:</span>
+0028 <span class="comment">%   dataset   - the datset with excluded samples</span>
+0029 <span class="comment">%</span>
+0030 <span class="comment">% Comments:</span>
+0031 <span class="comment">%</span>
+0032 <a name="_sub0" href="#_subfunctions" class="code">function [dataset] = selectSamples(dataset, criterion)</a>
+0033    
+0034    <span class="keyword">if</span>( ~exist(<span class="string">'dataset'</span>,<span class="string">'var'</span>) || ~exist(<span class="string">'criterion'</span>,<span class="string">'var'</span>))
+0035      error(<span class="string">'Usage of selectSamples: [dataset] = selectSamples(dataset, criterion [i.e. &quot;chunks &gt; 0&quot;])'</span>);
+0036    <span class="keyword">end</span>
+0037 
+0038    index = 1:length(dataset.chunks);
+0039    
+0040    
+0041    <span class="comment">%criterion is a vector</span>
+0042    <span class="keyword">if</span>(isnumeric(criterion))
+0043      
+0044      <span class="keyword">if</span>(size(criterion,1) &gt; size(criterion,2))
+0045        criterion = criterion';
+0046      <span class="keyword">end</span>
+0047      
+0048      sizeData = size(dataset.data);
+0049      
+0050      <span class="keyword">if</span>(length(criterion) ~= sizeData(end) || size(criterion,1) ~= 1)
+0051        disp(<span class="string">'ssssssssERROR: selectSamples: Selection criterion not valid!'</span>)
+0052        disp(<span class="string">'Examples for the usage of selectSamples using a string as criterion:'</span>)
+0053        disp(<span class="string">'ds = selectSamples(ds, `index &lt;= 500`)'</span>);
+0054        disp(<span class="string">'ds = selectSamples(ds, `chunks &gt; 0`)'</span>);
+0055        disp(<span class="string">'ds = selectSamples(ds, `chunks == 2`)'</span>);
+0056        disp(<span class="string">'ds = selectSamples(ds, `chunks &gt; 0 &amp; classIDs &gt;= 1`)'</span>);
+0057        disp(<span class="string">'ds = selectSamples(ds, `chunks &gt; 0 | classIDs &gt;= 1`)'</span>);
+0058        disp(<span class="string">' '</span>);
+0059        disp(<span class="string">'Examples for the usage of selectSamples using a vector as criterion:'</span>)
+0060        disp(<span class="string">'ds = selectSamples(ds, [0 1 1 0 0 0 1]); %length of selection vector must fit numbers of samples in ds !'</span>);
+0061        error(<span class="string">'Error selecting samples!'</span>);
+0062      <span class="keyword">else</span>
+0063        criterion = [<span class="string">'['</span>,num2str(criterion),<span class="string">']'</span>];
+0064      <span class="keyword">end</span>
+0065    
+0066    <span class="comment">%criterion is a string</span>
+0067    <span class="keyword">else</span>
+0068      criterion = strrep(criterion, <span class="string">'classIDs'</span>, <span class="string">'dataset.classIDs'</span>);
+0069      criterion = strrep(criterion, <span class="string">'chunks'</span>, <span class="string">'dataset.chunks'</span>);
+0070    <span class="keyword">end</span>
+0071    
+0072    <span class="keyword">try</span>
+0073        sel = eval(criterion);
+0074    <span class="keyword">catch</span>
+0075        disp(<span class="string">'ERROR: selectSamples: Selection criterion not valid!'</span>)
+0076        disp(<span class="string">'Examples for the usage of selectSamples using a string as criterion:'</span>)
+0077        disp(<span class="string">'ds = selectSamples(ds, `index &lt;= 500`)'</span>);
+0078        disp(<span class="string">'ds = selectSamples(ds, `chunks &gt; 0`)'</span>);
+0079        disp(<span class="string">'ds = selectSamples(ds, `chunks == 2`)'</span>);
+0080        disp(<span class="string">'ds = selectSamples(ds, `chunks &gt; 0 &amp; classIDs &gt;= 1`)'</span>);
+0081        disp(<span class="string">'ds = selectSamples(ds, `chunks &gt; 0 | classIDs &gt;= 1`)'</span>);
+0082        disp(<span class="string">' '</span>);
+0083        disp(<span class="string">'Examples for the usage of selectSamples using a vector as criterion:'</span>)
+0084        disp(<span class="string">'ds = selectSamples(ds, [0 1 1 0 0 0 1]); %length of selection vector must fit numbers of samples in ds !'</span>);
+0085        error(<span class="string">'Error selecting samples!'</span>);
+0086    <span class="keyword">end</span>
+0087       
+0088    dataset.chunks(~sel)        = [];
+0089    dataset.classIDs(~sel)      = [];
+0090    
+0091    <span class="keyword">if</span>(dataset.is4D)
+0092      dataset.data(:,:,:, ~sel) = [];
+0093    <span class="keyword">elseif</span>(dataset.is2D)
+0094      dataset.data(:, ~sel) = [];
+0095    <span class="keyword">end</span>
+0096    
+0097    <span class="keyword">if</span>(isempty(dataset.data) || isempty(dataset.classIDs) || isempty(dataset.chunks))
+0098      error(<span class="string">'Selection results in an empty dataset, please check selection criteria.'</span>);
+0099    <span class="keyword">end</span>
+0100 
+0101    
+0102 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 22-Oct-2012 13:45:25 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

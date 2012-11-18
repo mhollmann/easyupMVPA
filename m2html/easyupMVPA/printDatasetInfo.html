@@ -1,0 +1,243 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of printDatasetInfo</title>
+  <meta name="keywords" content="printDatasetInfo">
+  <meta name="description" content="Prints the content of the dataset on the screen.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">easyupMVPA</a> &gt; printDatasetInfo.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for easyupMVPA&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>printDatasetInfo
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Prints the content of the dataset on the screen.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function printDatasetInfo(dataset) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Prints the content of the dataset on the screen.
+
+ Author: Maurice Hollmann
+ Date  : 08/10
+
+ Description:
+
+   printDatasetInfo(dataset)
+
+   This methods prints the whole info about dataset at the screen.
+
+ Parameters:
+   dataset  - the dataset to print info 
+
+ Returns:
+
+
+ Comments:</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="averageFeaturesInROIs.html" class="code" title="function [dataset, dataset2D] = averageFeaturesInROIs(dataset, roiMap)">averageFeaturesInROIs</a>	Set the mask (1D or 3D) field of a dataset by a given matrix.</li><li><a href="doRecursiveFeatureElemination_bootStrap_SVM.html" class="code" title="function [dataset, resultStruct] = doRecursiveFeatureElemination_bootStrap_SVM(dataset, nmbBootSteps)">doRecursiveFeatureElemination_bootStrap_SVM</a>	[DO NOT USE: UNDER DEVELOPEMENT!] Recursively removes features according to SVM classification weights obtained by bootstrapping.</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function member_printDataset4DInfo(dataset)</a></li><li><a href="#_sub2" class="code">function member_printDataset2DInfo(dataset)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% Prints the content of the dataset on the screen.</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% Author: Maurice Hollmann</span>
+0004 <span class="comment">% Date  : 08/10</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% Description:</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%   printDatasetInfo(dataset)</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%   This methods prints the whole info about dataset at the screen.</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">% Parameters:</span>
+0013 <span class="comment">%   dataset  - the dataset to print info</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">% Returns:</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">% Comments:</span>
+0019 <span class="comment">%</span>
+0020 <a name="_sub0" href="#_subfunctions" class="code">function printDatasetInfo(dataset)</a>
+0021 
+0022   <span class="keyword">if</span>(isfield(dataset, <span class="string">'type'</span>) &amp;&amp;  strcmp(dataset.type,<span class="string">'dataset4D'</span>))
+0023     <a href="#_sub1" class="code" title="subfunction member_printDataset4DInfo(dataset)">member_printDataset4DInfo</a>(dataset);
+0024   <span class="keyword">elseif</span>(isfield(dataset, <span class="string">'type'</span>) &amp;&amp;  strcmp(dataset.type,<span class="string">'dataset2D'</span>))
+0025     <a href="#_sub2" class="code" title="subfunction member_printDataset2DInfo(dataset)">member_printDataset2DInfo</a>(dataset);
+0026   <span class="keyword">else</span>
+0027     disp(<span class="string">'PRINT DATASET INFO: Please check the dataset: field &quot;type&quot; is not defined!'</span>);
+0028   <span class="keyword">end</span>
+0029 <span class="keyword">end</span> <span class="comment">%end function printDatasetInfo(dataset)</span>
+0030 
+0031 
+0032 <a name="_sub1" href="#_subfunctions" class="code">function member_printDataset4DInfo(dataset)</a>
+0033   <span class="keyword">if</span>( ~isfield(dataset, <span class="string">'data'</span>) )
+0034     dataset.data = [];
+0035   <span class="keyword">end</span>
+0036   <span class="keyword">if</span>( ~isfield(dataset, <span class="string">'dataFilelist'</span>) )
+0037     dataset.dataFilelist = [];
+0038   <span class="keyword">end</span>
+0039    <span class="keyword">if</span>( ~isfield(dataset, <span class="string">'data4D_3DNiftiHdr'</span>) )
+0040     dataset.data_3DNiftiHdr = [];
+0041   <span class="keyword">end</span>
+0042   <span class="keyword">if</span>( ~isfield(dataset, <span class="string">'mask'</span>) )
+0043     dataset.mask = [];
+0044   <span class="keyword">end</span>
+0045   
+0046   <span class="keyword">if</span>( ~isfield(dataset, <span class="string">'featureSelectionMap'</span>) )
+0047     dataset.featureSelectionMap = [];
+0048   <span class="keyword">end</span>
+0049   <span class="keyword">if</span>( ~isfield(dataset, <span class="string">'chunks'</span>) )
+0050     dataset.chunks = [];
+0051   <span class="keyword">end</span>
+0052   <span class="keyword">if</span>( ~isfield(dataset, <span class="string">'classIDs'</span>) )
+0053     dataset.classIDs = [];
+0054   <span class="keyword">end</span>
+0055 
+0056   sizeData   = size(dataset.data);
+0057   sizeMask   = size(dataset.mask);
+0058   
+0059   disp(<span class="string">'----------------------------------------'</span>)
+0060   disp(<span class="string">'*** Info Dataset ***'</span>)
+0061   disp(<span class="string">' '</span>);
+0062   disp([<span class="string">'Dataset Type: '</span>, dataset.type]);
+0063   disp(<span class="string">' '</span>);
+0064   <span class="keyword">if</span>(isfield(dataset,<span class="string">'processingHistory'</span>) &amp;&amp; ~isempty(dataset.processingHistory))
+0065     disp(<span class="string">'processing history:'</span>);
+0066     disp(<span class="string">' '</span>);
+0067     <span class="keyword">for</span> i=1:size(dataset.processingHistory,2)
+0068       disp([<span class="string">' * '</span>,char(dataset.processingHistory(1,i))]);
+0069     <span class="keyword">end</span>
+0070     disp(<span class="string">' '</span>);
+0071   <span class="keyword">end</span>
+0072   disp(<span class="string">'field data (4D):'</span>);
+0073   disp([<span class="string">'              size : '</span>, num2str(sizeData)]);
+0074   disp([<span class="string">'              class: '</span>, class(dataset.data)]);
+0075   disp(<span class="string">'field dataFilelist:'</span>);
+0076   disp([<span class="string">'              size : '</span>, num2str(size(dataset.dataFilelist))]);
+0077   disp([<span class="string">'              class: '</span>, class(dataset.dataFilelist)]);
+0078   disp(<span class="string">'field data_3DNiftiHdr:'</span>);
+0079   disp([<span class="string">'              size : '</span>, num2str(size(dataset.data_3DNiftiHdr))]);
+0080   disp([<span class="string">'              class: '</span>, class(dataset.data_3DNiftiHdr)]);
+0081   disp(<span class="string">'field mask (3D):'</span>);
+0082   <span class="keyword">if</span>(~isempty(dataset.mask))
+0083     disp([<span class="string">'              size                 : '</span>, num2str(sizeMask)]);
+0084     disp([<span class="string">'              nmb non-zero elements: '</span>, num2str(num2str(sum(dataset.mask(:) &gt; 0)))]);
+0085     disp([<span class="string">'              class                : '</span>, class(dataset.mask)]);
+0086   <span class="keyword">else</span>
+0087     disp(<span class="string">'               No mask is defined for dataset.'</span>);
+0088   <span class="keyword">end</span>
+0089   disp(<span class="string">'field featureSelectionMap (3D):'</span>);
+0090   <span class="keyword">if</span>(~isempty(dataset.featureSelectionMap))
+0091     disp([<span class="string">'              size                 : '</span>, num2str(size(dataset.featureSelectionMap))]);
+0092     disp([<span class="string">'              nmb non-zero elements: '</span>, num2str(num2str(sum(dataset.featureSelectionMap(:) &gt; 0)))]);
+0093     disp([<span class="string">'              class                : '</span>, class(dataset.featureSelectionMap)]);
+0094   <span class="keyword">else</span>
+0095     disp(<span class="string">'               No featureSelectionMap is defined for dataset.'</span>);
+0096   <span class="keyword">end</span>
+0097   disp(<span class="string">'field chunks:'</span>);
+0098   disp([<span class="string">'              length: '</span>, num2str(length(dataset.chunks))]);
+0099   disp([<span class="string">'              class : '</span>, class(dataset.chunks)]);
+0100   disp(num2str(dataset.chunks));
+0101   disp(<span class="string">'field classIDs:'</span>);
+0102   disp([<span class="string">'              length: '</span>, num2str(length(dataset.classIDs))]);
+0103   disp([<span class="string">'              class : '</span>, class(dataset.classIDs)]);
+0104   disp(num2str(dataset.classIDs));
+0105   disp(<span class="string">'----------------------------------------'</span>)
+0106   disp(<span class="string">' '</span>);
+0107 
+0108 <span class="keyword">end</span> <span class="comment">%end function member_printDatasetInfo(dataset)</span>
+0109 
+0110 
+0111 
+0112 
+0113 <a name="_sub2" href="#_subfunctions" class="code">function member_printDataset2DInfo(dataset)</a>
+0114 
+0115   <span class="keyword">if</span>( ~isfield(dataset, <span class="string">'data'</span>) )
+0116     dataset.data = [];
+0117   <span class="keyword">end</span>
+0118   <span class="keyword">if</span>( ~isfield(dataset, <span class="string">'mask'</span>) )
+0119     dataset.mask = [];
+0120   <span class="keyword">end</span>
+0121   
+0122   <span class="keyword">if</span>( ~isfield(dataset, <span class="string">'featureSelectionMap'</span>) )
+0123     dataset.featureSelectionMap1D = [];
+0124   <span class="keyword">end</span>
+0125   <span class="keyword">if</span>( ~isfield(dataset, <span class="string">'chunks'</span>) )
+0126     dataset.chunks = [];
+0127   <span class="keyword">end</span>
+0128   <span class="keyword">if</span>( ~isfield(dataset, <span class="string">'classIDs'</span>) )
+0129     dataset.classIDs = [];
+0130   <span class="keyword">end</span>
+0131 
+0132   sizeData   = size(dataset.data);
+0133   sizemask   = size(dataset.mask);
+0134   
+0135   disp(<span class="string">'----------------------------------------'</span>)
+0136   disp(<span class="string">'*** Info Dataset ***'</span>)
+0137   disp(<span class="string">' '</span>);
+0138   disp([<span class="string">'Dataset Type: '</span>, dataset.type]);
+0139   disp(<span class="string">' '</span>);
+0140   <span class="keyword">if</span>(isfield(dataset,<span class="string">'processingHistory'</span>) &amp;&amp; ~isempty(dataset.processingHistory))
+0141     disp(<span class="string">'processing history:'</span>);
+0142     disp(<span class="string">' '</span>);
+0143     <span class="keyword">for</span> i=1:size(dataset.processingHistory,2)
+0144       disp([<span class="string">' * '</span>,char(dataset.processingHistory(1,i))]);
+0145     <span class="keyword">end</span>
+0146     disp(<span class="string">' '</span>);
+0147   <span class="keyword">end</span>
+0148   disp(<span class="string">'field data (2D):'</span>);
+0149   disp([<span class="string">'              size : '</span>, num2str(sizeData)]);
+0150   disp([<span class="string">'              class: '</span>, class(dataset.data)]);
+0151   disp(<span class="string">'field mask (1D):'</span>);
+0152   <span class="keyword">if</span>(~isempty(dataset.mask))
+0153     disp([<span class="string">'              size                 : '</span>, num2str(sizemask)]);
+0154     disp([<span class="string">'              nmb non-zero elements: '</span>, num2str(num2str(sum(dataset.mask &gt; 0)))]);
+0155     disp([<span class="string">'              class                : '</span>, class(dataset.mask)]);
+0156   <span class="keyword">else</span>
+0157     disp(<span class="string">'               No mask is defined for dataset.'</span>);
+0158   <span class="keyword">end</span>
+0159   disp(<span class="string">'field featureSelectionMap (1D):'</span>);
+0160   <span class="keyword">if</span>(~isempty(dataset.featureSelectionMap))
+0161     disp([<span class="string">'              size                 : '</span>, num2str(size(dataset.featureSelectionMap))]);
+0162     disp([<span class="string">'              nmb non-zero elements: '</span>, num2str(num2str(sum(dataset.featureSelectionMap &gt; 0)))]);
+0163     disp([<span class="string">'              class                : '</span>, class(dataset.featureSelectionMap)]);
+0164   <span class="keyword">else</span>
+0165     disp(<span class="string">'               No featureSelectionMap1D is defined for dataset.'</span>);
+0166   <span class="keyword">end</span>
+0167   disp(<span class="string">'field chunks:'</span>);
+0168   disp([<span class="string">'              length: '</span>, num2str(length(dataset.chunks))]);
+0169   disp([<span class="string">'              class : '</span>, class(dataset.chunks)]);
+0170   disp(num2str(dataset.chunks));
+0171   disp(<span class="string">'field classIDs:'</span>);
+0172   disp([<span class="string">'              length: '</span>, num2str(length(dataset.classIDs))]);
+0173   disp([<span class="string">'              class : '</span>, class(dataset.classIDs)]);
+0174   disp(num2str(dataset.classIDs));
+0175   disp(<span class="string">'----------------------------------------'</span>)
+0176   disp(<span class="string">' '</span>);
+0177 <span class="keyword">end</span> <span class="comment">%end function member_printDatasetInfo(dataset)</span></pre></div>
+<hr><address>Generated on Mon 22-Oct-2012 13:45:25 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

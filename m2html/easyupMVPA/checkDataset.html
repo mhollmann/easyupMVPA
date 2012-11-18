@@ -1,0 +1,189 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of checkDataset</title>
+  <meta name="keywords" content="checkDataset">
+  <meta name="description" content="Checks a given dataset for correctness (i.e. size of defined matrices).">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">easyupMVPA</a> &gt; checkDataset.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for easyupMVPA&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>checkDataset
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Checks a given dataset for correctness (i.e. size of defined matrices).</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [ok] = checkDataset(dataset) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Checks a given dataset for correctness (i.e. size of defined matrices).
+
+ Author: Maurice Hollmann
+ Date  : 08/10
+
+ Description:
+
+   checkDataset(dataset)
+
+   Checks a dataset: Dimensions of subfields etc.
+
+ Parameters:
+   dataset   - the datset to check
+
+ Returns:
+   ok        - true if dataset is ok, false otherwise 
+
+ Comments:</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="averageOverChunks.html" class="code" title="function [dataset] = averageOverChunks(dataset)">averageOverChunks</a>	Averages data in dataset over the chunks with equal ID.</li><li><a href="setDataset_chunks_ByAttribFile.html" class="code" title="function [dataset] = setDataset_chunks_ByAttribFile(dataset, attribFile)">setDataset_chunks_ByAttribFile</a>	Set the chunks of a dataset by a given attribute-file.</li><li><a href="setDataset_chunks_ByVector.html" class="code" title="function [dataset] = setDataset_chunks_ByVector(dataset, chunkVector)">setDataset_chunks_ByVector</a>	Set the chunks of a dataset by a given vector.</li><li><a href="setDataset_classIDs_ByAttribFile.html" class="code" title="function [dataset] = setDataset_classIDs_ByAttribFile(dataset, attribFile)">setDataset_classIDs_ByAttribFile</a>	Set the class-IDs of a dataset by a given attribute-file.</li><li><a href="setDataset_classIDs_ByVector.html" class="code" title="function [dataset] = setDataset_classIDs_ByVector(dataset, classIDsVector)">setDataset_classIDs_ByVector</a>	Set the class-IDs of a dataset by a given vector.</li><li><a href="setDataset_data_ByMatrix.html" class="code" title="function [dataset] = setDataset_data_ByMatrix(dataset, dataMatrix)">setDataset_data_ByMatrix</a>	Set the data field of a datasets by a given matrix.</li><li><a href="setDataset_featureSelectionMap_ByMatrix.html" class="code" title="function [dataset] = setDataset_featureSelectionMap_ByMatrix(dataset, mapMatrix)">setDataset_featureSelectionMap_ByMatrix</a>	Set the featureSelectionMap (1D or 3D) field of a dataset by a given matrix.</li><li><a href="setDataset_mask_ByImageFile.html" class="code" title="function [dataset] = setDataset_mask_ByImageFile(dataset, maskImageFile)">setDataset_mask_ByImageFile</a>	Set the mask field of 4D datasets by a given nifti-file.</li><li><a href="setDataset_mask_ByMatrix.html" class="code" title="function [dataset] = setDataset_mask_ByMatrix(dataset, maskMatrix)">setDataset_mask_ByMatrix</a>	Set the mask (1D or 3D) field of a dataset by a given matrix.</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function [ok] = member_checkDataset4D(dataset)</a></li><li><a href="#_sub2" class="code">function [ok] = member_checkDataset2D(dataset)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% Checks a given dataset for correctness (i.e. size of defined matrices).</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% Author: Maurice Hollmann</span>
+0004 <span class="comment">% Date  : 08/10</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% Description:</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%   checkDataset(dataset)</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%   Checks a dataset: Dimensions of subfields etc.</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">% Parameters:</span>
+0013 <span class="comment">%   dataset   - the datset to check</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">% Returns:</span>
+0016 <span class="comment">%   ok        - true if dataset is ok, false otherwise</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">% Comments:</span>
+0019 <span class="comment">%</span>
+0020 <a name="_sub0" href="#_subfunctions" class="code">function [ok] = checkDataset(dataset)</a>
+0021 
+0022   <span class="keyword">if</span>(isfield(dataset, <span class="string">'type'</span>) &amp;&amp;  strcmp(dataset.type,<span class="string">'dataset4D'</span>))
+0023     [ok] = <a href="#_sub1" class="code" title="subfunction [ok] = member_checkDataset4D(dataset)">member_checkDataset4D</a>(dataset);
+0024   <span class="keyword">elseif</span>(isfield(dataset, <span class="string">'type'</span>) &amp;&amp;  strcmp(dataset.type,<span class="string">'dataset2D'</span>))
+0025     [ok] = <a href="#_sub2" class="code" title="subfunction [ok] = member_checkDataset2D(dataset)">member_checkDataset2D</a>(dataset);
+0026   <span class="keyword">else</span>
+0027     ok = false;
+0028     disp(<span class="string">'CHECK DATASET: Please check the dataset: field &quot;type&quot; is not defined!'</span>);
+0029   <span class="keyword">end</span>
+0030   
+0031 <span class="keyword">end</span>
+0032 
+0033 
+0034 
+0035 
+0036 <a name="_sub1" href="#_subfunctions" class="code">function [ok] = member_checkDataset4D(dataset)</a>
+0037   ok = true;
+0038 
+0039   <span class="keyword">if</span>(~isempty(dataset.data))
+0040     <span class="keyword">if</span>(size(dataset.data,4) &lt;1)
+0041       disp(<span class="string">'CHECK DATASET: Please check the size of field data! The 4th dimension is lower than 1! This dimension should be your number of samples (timesteps, scans)!)'</span>);
+0042       ok = false;
+0043     <span class="keyword">end</span>
+0044   <span class="keyword">end</span>
+0045  
+0046   <span class="comment">%check the size of the mask</span>
+0047   <span class="keyword">if</span>(~isempty(dataset.data) &amp;&amp; ~isempty(dataset.mask))
+0048     sizeData = size(dataset.data);
+0049     sizeMask = size(dataset.mask);
+0050     <span class="keyword">if</span>(sizeData(1)~=sizeMask(1) || sizeData(2)~=sizeMask(2) || sizeData(3)~=sizeMask(3))
+0051       disp(<span class="string">'CHECK DATASET: Please check the size of field data and mask! The dimensions of mask do not fit the space of data!'</span>);
+0052       ok = false;
+0053     <span class="keyword">end</span>
+0054   <span class="keyword">end</span>
+0055   
+0056   
+0057   <span class="comment">%check the size of the actual featureSelectionMap</span>
+0058   <span class="keyword">if</span>(~isempty(dataset.data) &amp;&amp; isfield(dataset, <span class="string">'featureSelectionMap'</span>) &amp;&amp; ~isempty(dataset.featureSelectionMap))
+0059     sizeData4D = size(dataset.data);
+0060     sizefeatureSelectionMap = size(dataset.featureSelectionMap);
+0061     <span class="keyword">if</span>(sizeData4D(1)~=sizefeatureSelectionMap(1) || sizeData4D(2)~=sizefeatureSelectionMap(2) || sizeData4D(3)~=sizefeatureSelectionMap(3))
+0062       disp(<span class="string">'CHECK DATASET: Please check the size of field data and featureSelectionMap! The dimensions of featureSelectionMap do not fit the space of data!'</span>);
+0063       ok = false;
+0064     <span class="keyword">end</span>
+0065   <span class="keyword">end</span> 
+0066   
+0067   <span class="comment">%check length of chunks vs. nmbSamples</span>
+0068   <span class="keyword">if</span>(~isempty(dataset.chunks) &amp;&amp; ~isempty(dataset.data))
+0069     <span class="keyword">if</span>(size(dataset.chunks,2) ~= size(dataset.data,4))
+0070       disp(<span class="string">'CHECK DATASET: Please check dataset! The number of elements in chunks and the 4th dimension in data must be equal (This is your number of samples (timesteps, scans))!'</span>);
+0071       ok = false;
+0072     <span class="keyword">end</span>
+0073 
+0074   <span class="keyword">end</span>
+0075   
+0076   <span class="comment">%check length of classIDs vs. nmbSamples</span>
+0077   <span class="keyword">if</span>(~isempty(dataset.classIDs) &amp;&amp; ~isempty(dataset.data))
+0078     <span class="keyword">if</span>(size(dataset.classIDs,2) ~= size(dataset.data,4))
+0079       disp(<span class="string">'CHECK DATASET: Please check dataset! The number of elements in classIDs and the 4th dimension must be equal (This is your number of samples (timesteps, scans))!'</span>);
+0080       ok = false;
+0081     <span class="keyword">end</span>
+0082   <span class="keyword">end</span>
+0083 
+0084   <span class="keyword">if</span>(~isempty(dataset.classIDs) &amp;&amp; ~isempty(dataset.chunks))
+0085     <span class="keyword">if</span>(size(dataset.classIDs,2) ~= size(dataset.data,4))
+0086       disp(<span class="string">'CHECK DATASET: Please check dataset! The number of elements in classIDs and the number of elements in chunks must be equal (This is your number of samples (timesteps, scans))!'</span>);
+0087       ok = false;
+0088     <span class="keyword">end</span>
+0089   <span class="keyword">end</span>
+0090 <span class="keyword">end</span> <span class="comment">%end function member_checkDataset4D</span>
+0091 
+0092 
+0093 
+0094 
+0095 <a name="_sub2" href="#_subfunctions" class="code">function [ok] = member_checkDataset2D(dataset)</a>
+0096 
+0097   ok = true;
+0098   <span class="keyword">if</span>(~isempty(dataset.data))
+0099     <span class="keyword">if</span>(size(dataset.data,2) &lt;1)
+0100       disp(<span class="string">'CHECK DATASET: Please check the size of field data! The 2 dimension is lower than 1! This dimension should be your number of samples (timesteps, scans)!)'</span>);
+0101       ok = false;
+0102     <span class="keyword">end</span>
+0103   <span class="keyword">end</span>
+0104   
+0105   <span class="comment">%check length of chunks vs. nmbSamples</span>
+0106   <span class="keyword">if</span>(~isempty(dataset.chunks) &amp;&amp; ~isempty(dataset.data))
+0107     <span class="keyword">if</span>(size(dataset.chunks,2) ~= size(dataset.data,2))
+0108       disp(<span class="string">'CHECK DATASET: Please check dataset! The number of elements in &quot;chunks&quot; and the 2nd dimension in data must be equal (This is your number of samples (i.e. timesteps))!'</span>);
+0109       ok = false;
+0110     <span class="keyword">end</span>
+0111 
+0112   <span class="keyword">end</span>
+0113   
+0114   <span class="comment">%check length of classIDs vs. nmbSamples</span>
+0115   <span class="keyword">if</span>(~isempty(dataset.classIDs) &amp;&amp; ~isempty(dataset.data))
+0116     <span class="keyword">if</span>(size(dataset.classIDs,2) ~= size(dataset.data,2))
+0117       disp(<span class="string">'CHECK DATASET: Please check dataset! The number of elements in &quot;classIDs&quot; and the 2nd dimension must be equal (This is your number of samples (i.e. timesteps))!'</span>);
+0118       ok = false;
+0119     <span class="keyword">end</span>
+0120   <span class="keyword">end</span>
+0121   
+0122  
+0123 <span class="keyword">end</span> <span class="comment">%end function member_checkDataset2D</span></pre></div>
+<hr><address>Generated on Mon 22-Oct-2012 13:45:25 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

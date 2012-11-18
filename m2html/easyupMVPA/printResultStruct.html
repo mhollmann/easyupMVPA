@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of printResultStruct</title>
+  <meta name="keywords" content="printResultStruct">
+  <meta name="description" content="Prints the content of the result struct (result of prediction, LOOCV, RFE) on the screen.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">easyupMVPA</a> &gt; printResultStruct.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for easyupMVPA&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>printResultStruct
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Prints the content of the result struct (result of prediction, LOOCV, RFE) on the screen.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function printResultStruct(resultStruct) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Prints the content of the result struct (result of prediction, LOOCV, RFE) on the screen.
+
+ Author: Maurice Hollmann
+ Date  : 09/10
+
+ Description:
+
+   printResultStruct(resultStruct)
+
+   This methods prints the whole info about dataset at the screen.
+
+ Parameters:
+   dataset  - the dataset to print info 
+
+ Returns:
+
+
+ Comments:</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="printResultStruct.html" class="code" title="function printResultStruct(resultStruct)">printResultStruct</a>	Prints the content of the result struct (result of prediction, LOOCV, RFE) on the screen.</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="doRecursiveFeatureElemination_SVM.html" class="code" title="function [dataset, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = doRecursiveFeatureElemination_SVM(dataset, nmbIterations, thresholdPercentOfFeaturesOut, dataSplitter, svmType, kernelMode, costParam, paramStruct)">doRecursiveFeatureElemination_SVM</a>	Recursively removes features according to SVM classification weights (parallel execution).</li><li><a href="doRecursiveFeatureElemination_SVM_nestedLOOCV.html" class="code" title="function [dataset, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = doRecursiveFeatureElemination_SVM_nestedLOOCV(dataset, nmbIterations, thresholdPercentOfFeaturesOut, nmbSplitsLOOCV, dataSplitter, kernelMode, costParam, paramStruct)">doRecursiveFeatureElemination_SVM_nestedLOOCV</a>	! DEPRECATED ! Recursively removes features according to SVM classification weights from LOOCV.</li><li><a href="doRecursiveFeatureElemination_bootStrap_SVM.html" class="code" title="function [dataset, resultStruct] = doRecursiveFeatureElemination_bootStrap_SVM(dataset, nmbBootSteps)">doRecursiveFeatureElemination_bootStrap_SVM</a>	[DO NOT USE: UNDER DEVELOPEMENT!] Recursively removes features according to SVM classification weights obtained by bootstrapping.</li><li><a href="doRecursiveFeatureElemination_bootstrapping_SVM.html" class="code" title="function [dataset, resultStruct, avg_rfe_weightMap, avg_rfe_featureSelectionMap, rfe_weightMaps, rfe_featureSelectionMaps] = doRecursiveFeatureElemination_bootstrapping_SVM(dataset, nmbBootstrapIterations, nmbIterations, thresholdPercentOfFeaturesOut, dataSplitter, kernelMode, costParam, paramStruct)">doRecursiveFeatureElemination_bootstrapping_SVM</a>	[DO NOT USE: UNDER DEVELOPEMENT!] Recursively removes features according to SVM classification weights (parallel execution).</li><li><a href="printResultStruct.html" class="code" title="function printResultStruct(resultStruct)">printResultStruct</a>	Prints the content of the result struct (result of prediction, LOOCV, RFE) on the screen.</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% Prints the content of the result struct (result of prediction, LOOCV, RFE) on the screen.</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% Author: Maurice Hollmann</span>
+0004 <span class="comment">% Date  : 09/10</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% Description:</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%   printResultStruct(resultStruct)</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%   This methods prints the whole info about dataset at the screen.</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">% Parameters:</span>
+0013 <span class="comment">%   dataset  - the dataset to print info</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">% Returns:</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">% Comments:</span>
+0019 <span class="comment">%</span>
+0020 <a name="_sub0" href="#_subfunctions" class="code">function printResultStruct(resultStruct)</a>
+0021 
+0022      disp(<span class="string">'*** RESULT STRUCT:  ***'</span>);
+0023      disp([<span class="string">'Number of Tests: '</span>, num2str(resultStruct.nmbTests)])
+0024      disp([<span class="string">'Accuracy:        '</span>, num2str(resultStruct.accuracy), <span class="string">' %'</span>])
+0025      disp([<span class="string">'True Positives:  '</span>, num2str(resultStruct.TP)])
+0026      disp([<span class="string">'True Negatives:  '</span>, num2str(resultStruct.TN)])
+0027      disp([<span class="string">'False Positives: '</span>, num2str(resultStruct.FP)])
+0028      disp([<span class="string">'False Negatives: '</span>, num2str(resultStruct.FN)])
+0029      disp([<span class="string">'Sensitivity:     '</span>, num2str(resultStruct.sensitivity),<span class="string">'  (TP/TP+FN = Proportion of true positives to all positives).'</span>])
+0030      disp([<span class="string">'Specificity:     '</span>, num2str(resultStruct.specificity),<span class="string">'  (TN/TN+FP = Proportion of true negatives to all negatives).'</span>])
+0031      <span class="keyword">if</span>(isfield(resultStruct, <span class="string">'infoString'</span>))
+0032        disp([<span class="string">'Additional Info: '</span>, resultStruct.infoString])
+0033      <span class="keyword">end</span>
+0034      
+0035      
+0036      <span class="keyword">if</span>(isfield(resultStruct, <span class="string">'innerResultStruct'</span>) &amp;&amp; ~isempty(resultStruct.innerResultStruct))
+0037        disp(<span class="string">' '</span>);
+0038        disp(<span class="string">'*** INNER RESULT STRUCT HOLDING ADDITIONAL INFORMATION ***'</span>);
+0039        <a href="printResultStruct.html" class="code" title="function printResultStruct(resultStruct)">printResultStruct</a>(resultStruct.innerResultStruct);
+0040      <span class="keyword">end</span>
+0041      
+0042      <span class="keyword">if</span>(isfield(resultStruct, <span class="string">'predictedClassIDs'</span>) &amp;&amp; ~isempty(resultStruct.predictedClassIDs))
+0043        disp(<span class="string">' '</span>);
+0044        disp(<span class="string">'Predicted class IDs / regression values:'</span>);
+0045        disp([<span class="string">'                 size : '</span>, num2str(size(resultStruct.predictedClassIDs))]);
+0046        disp([<span class="string">'                 class: '</span>, class(resultStruct.predictedClassIDs)]);
+0047 
+0048      <span class="keyword">end</span>
+0049      disp(<span class="string">'************************'</span>);
+0050 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 22-Oct-2012 13:45:25 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of predict_SVM</title>
+  <meta name="keywords" content="predict_SVM">
+  <meta name="description" content="Predicts classes of the samples in dataset using the given SVM-model.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">easyupMVPA</a> &gt; predict_SVM.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for easyupMVPA&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>predict_SVM
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Predicts classes of the samples in dataset using the given SVM-model.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [resultStruct, probEstimates] = predict_SVM(dataset, svmModel) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Predicts classes of the samples in dataset using the given SVM-model.
+
+ Author: Maurice Hollmann
+ Date  : 09/10
+
+ Description:
+  This high-level function implements a simple prediction using a Support Vector Machine (SVM).
+
+
+ Parameters:
+   dataset     - the datset holding the test set to do prediction for
+   svmModel    - the model learned via train_SVM
+
+ Returns:
+   resultStruct   - The struct holding the classification results:
+                    resultStruct.nmbTests     (the number of samples tested for this result)
+                    resultStruct.accuracy     (percentual value of correct predictions (correct * 100 / nmbSamples))
+                    resultStruct.sensitivity  (TP/TP+FN = Proportion of true positives to all positives)
+                    resultStruct.specificity  (TN/TN+FP = Proportion of true negatives to all negatives)
+                    resultStruct.TP           (True positives = all correct predicted in class 1)
+                    resultStruct.TN           (True negatives = all correct predicted in class 2)
+                    resultStruct.FP           (False positives = all incorrect predicted in class 1)
+                    resultStruct.FN           (False negatives = all incorrect predicted in class 2)
+                    resultStruct.predictedClassIDs (values that depict the predicted class label or a predicted 
+                                                    value in regression for each input sample)
+
+   probEstimates  - Probability estimates if model was learned with Option 'probEstimates' = 1, otherwise empty matrix
+
+ Comments:</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="selectFeaturesBySelectionMap.html" class="code" title="function [dataset, data2D] = selectFeaturesBySelectionMap(dataset)">selectFeaturesBySelectionMap</a>	Apply a featureSelection map that is stored in a dataset to this dataset.</li><li><a href="setDataset_featureSelectionMap_ByMatrix.html" class="code" title="function [dataset] = setDataset_featureSelectionMap_ByMatrix(dataset, mapMatrix)">setDataset_featureSelectionMap_ByMatrix</a>	Set the featureSelectionMap (1D or 3D) field of a dataset by a given matrix.</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% Predicts classes of the samples in dataset using the given SVM-model.</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% Author: Maurice Hollmann</span>
+0004 <span class="comment">% Date  : 09/10</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% Description:</span>
+0007 <span class="comment">%  This high-level function implements a simple prediction using a Support Vector Machine (SVM).</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">% Parameters:</span>
+0011 <span class="comment">%   dataset     - the datset holding the test set to do prediction for</span>
+0012 <span class="comment">%   svmModel    - the model learned via train_SVM</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">% Returns:</span>
+0015 <span class="comment">%   resultStruct   - The struct holding the classification results:</span>
+0016 <span class="comment">%                    resultStruct.nmbTests     (the number of samples tested for this result)</span>
+0017 <span class="comment">%                    resultStruct.accuracy     (percentual value of correct predictions (correct * 100 / nmbSamples))</span>
+0018 <span class="comment">%                    resultStruct.sensitivity  (TP/TP+FN = Proportion of true positives to all positives)</span>
+0019 <span class="comment">%                    resultStruct.specificity  (TN/TN+FP = Proportion of true negatives to all negatives)</span>
+0020 <span class="comment">%                    resultStruct.TP           (True positives = all correct predicted in class 1)</span>
+0021 <span class="comment">%                    resultStruct.TN           (True negatives = all correct predicted in class 2)</span>
+0022 <span class="comment">%                    resultStruct.FP           (False positives = all incorrect predicted in class 1)</span>
+0023 <span class="comment">%                    resultStruct.FN           (False negatives = all incorrect predicted in class 2)</span>
+0024 <span class="comment">%                    resultStruct.predictedClassIDs (values that depict the predicted class label or a predicted</span>
+0025 <span class="comment">%                                                    value in regression for each input sample)</span>
+0026 <span class="comment">%</span>
+0027 <span class="comment">%   probEstimates  - Probability estimates if model was learned with Option 'probEstimates' = 1, otherwise empty matrix</span>
+0028 <span class="comment">%</span>
+0029 <span class="comment">% Comments:</span>
+0030 <span class="comment">%</span>
+0031 <a name="_sub0" href="#_subfunctions" class="code">function [resultStruct, probEstimates] = predict_SVM(dataset, svmModel)</a>
+0032 
+0033   nmbSamples    = length(dataset.chunks);
+0034   probEstimates = []; 
+0035   
+0036   
+0037   <span class="comment">%get the data as 2D array by using the selection-map or the mask</span>
+0038   sizeData   = size(dataset.data);
+0039   <span class="keyword">if</span>(isfield(dataset,<span class="string">'featureSelectionMap'</span>) &amp;&amp; ~isempty(dataset.featureSelectionMap))
+0040     [dataset, testData2D] = <a href="selectFeaturesBySelectionMap.html" class="code" title="function [dataset, data2D] = selectFeaturesBySelectionMap(dataset)">selectFeaturesBySelectionMap</a>(dataset);
+0041   <span class="keyword">elseif</span>(isfield(dataset,<span class="string">'mask3D'</span>) &amp;&amp; ~isempty(dataset.mask))
+0042     dataset = <a href="setDataset_featureSelectionMap_ByMatrix.html" class="code" title="function [dataset] = setDataset_featureSelectionMap_ByMatrix(dataset, mapMatrix)">setDataset_featureSelectionMap_ByMatrix</a>(dataset, dataset.mask);
+0043     [dataset, testData2D] = <a href="selectFeaturesBySelectionMap.html" class="code" title="function [dataset, data2D] = selectFeaturesBySelectionMap(dataset)">selectFeaturesBySelectionMap</a>(dataset);
+0044   <span class="keyword">else</span>
+0045     <span class="comment">%all features are used</span>
+0046     <span class="keyword">if</span>(dataset.is2D)
+0047      dataset = <a href="setDataset_featureSelectionMap_ByMatrix.html" class="code" title="function [dataset] = setDataset_featureSelectionMap_ByMatrix(dataset, mapMatrix)">setDataset_featureSelectionMap_ByMatrix</a>(dataset, ones(sizeData(1:end-1),1));
+0048     <span class="keyword">else</span>
+0049      dataset = <a href="setDataset_featureSelectionMap_ByMatrix.html" class="code" title="function [dataset] = setDataset_featureSelectionMap_ByMatrix(dataset, mapMatrix)">setDataset_featureSelectionMap_ByMatrix</a>(dataset, ones(sizeData(1), sizeData(2), sizeData(3))); 
+0050     <span class="keyword">end</span>
+0051     [dataset, testData2D] = <a href="selectFeaturesBySelectionMap.html" class="code" title="function [dataset, data2D] = selectFeaturesBySelectionMap(dataset)">selectFeaturesBySelectionMap</a>(dataset);
+0052   <span class="keyword">end</span>
+0053 
+0054    <span class="comment">%predict the class ID of the test data</span>
+0055    <span class="comment">%check if the model was trained with probability estimates</span>
+0056    <span class="keyword">if</span>(~isempty(svmModel.ProbA) &amp;&amp; ~isempty(svmModel.ProbB))
+0057      [predicted_labels, accuracy, probEstimates] = svmpredict_modifiedMH(double(dataset.classIDs)', testData2D, svmModel, <span class="string">'-b 1'</span>);
+0058    <span class="keyword">else</span>
+0059      [predicted_labels, accuracy, decisionValues] = svmpredict_modifiedMH(double(dataset.classIDs)', testData2D, svmModel); 
+0060    <span class="keyword">end</span>
+0061    
+0062    svmInfoStruct = getSVMModelInfo(svmModel);
+0063    
+0064    <span class="keyword">if</span>(strcmp(svmInfoStruct.svmType, <span class="string">'classification'</span>))
+0065    
+0066      cVec = predicted_labels' == dataset.classIDs;
+0067 
+0068      nmbTruePos  = sum(cVec(dataset.classIDs==1));
+0069      nmbTrueNeg  = sum(cVec(dataset.classIDs==0));
+0070      nmbFalsePos = sum(dataset.classIDs) - sum(predicted_labels);
+0071      <span class="keyword">if</span>(nmbFalsePos &lt; 0)
+0072        nmbFalsePos = abs(nmbFalsePos);
+0073      <span class="keyword">else</span>
+0074        nmbFalsePos = 0;
+0075      <span class="keyword">end</span>
+0076      nmbFalseNeg = nmbSamples - nmbTrueNeg - nmbFalsePos - nmbTruePos;
+0077 
+0078      accuracy    = sum(cVec)/nmbSamples*100;
+0079      sensitivity = nmbTruePos/(nmbTruePos+nmbFalseNeg); 
+0080      specificity = nmbTrueNeg/(nmbTrueNeg+nmbFalsePos);
+0081 
+0082      resultStruct             = {};
+0083      resultStruct.nmbTests    = nmbSamples;
+0084      resultStruct.accuracy    = accuracy;
+0085      resultStruct.sensitivity = sensitivity;
+0086      resultStruct.specificity = specificity;
+0087      resultStruct.TP          = nmbTruePos;
+0088      resultStruct.TN          = nmbTrueNeg;
+0089      resultStruct.FP          = nmbFalsePos;
+0090      resultStruct.FN          = nmbFalseNeg;
+0091      resultStruct.predictedClassIDs = predicted_labels';
+0092      
+0093    <span class="keyword">else</span> <span class="comment">%must be regression</span>
+0094      
+0095      resultStruct             = {};
+0096      resultStruct.nmbTests    = nmbSamples;
+0097      resultStruct.accuracy    = NaN;
+0098      resultStruct.sensitivity = NaN;
+0099      resultStruct.specificity = NaN;
+0100      resultStruct.TP          = NaN;
+0101      resultStruct.TN          = NaN;
+0102      resultStruct.FP          = NaN;
+0103      resultStruct.FN          = NaN;
+0104      resultStruct.predictedClassIDs = predicted_labels';
+0105 
+0106    <span class="keyword">end</span>
+0107 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 22-Oct-2012 13:45:25 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

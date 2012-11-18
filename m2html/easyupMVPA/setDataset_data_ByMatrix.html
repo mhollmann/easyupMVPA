@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of setDataset_data_ByMatrix</title>
+  <meta name="keywords" content="setDataset_data_ByMatrix">
+  <meta name="description" content="Set the data field of a datasets by a given matrix.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">easyupMVPA</a> &gt; setDataset_data_ByMatrix.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for easyupMVPA&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>setDataset_data_ByMatrix
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Set the data field of a datasets by a given matrix.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [dataset] = setDataset_data_ByMatrix(dataset, dataMatrix) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Set the data field of a datasets by a given matrix.
+
+ Author: Maurice Hollmann
+ Date  : 08/10
+
+ Description:
+
+   [dataset] = setDataset_data_ByMatrix(dataset, matrix2D)
+
+   This methods sets the data (2D or 4D) for the given dataset and checks the outcome. 
+
+ Parameters:
+   dataset     - the datset to set the data2D field
+   dataMatrix  - a 2D or 4D matrix containing the whole data (nmbFeatures x nmbSamples)
+
+ Returns:
+   dataset   - the datset with included data2D
+
+ Comments:</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="checkDataset.html" class="code" title="function [ok] = checkDataset(dataset)">checkDataset</a>	Checks a given dataset for correctness (i.e. size of defined matrices).</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="averageFeaturesInROIs.html" class="code" title="function [dataset, dataset2D] = averageFeaturesInROIs(dataset, roiMap)">averageFeaturesInROIs</a>	Set the mask (1D or 3D) field of a dataset by a given matrix.</li><li><a href="doRecursiveFeatureElemination_bootStrap_SVM.html" class="code" title="function [dataset, resultStruct] = doRecursiveFeatureElemination_bootStrap_SVM(dataset, nmbBootSteps)">doRecursiveFeatureElemination_bootStrap_SVM</a>	[DO NOT USE: UNDER DEVELOPEMENT!] Recursively removes features according to SVM classification weights obtained by bootstrapping.</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% Set the data field of a datasets by a given matrix.</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% Author: Maurice Hollmann</span>
+0004 <span class="comment">% Date  : 08/10</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% Description:</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%   [dataset] = setDataset_data_ByMatrix(dataset, matrix2D)</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%   This methods sets the data (2D or 4D) for the given dataset and checks the outcome.</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">% Parameters:</span>
+0013 <span class="comment">%   dataset     - the datset to set the data2D field</span>
+0014 <span class="comment">%   dataMatrix  - a 2D or 4D matrix containing the whole data (nmbFeatures x nmbSamples)</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">% Returns:</span>
+0017 <span class="comment">%   dataset   - the datset with included data2D</span>
+0018 <span class="comment">%</span>
+0019 <span class="comment">% Comments:</span>
+0020 <span class="comment">%</span>
+0021 <a name="_sub0" href="#_subfunctions" class="code">function [dataset] = setDataset_data_ByMatrix(dataset, dataMatrix)</a>
+0022 
+0023   <span class="keyword">if</span>(~isfield(dataset, <span class="string">'type'</span>))
+0024     error(<span class="string">'Given dataset has not defined the field &quot;type&quot; !'</span>);
+0025   <span class="keyword">end</span>
+0026   <span class="keyword">if</span>( ~exist(<span class="string">'dataset'</span>,<span class="string">'var'</span>) || ~exist(<span class="string">'dataMatrix'</span>,<span class="string">'var'</span>) ) 
+0027     error(<span class="string">'Usage of setDataset_data_ByMatrix: [dataset] = setDataset_data_ByMatrix(dataset, dataMatrix)'</span>);
+0028   <span class="keyword">end</span>
+0029   <span class="keyword">if</span>(isempty(dataMatrix))
+0030     error(<span class="string">'Given matrix2D is empty!'</span>);
+0031   <span class="keyword">end</span>  
+0032   
+0033   dataset.data = dataMatrix;
+0034   
+0035   <span class="keyword">if</span>(~<a href="checkDataset.html" class="code" title="function [ok] = checkDataset(dataset)">checkDataset</a>(dataset))
+0036     disp(<span class="string">'WARNING: setDataset_data_ByMatrix: In the current state the dataset is not suitable for further processing, please see messages before!'</span>);
+0037   <span class="keyword">end</span>
+0038 
+0039 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Mon 22-Oct-2012 13:45:25 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>
