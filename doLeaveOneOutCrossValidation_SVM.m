@@ -32,8 +32,15 @@
 %   kernelMode     - Kernels: ['linear', 'polynomial', 'radial', 'sigmoid']
 %   costParam      - The slack variable C in SVM (range 0 to 1  0 = low cost, 1 = highest costs). 
 %                    It defines the costs for misclassification (How strongly are outliers punished?).
-%   paramStruct    - [optional] - i.e. {"degree", 3}
-%
+%   paramStruct    - [optional] - i.e. {"degree", 3, "gamma", 0.5, "coeff0", 0.5, "nu", 0.3, "epsilon", 0.01, "probEstimates", 1}
+%                     possible fields:
+%                    'degree'        : default=3     Describes the exponent in polynomial kernel function
+%                    'gamma'         : default=1/k   The gamma-factor in kernel function
+%                    'coef0'         : default=0     The coefficient summand in kernel function
+%                    'nu'            : default=0.5   The nu parameter of regression_nu
+%                    'epsilon'       : default=0.001 The epsilon parameter of regression_epsilon
+%                    'probEstimates' : default=0     1 if probabilistic estimates should be computed, 0 if not
+
 %
 % Returns:
 %   dataset        - the datset that has been the input 
@@ -46,7 +53,7 @@
 %                    resultStruct.TN           (True negatives = all correct predicted in class 2)
 %                    resultStruct.FP           (False positives = all incorrect predicted in class 1)
 %                    resultStruct.FN           (False negatives = all incorrect predicted in class 2)
-%   avgWeights    - a 3D or 1D map containing the average weights used in the LOOCV (See Description of this function)
+%   avgWeights     - a 3D or 1D map containing the average weights used in the LOOCV (See Description of this function)
 %
 %
 % Comments:
@@ -55,17 +62,18 @@ function [dataset, resultStruct, avgWeights] = doLeaveOneOutCrossValidation_SVM(
  
 
   if( ~exist('dataset','var') || ~exist('dataSplitter','var') || ~exist('svmType','var') || ~exist('kernelMode','var') || ~exist('costParam','var')) 
-    error('Usage of doLeaveOneOutCrossValidation_SVM: [dataset, classificationResult] = doLeaveOneOutCrossValidation_SVM(dataset, dataSplitter, svmType - [classification, regression_epsilon, regression_nu], kernelMode - [linear, polynomial, radial, sigmoid] , costParam [0-1], paramStruct [optional - i.e. {"degree", 3}])');
+    keyboard;
+    error('Usage of doLeaveOneOutCrossValidation_SVM: [dataset, classificationResult, avgWeights] = doLeaveOneOutCrossValidation_SVM(dataset, dataSplitter, svmType - [classification, regression_epsilon, regression_nu], kernelMode - [linear, polynomial, radial, sigmoid] , costParam [0-1], paramStruct [optional - i.e. {"degree", 3}])');
   end
   
-  %extractt the SVM parameter values from paramStruct
+  %extract the SVM parameter values from paramStruct
   if( ~exist('paramStruct','var'))
     [paramStructIsValid, svmParamInfoStruct, cmdString] = getSVMParamInfo(svmType, kernelMode, costParam, {});
   else
     [paramStructIsValid, svmParamInfoStruct, cmdString] = getSVMParamInfo(svmType, kernelMode, costParam, paramStruct);
   end
   if( ~paramStructIsValid)
-    error('Usage of doLeaveOneOutCrossValidation_SVM: [dataset, classificationResult] = doLeaveOneOutCrossValidation_SVM(dataset, dataSplitter, svmType - [classification, regression_epsilon, regression_nu], kernelMode - [linear, polynomial, radial, sigmoid] , costParam [0-1], paramStruct [optional - i.e. {"degree", 3}])');
+    error('Usage of doLeaveOneOutCrossValidation_SVM: [dataset, classificationResult, avgWeights] = doLeaveOneOutCrossValidation_SVM(dataset, dataSplitter, svmType - [classification, regression_epsilon, regression_nu], kernelMode - [linear, polynomial, radial, sigmoid] , costParam [0-1], paramStruct [optional - i.e. {"degree", 3}])');
   end
   
  
@@ -103,8 +111,10 @@ function [dataset, resultStruct, avgWeights] = doLeaveOneOutCrossValidation_SVM(
    
    localQuietMode = easyupMVPA_getGlobals('quietMode');
    
+   progressIndices = [1 1:nmbSplits];
+   
    if(~localQuietMode)
-     disp(['Running Leave One Out Cross Validation with command string: ',cmdString,' ...']);
+     disp(['Running SVM Leave One Out Cross Validation with command string: ',cmdString,' ...']);
      % create a progress display that works also for parallel loops 
      if(nmbSplits <50)
        disp(['0%', num2str(repmat(' ',1,nmbSplits-1)),'100%']);
@@ -121,6 +131,7 @@ function [dataset, resultStruct, avgWeights] = doLeaveOneOutCrossValidation_SVM(
    nmbTests = 0;
    
    splitMatrix = dataSplitter.splitMatrix;
+   
    
    parfor i=1:nmbSplits
      

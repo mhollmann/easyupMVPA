@@ -22,13 +22,14 @@
 %
 %   costParam      - The slack variable C in SVM (range 0 to 1  0 = low cost, 1 = highest costs). 
 %                    It defines the costs for misclassification (How strongly are outliers punished?).
-%   paramStruct    - example: {'degree', 3, 'gamma', 0.02, 'probEstimates', 1}
+%   paramStruct    - example: {"degree", 3, "gamma", 0.5, "coeff0", 0.5, "nu", 0.3, "epsilon", 0.01, "probEstimates", 1}
 %                    possible fields:
-%                    'degree'        : default=3    Describes the exponent in polynomial kernel function
-%                    'gamma'         : default=1/k  The gamma-factor in kernel function
-%                    'coef0'         : default=0    The coefficient summand in kernel function
-%                    'nu'            : default
-%                    'probEstimates' : default=0    1 if probabilistic estimates should be computed, 0 if not
+%                    'degree'        : default=3     Describes the exponent in polynomial kernel function
+%                    'gamma'         : default=1/k   The gamma-factor in kernel function
+%                    'coef0'         : default=0     The coefficient summand in kernel function
+%                    'nu'            : default=0.5   The nu parameter of regression_nu
+%                    'epsilon'       : default=0.001 The epsilon parameter of regression_epsilon
+%                    'probEstimates' : default=0     1 if probabilistic estimates should be computed, 0 if not
 % 
 %
 % Returns:

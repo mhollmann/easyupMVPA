@@ -13,6 +13,6 @@
 %
 % Comments:
 function [versionNmb] = easyupMVPA_version()
-  versionNmb  = 1.0;
-  disp('easyupMVPA: This is toolbox version: 1.0.');
+  versionNmb  = 1.1;
+  disp('easyupMVPA: This is toolbox version: 1.1.');
 end

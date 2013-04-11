@@ -28,6 +28,11 @@ function [dataset] = setDataset_featureSelectionMap_ByMatrix(dataset, mapMatrix)
     error('Usage of setDataset_featureSelectionMap_ByMatrix: [dataset] = setDataset_featureSelectionMap_ByMatrix(dataset, mapMatrix)');
   end
   
+  if(isempty(dataset.data))
+    error('Please set the data of dataset before setting the feature selection mask.');
+  end
+  
+  
   %4D type
   if(dataset.is4D)
   
@@ -58,9 +63,14 @@ function [dataset] = setDataset_featureSelectionMap_ByMatrix(dataset, mapMatrix)
     
     %check dimensions
     sizeData = size(dataset.data);
-    sizeMask   = size(mapMatrix);
-    if(sizeData(1)~=sizeMask(1))
+    sizeMask = size(mapMatrix);
+    if(sizeData(1)~=sizeMask(1))    
+      %try transposing the data
+      mapMatrix = mapMatrix';
+      sizeMask = size(mapMatrix);
+      if(sizeData(1)~=sizeMask(1))
         error('The dimensions of mapMatrix do not fit the space of dataset.data!');
+      end  
     end
 
     if(isfield(dataset, 'featureSelectionMap') && ~isempty(dataset.featureSelectionMap))

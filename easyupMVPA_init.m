@@ -68,44 +68,48 @@ function easyupMVPA_init(varargin)
      
   end
   
-  %check if matlabpool command is available otherwise
-  %the distributed computing toolbox is not available
-  try
-    sPool = matlabpool('size');
-  catch
-    disp('INFO: Seems as the Distributed Computing Toolbox is not available. Running easyUpMVPA without parallelization.');
-    return;
-  end
   
-  if(exist('nmbUsedCores','var') && nmbUsedCores>0)
-    outP = findResource();
-    if(nmbUsedCores > outP.ClusterSize || nmbUsedCores < 0) 
-      nmbUsedCores = outP.ClusterSize;
-      warning(['Restricted number of used cores to maximum available cores: ', num2str(nmbUsedCores),'.']);
+  if(nmbUsedCores ~= 0)
+    %check if matlabpool command is available otherwise
+    %the distributed computing toolbox is not available
+    try
+      sPool = matlabpool('size');
+    catch
+      disp('INFO: Seems as the Distributed Computing Toolbox is not available. Running easyUpMVPA without parallelization.');
+      return;
     end
-  end
-  if(~exist('nmbUsedCores','var'))
-    outP = findResource();
-    nmbUsedCores = outP.ClusterSize;
-  end
-  
-  sPool = matlabpool('size');
-  
-  %try to open a parallel session if intended
-  if( sPool==0 && nmbUsedCores>0)
-    matlabpool('open', nmbUsedCores);    
-  elseif(sPool ~= nmbUsedCores && nmbUsedCores>0)
-    matlabpool close;
-    matlabpool('open', nmbUsedCores); 
-  elseif(sPool > 0 && nmbUsedCores==0)
-    matlabpool close;
-  end
-    
-  if(matlabpool('size') > 0)
-    disp(['INFO: running easyUpMVPA parallelized using ', num2str(matlabpool('size')),' cores. You can set the number of maximal cores to N using easyupMVPA_init(''nmbCores'', N)!']);
+
+    if(exist('nmbUsedCores','var') && nmbUsedCores>0)
+      outP = findResource();
+      if(nmbUsedCores > outP.ClusterSize || nmbUsedCores < 0) 
+        nmbUsedCores = outP.ClusterSize;
+        warning(['Restricted number of used cores to maximum available cores: ', num2str(nmbUsedCores),'.']);
+      end
+    end
+    if(~exist('nmbUsedCores','var'))
+      outP = findResource();
+      nmbUsedCores = outP.ClusterSize;
+    end
+
+    sPool = matlabpool('size');
+
+    %try to open a parallel session if intended
+    if( sPool==0 && nmbUsedCores>0)
+      matlabpool('open', nmbUsedCores);    
+    elseif(sPool ~= nmbUsedCores && nmbUsedCores>0)
+      matlabpool close;
+      matlabpool('open', nmbUsedCores); 
+    elseif(sPool > 0 && nmbUsedCores==0)
+      matlabpool close;
+    end
+
+    if(matlabpool('size') > 0)
+      disp(['INFO: running easyUpMVPA parallelized using ', num2str(matlabpool('size')),' cores. You can set the number of maximal cores to N using easyupMVPA_init(''nmbCores'', N)!']);
+    else
+      disp('INFO: running easyUpMVPA without parallelization.');
+    end
   else
     disp('INFO: running easyUpMVPA without parallelization.');
   end
-  
   
 end

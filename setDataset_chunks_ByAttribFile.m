@@ -11,7 +11,7 @@
 %   subdivide a dataset. One may for example set a separate chunk for all transition 
 %   scans for easy removing after preprocessing. 
 %   The given attributes file must be in ASCII-format.
-%   An attributse file has the content (classID  chunk):
+%   An attribute file has the content (classID  chunk):
 %
 %     0       0
 %     0       1
@@ -51,6 +51,11 @@ function [dataset] = setDataset_chunks_ByAttribFile(dataset, attribFile)
   %loop over lines
   for i=1:size(attribs{1},1)
     attribLine  = str2num(char(attribs{1}(i)));
+    
+    if(numel(attribLine)<2)
+      error('ERROR: It seems as there are empty or incomplete lines in your attribute file, please fix that first!');
+    end
+
     dataset.chunks(i) = attribLine(2);
   end  
   

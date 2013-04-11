@@ -62,7 +62,12 @@ function [dataset] = setDataset_classIDs_ByAttribFile(dataset, attribFile)
   %loop over lines
   for i=1:size(attribs{1},1)
     attribLine  = str2num(char(attribs{1}(i)));
+    
+    if(numel(attribLine)==0)
+      error('ERROR: It seems as there are empty lines in your attribute file, please remove these first!');
+    end
     dataset.classIDs(i) = attribLine(1);
+    
   end  
   
   if(~checkDataset(dataset))

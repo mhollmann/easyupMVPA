@@ -1,4 +1,4 @@
-easyupMVPA v 1.0
+easyupMVPA v 1.1
 
 This toolbox is created to ease the multivariate analysis of (neuro) scientific data.
 It is supporting Support Vector Machine (SVM) and Relevance Vector Machine (RVM) classification and regression.
